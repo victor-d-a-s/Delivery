@@ -103,7 +103,7 @@
         const TAXA_RETORNO = 0.10;    // % Extra se tiver volta (0.70 = 70% a mais)
 
         // --- CONFIGURAÇÃO DA SUA TAXA (VALOR FIXO) ---
-        const TAXA_FIXA_CENTRAL = 0.50; // Quanto VOCÊ ganha por corrida (fixo)
+        const TAXA_FIXA_CENTRAL = 0.50; // <--- SUC TAAXA AQUI (Está 0.50 centavos)
 
         let distanciaFinal = 0;
         let valorFinal = 0;
@@ -181,7 +181,7 @@
             }
         }
 
-        // 4. ENVIO PARA O WHATSAPP COM CAMUFLAGEM DE TAXA FIXA
+        // 4. ENVIO PARA O WHATSAPP COM CORREÇÃO DE PROTOCOLO
         function enviarParaCentral() {
             const nome = document.getElementById('nome').value;
             const origem = document.getElementById('origem').value;
@@ -189,35 +189,37 @@
             const pagamento = document.getElementById('pagamento').value;
             const retorno = document.getElementById('retorno').checked ? "COM RETORNO" : "SEM RETORNO";
             
-            // --- CÁLCULO DA TAXA FIXA ---
-            // Total - Taxa Fixa = Valor do Motoboy
-            let valorTotal = parseFloat(valorFinal);
-            let valorParaMotoboy = valorTotal - TAXA_FIXA_CENTRAL;
-
-            // Segurança: Se a corrida for muito barata e a taxa "comer" tudo, garante R$ 5,00 pro motoboy
-            if(valorParaMotoboy < 5.00) valorParaMotoboy = 5.00; 
-
-            valorParaMotoboy = valorParaMotoboy.toFixed(2);
+            // --- CÁLCULO DO PROTOCOLO ---
+            let valorTotalNumerico = parseFloat(valorFinal);
             
-            // Cria o "Protocolo" (Ex: R$ 14,00 vira #01400)
-            let codigoDisfarçado = valorParaMotoboy.replace('.', ''); 
-            while(codigoDisfarçado.length < 5) {
-                codigoDisfarçado = "0" + codigoDisfarçado;
+            // Subtrai sua taxa fixa (Configurada no topo do script)
+            let valorParaMotoboy = valorTotalNumerico - TAXA_FIXA_CENTRAL;
+
+            // Segurança: Garante mínimo de R$ 4,00 pro motoboy
+            if(valorParaMotoboy < 4.00) valorParaMotoboy = 4.00; 
+
+            // Formata para string "00.00"
+            let textoValorMotoboy = valorParaMotoboy.toFixed(2);
+            
+            // Remove o ponto e cria o código (Ex: 15.50 vira 1550)
+            let codigoProtocolo = textoValorMotoboy.replace('.', ''); 
+            while(codigoProtocolo.length < 5) {
+                codigoProtocolo = "0" + codigoProtocolo;
             }
 
             // ATENÇÃO: COLOQUE SEU NÚMERO AQUI (DDD + NÚMERO)
             const numAdmin = "5584982005039"; 
             
-            // Mensagem formatada
+            // Mensagem (Usando %23 no lugar de # para garantir que apareça)
             const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A` +
-                        `📍 *RETIRADA:* ${origem}%0A` +
-                        `🏁 *ENTREGA:* ${destino}%0A` +
+                        `📍 *DE:* ${origem}%0A` +
+                        `🏁 *PARA:* ${destino}%0A` +
                         `--------------------------------%0A` +
                         `📏 *Distância:* ${distanciaFinal}km%0A` +
                         `🔄 *Retorno:* ${retorno}%0A` +
                         `💰 *Pagamento:* ${pagamento}%0A` +
                         `💲 *VALOR TOTAL:* R$ ${valorFinal}%0A` +
-                        `🔑 *Prot:* #${codigoDisfarçado}%0A` + // Onde está o valor do motoboy
+                        `🔑 *Prot:* %23${codigoProtocolo}%0A` + // Código corrigido aqui
                         `--------------------------------%0A` +
                         `✅ *AGUARDANDO APROVAÇÃO*`;
 
@@ -229,5 +231,5 @@
         function deg2rad(deg) { return deg * (Math.PI/180); }
     </script>
 </body>
-                    </html>
-    
+                                                                        </html>
+                            
