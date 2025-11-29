@@ -96,14 +96,12 @@
     <script>
         $(document).ready(function(){ $('#telefone').mask('(00) 00000-0000'); });
 
-        // --- CONFIGURAÇÃO DE PREÇOS (AJUSTE AQUI) ---
+        // --- CONFIGURAÇÃO ---
         const CIDADE_FIXA = "Mossoró, Rio Grande do Norte, Brasil"; 
-        const PRECO_BASE = 4.00;      // Taxa de Saída
-        const PRECO_POR_KM = 1.00;    // Valor do KM
-        const TAXA_RETORNO = 0.10;    // % Extra se tiver volta (0.70 = 70% a mais)
-
-        // --- CONFIGURAÇÃO DA SUA TAXA (VALOR FIXO) ---
-        const TAXA_FIXA_CENTRAL = 0.50; // <--- SUC TAAXA AQUI (Está 0.50 centavos)
+        const PRECO_BASE = 4.00;      
+        const PRECO_POR_KM = 1.00;    
+        const TAXA_RETORNO = 0.10;
+        const TAXA_FIXA_CENTRAL = 0.50; // Sua taxa fixa
 
         let distanciaFinal = 0;
         let valorFinal = 0;
@@ -119,7 +117,7 @@
             document.getElementById('loading').classList.remove('hidden');
 
             try {
-                // Adiciona cidade fixa na busca
+                // Adiciona cidade fixa
                 const buscaA = `${origemInput}, ${CIDADE_FIXA}`;
                 const buscaB = `${destinoInput}, ${CIDADE_FIXA}`;
 
@@ -136,12 +134,11 @@
                 }
 
                 const dist = getDistanceFromLatLonInKm(dataA[0].lat, dataA[0].lon, dataB[0].lat, dataB[0].lon);
-                distanciaFinal = (dist * 1.3).toFixed(1); // Margem de segurança de 30%
+                distanciaFinal = (dist * 1.3).toFixed(1); // Margem 30%
                 if(distanciaFinal < 1) distanciaFinal = 1;
 
                 recalcularTotal();
 
-                // Mostra resultado
                 document.getElementById('resultado-box').classList.remove('hidden');
                 document.getElementById('btn-enviar').classList.remove('hidden');
                 document.getElementById('resultado-box').classList.remove('animate-pulse');
@@ -163,7 +160,7 @@
             document.getElementById('valor-display').innerText = valorFinal.replace('.', ',');
         }
 
-        // 3. Efeito Visual do Botão Retorno
+        // 3. Efeito Visual Retorno
         function mudarStatusRetorno() {
             const checked = document.getElementById('retorno').checked;
             const box = document.getElementById('box-retorno');
@@ -181,49 +178,88 @@
             }
         }
 
-        // 4. ENVIO PARA O WHATSAPP COM CORREÇÃO DE PROTOCOLO
+        // 4. FUNÇÃO HÍBRIDA: PLANILHA + ZAP COM PROTOCOLO
         function enviarParaCentral() {
+            // Coleta dados
             const nome = document.getElementById('nome').value;
             const origem = document.getElementById('origem').value;
             const destino = document.getElementById('destino').value;
             const pagamento = document.getElementById('pagamento').value;
             const retorno = document.getElementById('retorno').checked ? "COM RETORNO" : "SEM RETORNO";
             
-            // --- CÁLCULO DO PROTOCOLO ---
+            if(!nome || !origem || !destino) {
+                alert("Preencha todos os dados!");
+                return;
+            }
+
+            // --- CÁLCULO DO PROTOCOLO (Lógica do Motoboy) ---
             let valorTotalNumerico = parseFloat(valorFinal);
-            
-            // Subtrai sua taxa fixa (Configurada no topo do script)
             let valorParaMotoboy = valorTotalNumerico - TAXA_FIXA_CENTRAL;
-
-            // Segurança: Garante mínimo de R$ 4,00 pro motoboy
             if(valorParaMotoboy < 4.00) valorParaMotoboy = 4.00; 
-
-            // Formata para string "00.00"
             let textoValorMotoboy = valorParaMotoboy.toFixed(2);
-            
-            // Remove o ponto e cria o código (Ex: 15.50 vira 1550)
             let codigoProtocolo = textoValorMotoboy.replace('.', ''); 
             while(codigoProtocolo.length < 5) {
                 codigoProtocolo = "0" + codigoProtocolo;
             }
 
-            // ATENÇÃO: COLOQUE SEU NÚMERO AQUI (DDD + NÚMERO)
-            const numAdmin = "5584982005039"; 
-            
-            // Mensagem (Usando %23 no lugar de # para garantir que apareça)
-            const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A` +
-                        `📍 *DE:* ${origem}%0A` +
-                        `🏁 *PARA:* ${destino}%0A` +
-                        `--------------------------------%0A` +
-                        `📏 *Distância:* ${distanciaFinal}km%0A` +
-                        `🔄 *Retorno:* ${retorno}%0A` +
-                        `💰 *Pagamento:* ${pagamento}%0A` +
-                        `💲 *VALOR TOTAL:* R$ ${valorFinal}%0A` +
-                        `🔑 *Prot:* %23${codigoProtocolo}%0A` + // Código corrigido aqui
-                        `--------------------------------%0A` +
-                        `✅ *AGUARDANDO APROVAÇÃO*`;
+            // --- UI FEEDBACK ---
+            const btn = document.getElementById('btn-enviar');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando pedido...';
+            btn.disabled = true;
 
-            window.open(`https://wa.me/${numAdmin}?text=${msg}`, '_blank');
+            // --- 1. PREPARA DADOS PARA A PLANILHA ---
+            const dadosParaPlanilha = {
+                'Data': new Date().toLocaleString('pt-BR'),
+                'Cliente': nome,
+                'Telefone': document.getElementById('telefone').value,
+                'Origem': origem,
+                'Destino': destino,
+                'Valor': valorFinal,
+                'Pagamento': pagamento
+            };
+
+            // -------------------------------------------------------------
+            // COLE SEU LINK DO SHEETMONKEY AQUI
+            const urlSheetMonkey = "https://api.sheetmonkey.io/form/r4dyQzn6deZCnkXzym8sE7";
+            // -------------------------------------------------------------
+
+            // --- 2. SALVA NA NUVEM E DEPOIS ABRE O ZAP ---
+            fetch(urlSheetMonkey, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dadosParaPlanilha)
+            }).then(() => {
+                
+                // --- 3. ABRE O WHATSAPP COM A MENSAGEM DO PROTOCOLO ---
+                const numAdmin = "5584982005039"; // SEU NÚMERO AQUI
+                
+                const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A` +
+                            `📍 *DE:* ${origem}%0A` +
+                            `🏁 *PARA:* ${destino}%0A` +
+                            `--------------------------------%0A` +
+                            `📏 *Distância:* ${distanciaFinal}km%0A` +
+                            `🔄 *Retorno:* ${retorno}%0A` +
+                            `💰 *Pagamento:* ${pagamento}%0A` +
+                            `💲 *VALOR TOTAL:* R$ ${valorFinal}%0A` +
+                            `🔑 *Prot:* %23${codigoProtocolo}%0A` + 
+                            `--------------------------------%0A` +
+                            `✅ *AGUARDANDO APROVAÇÃO*`;
+
+                window.open(`https://wa.me/${numAdmin}?text=${msg}`, '_blank');
+                
+                // Restaura botão
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+
+            }).catch(erro => {
+                console.error('Erro ao salvar:', erro);
+                // Fallback: Se a planilha falhar, abre o Zap mesmo assim
+                const numAdmin = "5584982005039"; 
+                window.open(`https://wa.me/${numAdmin}?text=ERRO PLANILHA - PEDIDO MANUAL DE ${nome}`, '_blank');
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            });
         }
 
         function resetBotao() { document.getElementById('btn-text').innerText = "Recalcular"; document.getElementById('loading').classList.add('hidden'); }
@@ -231,5 +267,4 @@
         function deg2rad(deg) { return deg * (Math.PI/180); }
     </script>
 </body>
-                                                                        </html>
-                            
+</html>
