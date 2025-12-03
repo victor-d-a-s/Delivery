@@ -12,7 +12,6 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; }
         
-        /* Estilos de Animação e Botões */
         .spinner { border: 3px solid rgba(0, 0, 0, 0.1); border-left-color: #2563EB; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -40,35 +39,50 @@
             </div>
 
             <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3">
-                <p class="text-[10px] text-center text-blue-500 font-bold uppercase tracking-wider">📍 Cobertura: Mossoró/RN</p>
+                <p class="text-[10px] text-center text-blue-500 font-bold uppercase tracking-wider">📍 Rota (Cálculo de Valor)</p>
                 
                 <div class="relative">
                     <i class="fas fa-map-marker-alt text-blue-600 absolute left-3 top-3"></i>
-                    <input type="text" id="origem" placeholder="Onde buscar? (Bairro/Rua)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500">
+                    <input type="text" id="origem" placeholder="Buscar onde? (Bairro ou Rua)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500">
                 </div>
+
                 <div class="relative">
                     <i class="fas fa-flag-checkered text-green-600 absolute left-3 top-3"></i>
-                    <input type="text" id="destino" placeholder="Onde levar? (Bairro/Rua)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-green-500">
+                    <input type="text" id="destino" placeholder="Levar pra onde? (Bairro ou Rua)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-green-500">
                 </div>
                 
-                <button onclick="calcularDistancia()" class="w-full bg-blue-600 text-white text-sm font-bold py-3 rounded-lg hover:bg-blue-700 flex justify-center items-center gap-2 shadow-md active:scale-95 transition">
+                <button onclick="calcularDistancia()" class="w-full bg-blue-600 text-white text-sm font-bold py-3 rounded-lg hover:bg-blue-700 flex justify-center items-center gap-2 shadow-md active:scale-95 transition mt-2">
                     <span id="btn-text">Calcular Valor</span>
                     <div id="loading" class="spinner hidden"></div>
                 </button>
             </div>
 
+            <div id="detalhes-box" class="hidden space-y-3">
+                <p class="text-[10px] text-center text-gray-400 font-bold uppercase tracking-wider">📝 Detalhes para o Motoboy</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="col-span-1">
+                        <input type="text" id="numero" placeholder="Nº" class="bg-gray-50 border w-full p-2 text-sm rounded-lg outline-none focus:bg-white">
+                    </div>
+                    <div class="col-span-2">
+                        <input type="text" id="complemento" placeholder="Apto / Bloco (Opcional)" class="bg-gray-50 border w-full p-2 text-sm rounded-lg outline-none focus:bg-white">
+                    </div>
+                </div>
+                <input type="text" id="referencia" placeholder="Ponto de Referência" class="bg-gray-50 border w-full p-2 text-sm rounded-lg outline-none focus:bg-white">
+            </div>
+
             <div id="resultado-box" class="hidden bg-green-50 border border-green-200 p-4 rounded-xl flex justify-between items-center animate-pulse">
                 <div>
-                    <p class="text-xs text-gray-500">Distância</p>
+                    <p class="text-xs text-gray-500">Distância Estimada</p>
                     <p class="font-bold text-gray-800"><span id="km-display">0</span> km</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-xs text-gray-500">Valor Final</p>
+                    <p class="text-xs text-gray-500">Valor Frete</p>
                     <p class="font-bold text-2xl text-green-700">R$ <span id="valor-display">0,00</span></p>
                 </div>
             </div>
 
             <div class="space-y-3">
+                
                 <div id="box-retorno" class="flex items-center justify-between bg-gray-50 p-3 rounded-xl border border-gray-100 transition-all-300">
                     <div class="flex items-center gap-2">
                         <i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i>
@@ -80,10 +94,25 @@
                     </div>
                 </div>
 
-                <select id="pagamento" class="w-full bg-gray-50 border rounded-lg p-3 text-sm text-gray-700 outline-none">
-                    <option value="PIX">💠 PIX (Transferência)</option>
-                    <option value="Dinheiro">💵 Dinheiro (Espécie)</option>
-                </select>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Pgto da Entrega</label>
+                        <select id="pagamento_entrega" class="w-full bg-gray-50 border rounded-lg p-2 text-sm text-gray-700 outline-none focus:bg-white border-blue-300">
+                            <option value="PIX">💠 PIX</option>
+                            <option value="Dinheiro">💵 Dinheiro</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Pgto do Produto</label>
+                        <select id="pagamento_produto" class="w-full bg-gray-50 border rounded-lg p-2 text-sm text-gray-700 outline-none focus:bg-white border-green-300">
+                            <option value="Já Pago">✅ Já Pago</option>
+                            <option value="Cartão">💳 Cartão</option>
+                            <option value="PIX">💠 PIX</option>
+                            <option value="Dinheiro">💵 Dinheiro</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <button onclick="enviarParaCentral()" id="btn-enviar" class="hidden w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-green-700 flex justify-center items-center gap-2 transform active:scale-95 transition">
@@ -98,26 +127,25 @@
 
         // --- CONFIGURAÇÃO ---
         const CIDADE_FIXA = "Mossoró, Rio Grande do Norte, Brasil"; 
-        const PRECO_BASE = 4.00;      
-        const PRECO_POR_KM = 1.00;    
-        const TAXA_RETORNO = 0.10;
-        const TAXA_FIXA_CENTRAL = 0.50; // Sua taxa fixa
+        const PRECO_BASE = 6.00;      
+        const PRECO_POR_KM = 1.80;    
+        const TAXA_RETORNO = 0.70;
+        const TAXA_FIXA_CENTRAL = 0.50; // Sua taxa
 
         let distanciaFinal = 0;
         let valorFinal = 0;
 
-        // 1. Busca Endereço e Calcula KM
+        // 1. Busca Endereço
         async function calcularDistancia() {
             const origemInput = document.getElementById('origem').value;
             const destinoInput = document.getElementById('destino').value;
 
-            if(!origemInput || !destinoInput) { alert("Digite os locais de retirada e entrega!"); return; }
+            if(!origemInput || !destinoInput) { alert("Preencha Origem e Destino!"); return; }
 
-            document.getElementById('btn-text').innerText = "Calculando rota...";
+            document.getElementById('btn-text').innerText = "Calculando...";
             document.getElementById('loading').classList.remove('hidden');
 
             try {
-                // Adiciona cidade fixa
                 const buscaA = `${origemInput}, ${CIDADE_FIXA}`;
                 const buscaB = `${destinoInput}, ${CIDADE_FIXA}`;
 
@@ -128,18 +156,19 @@
                 const dataB = await resB.json();
 
                 if(dataA.length === 0 || dataB.length === 0) {
-                    alert("Endereço não encontrado. Tente colocar o nome do Bairro.");
+                    alert("Endereço não encontrado no mapa. Tente usar apenas o nome do Bairro.");
                     resetBotao();
                     return;
                 }
 
                 const dist = getDistanceFromLatLonInKm(dataA[0].lat, dataA[0].lon, dataB[0].lat, dataB[0].lon);
-                distanciaFinal = (dist * 1.3).toFixed(1); // Margem 30%
+                distanciaFinal = (dist * 1.3).toFixed(1); 
                 if(distanciaFinal < 1) distanciaFinal = 1;
 
                 recalcularTotal();
 
                 document.getElementById('resultado-box').classList.remove('hidden');
+                document.getElementById('detalhes-box').classList.remove('hidden');
                 document.getElementById('btn-enviar').classList.remove('hidden');
                 document.getElementById('resultado-box').classList.remove('animate-pulse');
                 
@@ -149,7 +178,7 @@
             resetBotao();
         }
 
-        // 2. Calcula Preço Total
+        // 2. Calcula Preço
         function recalcularTotal() {
             if(distanciaFinal == 0) return;
             let preco = PRECO_BASE + (distanciaFinal * PRECO_POR_KM);
@@ -160,7 +189,6 @@
             document.getElementById('valor-display').innerText = valorFinal.replace('.', ',');
         }
 
-        // 3. Efeito Visual Retorno
         function mudarStatusRetorno() {
             const checked = document.getElementById('retorno').checked;
             const box = document.getElementById('box-retorno');
@@ -178,85 +206,86 @@
             }
         }
 
-        // 4. FUNÇÃO HÍBRIDA: PLANILHA + ZAP COM PROTOCOLO
+        // 4. ENVIO FINAL
         function enviarParaCentral() {
-            // Coleta dados
             const nome = document.getElementById('nome').value;
             const origem = document.getElementById('origem').value;
             const destino = document.getElementById('destino').value;
-            const pagamento = document.getElementById('pagamento').value;
+            
+            const numero = document.getElementById('numero').value;
+            const complemento = document.getElementById('complemento').value;
+            const referencia = document.getElementById('referencia').value;
+            
+            // PAGAMENTOS SEPARADOS
+            const pagEntrega = document.getElementById('pagamento_entrega').value;
+            const pagProduto = document.getElementById('pagamento_produto').value;
+            
             const retorno = document.getElementById('retorno').checked ? "COM RETORNO" : "SEM RETORNO";
             
-            if(!nome || !origem || !destino) {
-                alert("Preencha todos os dados!");
+            if(!nome || !numero) {
+                alert("Por favor, preencha seu Nome e o Número.");
+                if(!numero) document.getElementById('numero').focus();
                 return;
             }
 
-            // --- CÁLCULO DO PROTOCOLO (Lógica do Motoboy) ---
+            // Protocolo
             let valorTotalNumerico = parseFloat(valorFinal);
             let valorParaMotoboy = valorTotalNumerico - TAXA_FIXA_CENTRAL;
             if(valorParaMotoboy < 4.00) valorParaMotoboy = 4.00; 
             let textoValorMotoboy = valorParaMotoboy.toFixed(2);
             let codigoProtocolo = textoValorMotoboy.replace('.', ''); 
-            while(codigoProtocolo.length < 5) {
-                codigoProtocolo = "0" + codigoProtocolo;
-            }
+            while(codigoProtocolo.length < 5) { codigoProtocolo = "0" + codigoProtocolo; }
 
-            // --- UI FEEDBACK ---
             const btn = document.getElementById('btn-enviar');
             const textoOriginal = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando pedido...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
             btn.disabled = true;
 
-            // --- 1. PREPARA DADOS PARA A PLANILHA ---
             const dadosParaPlanilha = {
                 'Data': new Date().toLocaleString('pt-BR'),
                 'Cliente': nome,
                 'Telefone': document.getElementById('telefone').value,
                 'Origem': origem,
                 'Destino': destino,
-                'Valor': valorFinal,
-                'Pagamento': pagamento
+                'Numero': numero,
+                'Complemento': complemento,
+                'Referencia': referencia,
+                'Pgto_Entrega': pagEntrega, // Novo
+                'Pgto_Produto': pagProduto, // Novo
+                'Valor_Frete': valorFinal
             };
 
-            // -------------------------------------------------------------
-            // COLE SEU LINK DO SHEETMONKEY AQUI
-            const urlSheetMonkey = "https://api.sheetmonkey.io/form/bjbGYT8y9RCwwAk71aqbLr";
-            // -------------------------------------------------------------
+            const urlSheetMonkey = "https://api.sheetmonkey.io/form/bjbGYT8y9RCwwAk71aqbLr"; 
 
-            // --- 2. SALVA NA NUVEM E DEPOIS ABRE O ZAP ---
             fetch(urlSheetMonkey, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dadosParaPlanilha)
             }).then(() => {
                 
-                // --- 3. ABRE O WHATSAPP COM A MENSAGEM DO PROTOCOLO ---
-                const numAdmin = "5584982005039"; // SEU NÚMERO AQUI
+                const numAdmin = "5584982005039"; 
                 
+                // Mensagem formatada
                 const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A` +
+                            `👤 *Cliente:* ${nome}%0A` +
                             `📍 *DE:* ${origem}%0A` +
                             `🏁 *PARA:* ${destino}%0A` +
+                            `🔢 *Nº:* ${numero} ${complemento ? '('+complemento+')' : ''}%0A` +
+                            `🏛️ *Ref:* ${referencia}%0A` +
                             `--------------------------------%0A` +
-                            `📏 *Distância:* ${distanciaFinal}km%0A` +
-                            `🔄 *Retorno:* ${retorno}%0A` +
-                            `💰 *Pagamento:* ${pagamento}%0A` +
-                            `💲 *VALOR TOTAL:* R$ ${valorFinal}%0A` +
-                            `🔑 *Prot:* %23${codigoProtocolo}%0A` + 
-                            `--------------------------------%0A` +
-                            `✅ *AGUARDANDO APROVAÇÃO*`;
+                            `📏 ${distanciaFinal}km | 🔄 ${retorno}%0A` +
+                            `🛵 *Pgto Entrega:* ${pagEntrega}%0A` +
+                            `📦 *Pgto Produto:* ${pagProduto}%0A` +
+                            `💲 *FRETE: R$ ${valorFinal}*%0A` +
+                            `🔑 *Prot:* %23${codigoProtocolo}`;
 
                 window.open(`https://wa.me/${numAdmin}?text=${msg}`, '_blank');
-                
-                // Restaura botão
                 btn.innerHTML = textoOriginal;
                 btn.disabled = false;
 
             }).catch(erro => {
-                console.error('Erro ao salvar:', erro);
-                // Fallback: Se a planilha falhar, abre o Zap mesmo assim
                 const numAdmin = "5584982005039"; 
-                window.open(`https://wa.me/${numAdmin}?text=ERRO PLANILHA - PEDIDO MANUAL DE ${nome}`, '_blank');
+                window.open(`https://wa.me/${numAdmin}?text=ERRO NO SITE - PEDIDO MANUAL: ${nome}`, '_blank');
                 btn.innerHTML = textoOriginal;
                 btn.disabled = false;
             });
