@@ -10,7 +10,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
@@ -38,29 +37,36 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
 
-    <!-- CONFIGURAÇÃO -->
+    <!-- CONFIGURAÇÃO DO SISTEMA -->
     <script>
-        // ⚠️ COLOQUE SUAS CHAVES AQUI ⚠️
-        const SUPABASE_URL = 'SUA_URL_SUPABASE_AQUI'; 
-        const SUPABASE_KEY = 'SUA_CHAVE_ANON_AQUI';
+        // ---------------------------------------------------------
+        // CHAVES CONFIGURADAS (NÃO ALTERAR)
+        // ---------------------------------------------------------
+        const SUPABASE_URL = 'https://zblwwoqfnhmoexonuzbi.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpibHd3b3Fmbmhtb2V4b251emJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3ODcyMDgsImV4cCI6MjA4MDM2MzIwOH0.crZGeKTawenl8N6ajhceRKalXVsCq31RWmSlvO6LHVc';
+        const SHEETMONKEY_URL = 'https://api.sheetmonkey.io/form/bjbGYT8y9RCwwAk71aqbLr'; 
         
-        const supabase = supabase.createClient(https://zblwwoqfnhmoexonuzbi.supabase.co, eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpibHd3b3Fmbmhtb2V4b251emJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3ODcyMDgsImV4cCI6MjA4MDM2MzIwOH0.crZGeKTawenl8N6ajhceRKalXVsCq31RWmSlvO6LHVc);
-        
-        // Link do Robô (Make)
-        const MAKE_WEBHOOK_URL = "SEU_WEBHOOK_MAKE_AQUI";
+        // Caso tenha configurado o Make para Pix, coloque o link aqui:
+        const MAKE_WEBHOOK_URL = ""; // Deixe vazio se não for usar recarga automática agora
 
+        // Inicializa Supabase
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Configurações de Negócio
         const CIDADE_FIXA = "Mossoró, Rio Grande do Norte, Brasil"; 
         const NUMERO_ADMIN = "5584982005039"; 
-        const PRECO_BASE = 6.00; const PRECO_POR_KM = 1.80; const TAXA_RETORNO = 0.70; const TAXA_FIXA_CENTRAL = 0.50;
+        const PRECO_BASE = 6.00;      
+        const PRECO_POR_KM = 1.80;    
+        const TAXA_RETORNO = 0.70;
+        const TAXA_FIXA_CENTRAL = 0.50;
 
+        // Variáveis Globais
         let usuarioAtual = { nome: "", telefone: "", codigo: "", saldo: 0 };
         let distanciaFinal = 0;
         let valorFinal = 0;
     </script>
 
-    <!-- ========================================== -->
     <!-- TELA 1: BOAS-VINDAS -->
-    <!-- ========================================== -->
     <div id="screen-welcome" class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 text-center fade-in">
         <div class="mb-8">
             <div class="inline-block p-5 rounded-full bg-blue-50 text-blue-700 mb-4 shadow-sm">
@@ -78,18 +84,18 @@
                 <i class="fas fa-sign-in-alt"></i> Já tenho Código
             </button>
         </div>
-        <p class="mt-6 text-xs text-gray-400">Versão 4.0 - Mossoró/RN</p>
+        <p class="mt-6 text-xs text-gray-400">Versão 5.0 - Mossoró/RN</p>
     </div>
 
-    <!-- ========================================== -->
-    <!-- TELA 2: CADASTRO (NOVO FORMULÁRIO) -->
-    <!-- ========================================== -->
+    <!-- TELA 2: CADASTRO -->
     <div id="screen-register" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 fade-in relative">
         <button onclick="showScreen('welcome')" class="absolute top-4 left-4 text-gray-400 hover:text-blue-700"><i class="fas fa-arrow-left text-xl"></i></button>
-        <div class="text-center mb-6 mt-2"><h2 class="text-xl font-bold text-gray-800">Novo Parceiro</h2></div>
         
+        <div class="text-center mb-6 mt-2">
+            <h2 class="text-xl font-bold text-gray-800">Novo Parceiro</h2>
+        </div>
+
         <div class="space-y-4">
-            <!-- Dados da Loja -->
             <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
                 <p class="text-[10px] uppercase font-bold text-blue-600 mb-2">Dados do Estabelecimento</p>
                 <div class="space-y-2">
@@ -98,7 +104,6 @@
                 </div>
             </div>
 
-            <!-- Dados do Responsável -->
             <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
                 <p class="text-[10px] uppercase font-bold text-gray-500 mb-2">Responsável</p>
                 <div class="space-y-2">
@@ -111,12 +116,8 @@
                 <span>Gerar Código de Acesso</span>
                 <div id="loading-cad" class="spinner hidden"></div>
             </button>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- TELA 3: LOGIN -->
-    <!-- ========================================== -->
+                             </div>
+  <!-- TELA 3: LOGIN -->
     <div id="screen-login" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 fade-in relative">
         <button onclick="showScreen('welcome')" class="absolute top-4 left-4 text-gray-400 hover:text-blue-700"><i class="fas fa-arrow-left text-xl"></i></button>
         <div class="text-center mb-8 mt-4"><h2 class="text-xl font-bold text-gray-800">Acesso Drop</h2><p class="text-xs text-gray-500">Digite seu código exclusivo.</p></div>
@@ -127,9 +128,7 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- TELA 4: O APP (PEDIDO) -->
-    <!-- ========================================== -->
+    <!-- TELA 4: O APP -->
     <div id="screen-app" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden fade-in relative">
         
         <!-- MODAL RECARGA -->
@@ -165,14 +164,14 @@
         </div>
 
         <div class="p-5 space-y-4">
-            <!-- 1. ROTA -->
+            <!-- ROTA -->
             <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3">
                 <p class="text-[10px] text-center text-blue-500 font-bold uppercase tracking-wider">📍 Rota (Apenas Rua/Bairro)</p>
                 <div class="relative"><i class="fas fa-map-marker-alt text-blue-600 absolute left-3 top-3"></i><input type="text" id="origem" placeholder="Retirada (Ex: Minha Loja)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500"></div>
                 <div class="relative"><i class="fas fa-flag-checkered text-green-600 absolute left-3 top-3"></i><input type="text" id="destino" placeholder="Entrega (Ex: Centro)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-green-500"></div>
             </div>
 
-            <!-- 2. DETALHES -->
+            <!-- DETALHES -->
             <div class="space-y-3">
                 <p class="text-[10px] text-center text-gray-400 font-bold uppercase mt-2">📝 Detalhes para o Motoboy</p>
                 <div class="grid grid-cols-3 gap-2">
@@ -205,35 +204,24 @@
                 <!-- Retorno -->
                 <div id="box-retorno" class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 transition-all-300">
                     <div class="flex items-center gap-2"><i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i><span id="text-retorno" class="text-sm font-bold text-gray-500">Com retorno?</span></div>
-                    <div class="relative inline-block w-12 mr-2">
-                        <input onchange="recalcularTotal(); mudarStatusRetorno()" type="checkbox" id="retorno" class="toggle-checkbox block w-6 h-6 rounded-full bg-white border-4 cursor-pointer border-gray-300"/>
-                        <label for="retorno" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-                    </div>
+                    <div class="relative inline-block w-12 mr-2"><input onchange="recalcularTotal(); mudarStatusRetorno()" type="checkbox" id="retorno" class="toggle-checkbox block w-6 h-6 rounded-full bg-white border-4 cursor-pointer border-gray-300"/><label for="retorno" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label></div>
                 </div>
             </div>
 
-            <!-- Botões -->
-            <button onclick="calcularDistancia()" id="btn-calcular" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2">
-                <span id="btn-text">Calcular Frete</span><div id="loading" class="spinner hidden"></div>
-            </button>
-
-            <!-- Resultado -->
+            <button onclick="calcularDistancia()" id="btn-calcular" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2"><span id="btn-text">Calcular Frete</span><div id="loading" class="spinner hidden"></div></button>
             <div id="resultado-box" class="hidden bg-green-50 border border-green-200 p-4 rounded-xl flex justify-between items-center animate-pulse">
                 <div><p class="text-xs text-gray-500">Distância</p><p class="font-bold text-gray-800"><span id="km-display">0</span> km</p></div>
                 <div class="text-right"><p class="text-xs text-gray-500">Total Frete</p><p class="font-bold text-2xl text-green-700">R$ <span id="valor-display">0,00</span></p></div>
             </div>
-
-            <button onclick="enviarParaCentral()" id="btn-enviar" class="hidden w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2">
-                <i class="fab fa-whatsapp text-2xl"></i> Confirmar Pedido
-            </button>
+            <button onclick="enviarParaCentral()" id="btn-enviar" class="hidden w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2"><i class="fab fa-whatsapp text-2xl"></i> Confirmar Pedido</button>
         </div>
     </div>
 
+    <!-- LÓGICA DO SISTEMA -->
     <script>
         $(document).ready(function(){ 
             $('#reg-zap-loja').mask('(00) 00000-0000'); 
             $('#reg-zap-resp').mask('(00) 00000-0000'); 
-            // $('#login-codigo').mask('0000'); // Opcional
         });
 
         function showScreen(id) {
@@ -241,54 +229,37 @@
             document.getElementById('screen-'+id).classList.remove('hidden');
         }
 
-        // --- CADASTRO NOVO (LOJA + RESPONSÁVEL) ---
+        // --- 1. CADASTRO (SALVA NO SUPABASE) ---
         async function fazerCadastro() {
             const loja = document.getElementById('reg-nome-loja').value;
             const zapLoja = document.getElementById('reg-zap-loja').value;
             const resp = document.getElementById('reg-nome-resp').value;
             const zapResp = document.getElementById('reg-zap-resp').value;
-            
             const btn = document.getElementById('btn-cadastrar');
             const load = document.getElementById('loading-cad');
 
             if(!loja || !zapLoja || !resp || !zapResp) { alert("Preencha todos os campos!"); return; }
-
             btn.disabled = true; load.classList.remove('hidden');
 
             try {
-                // Gera Código 4 Digitos
+                // Gera código 4 dígitos
                 const novoCodigo = Math.floor(1000 + Math.random() * 9000).toString();
-
-                // Salva no Supabase
-                // Nota: Salvamos o Nome da Loja como principal, e o Responsável concatenado no nome ou separado se tiver coluna
-                // Para simplificar e não quebrar tabelas antigas, vamos concatenar se necessário ou usar campos padrão.
-                // Vamos assumir a tabela 'clientes' padrão: nome, whatsapp, codigo_cliente, saldo.
-                // Para guardar tudo, vamos salvar "Loja - Resp" no nome.
-                
                 const nomeCompletoRegistro = `${loja} (Resp: ${resp})`;
 
                 const { error } = await supabase.from('clientes').insert([{ 
-                    codigo_cliente: novoCodigo, 
-                    nome: nomeCompletoRegistro, // Salva Loja + Resp para vc saber quem é
-                    whatsapp: zapLoja, // Zap principal
-                    saldo: 0 
+                    codigo_cliente: novoCodigo, nome: nomeCompletoRegistro, whatsapp: zapLoja, saldo: 0 
                 }]);
 
-                if(error) { 
-                    if(error.code === '23505') alert("Erro ao gerar código. Tente novamente.");
-                    else alert("Erro no cadastro.");
-                    throw error;
-                }
+                if(error) throw error;
 
                 alert(`🎉 Cadastro Sucesso!\n\nSEU CÓDIGO DE ACESSO: ${novoCodigo}\n\nAnote este número para entrar.`);
-                
                 document.getElementById('login-codigo').value = novoCodigo;
                 showScreen('login');
 
-            } catch (e) { console.error(e); } 
+            } catch (e) { console.error(e); alert("Erro no cadastro. Verifique se o código já existe ou tente novamente."); } 
             finally { btn.disabled = false; load.classList.add('hidden'); }
         }
-        // --- LOGIN ---
+               // --- 2. LOGIN (VERIFICA SUPABASE) ---
         async function fazerLogin() {
             const codigo = document.getElementById('login-codigo').value.trim();
             const btn = document.getElementById('btn-login');
@@ -301,22 +272,13 @@
                 const { data } = await supabase.from('clientes').select('*').eq('codigo_cliente', codigo);
                 
                 if (data && data.length > 0) {
-                    usuarioAtual = { nome: data[0].nome.split('(')[0].trim(), // Pega só o nome da loja antes do parenteses
-                                     telefone: data[0].whatsapp, 
-                                     codigo: data[0].codigo_cliente, 
-                                     saldo: data[0].saldo };
-                    
+                    usuarioAtual = { nome: data[0].nome.split('(')[0].trim(), telefone: data[0].whatsapp, codigo: data[0].codigo_cliente, saldo: data[0].saldo };
                     monitorarSaldo();
                     document.getElementById('app-user-name').innerText = usuarioAtual.nome;
                     document.getElementById('display-saldo').innerText = usuarioAtual.saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    
-                    // Preenche Origem Automaticamente com o Nome da Loja
                     document.getElementById('origem').value = usuarioAtual.nome;
-                    
                     showScreen('app');
-                } else {
-                    alert("Código não encontrado.");
-                }
+                } else { alert("Código não encontrado."); }
             } catch (e) { alert("Erro de conexão."); }
             finally { btn.disabled = false; load.classList.add('hidden'); }
         }
@@ -330,7 +292,7 @@
 
         function sair() { location.reload(); }
 
-        // --- APP E CÁLCULO ---
+        // --- 3. CÁLCULO (NOMINATIM API) ---
         async function calcularDistancia() {
             const origem = document.getElementById('origem').value;
             const destino = document.getElementById('destino').value;
@@ -390,7 +352,7 @@
             }
         }
 
-        // --- ENVIO ---
+        // --- 4. ENVIO (SUPABASE + SHEETMONKEY + ZAP) ---
         async function enviarParaCentral() {
             const origem = document.getElementById('origem').value;
             const destino = document.getElementById('destino').value;
@@ -403,9 +365,15 @@
             
             if(!numero) { alert("Informe o número do local!"); document.getElementById('numero').focus(); return; }
 
+            const btn = document.getElementById('btn-enviar');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+            btn.disabled = true;
+
+            // 1. DÉBITO EM CARTEIRA (SELECIONADO)
             if(pagEntrega === "Carteira") {
                 const valorFloat = parseFloat(valorFinal);
-                if(valorFloat > usuarioAtual.saldo) { alert(`Saldo Insuficiente!`); return; }
+                if(valorFloat > usuarioAtual.saldo) { alert(`Saldo Insuficiente!`); btn.disabled = false; btn.innerHTML = textoOriginal; return; }
                 const novoSaldo = usuarioAtual.saldo - valorFloat;
                 const { error } = await supabase.from('clientes').update({ saldo: novoSaldo }).eq('codigo_cliente', usuarioAtual.codigo);
                 if(error) { alert("Erro ao debitar."); return; }
@@ -413,6 +381,7 @@
                 document.getElementById('display-saldo').innerText = novoSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             }
 
+            // 2. SALVAR NO BANCO DE DADOS (SUPABASE)
             await supabase.from('pedidos').insert([{
                 cliente_id: usuarioAtual.codigo,
                 nome_cliente: usuarioAtual.nome,
@@ -420,14 +389,35 @@
                 forma_pagamento: pagEntrega, status: 'Solicitado'
             }]);
 
+            // 3. SALVAR NA PLANILHA (SHEETMONKEY - BACKUP)
+            try {
+                const dadosParaPlanilha = {
+                    'x-sheetmonkey-insert-worksheet': 'Corridas', // Aba da Planilha
+                    'Data': new Date().toLocaleString('pt-BR'),
+                    'Cliente': usuarioAtual.nome,
+                    'Telefone': usuarioAtual.telefone,
+                    'Origem': origem,
+                    'Destino': destino,
+                    'Numero': numero,
+                    'Complemento': complemento,
+                    'Referencia': referencia,
+                    'Pgto_Entrega': pagEntrega,
+                    'Pgto_Produto': pagProduto,
+                    'Valor_Frete': valorFinal
+                };
+                await fetch(SHEETMONKEY_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dadosParaPlanilha) });
+            } catch(e) { console.log("Erro backup planilha"); }
+
+            // 4. ENVIAR WHATSAPP
+            const numAdmin = NUMERO_ADMIN; 
             let avisoPagamento = pagEntrega === "Carteira" ? "✅ *PAGO VIA CARTEIRA*" : `🛵 *Pgto Entrega:* ${pagEntrega}`;
             let valorParaMotoboy = parseFloat(valorFinal) - TAXA_FIXA_CENTRAL;
             if(valorParaMotoboy < 4.00) valorParaMotoboy = 4.00;
             let codigoProtocolo = valorParaMotoboy.toFixed(2).replace('.', '');
             while(codigoProtocolo.length < 5) { codigoProtocolo = "0" + codigoProtocolo; }
 
-            const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A👤 *Loja:* ${usuarioAtual.nome} (Cód: ${usuarioAtual.codigo})%0A📍 *DE:* ${origem}%0A🏁 *PARA:* ${destino}%0A🔢 *Nº:* ${numero} ${complemento ? '('+complemento+')' : ''}%0A🏛️ *Ref:* ${referencia}%0A--------------------------------%0A📏 ${distanciaFinal}km | 🔄 ${retorno}%0A${avisoPagamento}%0A📦 *Pgto Produto:* ${pagProduto}%0A💲 *FRETE: R$ ${valorFinal}*%0A🔑 *Prot:* %23${codigoProtocolo}`;
-            window.open(`https://wa.me/${NUMERO_ADMIN}?text=${msg}`, '_blank');
+            const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A👤 *Loja:* ${usuarioAtual.nome} (Cód: ${usuarioAtual.codigo})%0A📍 *DE:* ${origem}%0A🏁 *PARA:* ${destino}%0A🔢 *Nº:* ${numero} ${complemento ? ' - ' + complemento : ''}%0A🏛️ *Ref:* ${referencia}%0A--------------------------------%0A📏 ${distanciaFinal}km | 🔄 ${retorno}%0A${avisoPagamento}%0A📦 *Pgto Produto:* ${pagProduto}%0A💲 *FRETE: R$ ${valorFinal}*%0A🔑 *Prot:* %23${codigoProtocolo}`;
+            window.open(`https://wa.me/${numAdmin}?text=${msg}`, '_blank');
             location.reload();
         }
 
@@ -437,6 +427,8 @@
         async function gerarPixRecarga() {
             const valor = parseFloat(document.getElementById('valor-recarga').value);
             if(!valor || valor < 5) { alert("Mínimo R$ 5,00"); return; }
+            if(!MAKE_WEBHOOK_URL) { alert("Recarga indisponível no momento."); return; }
+            
             document.getElementById('step-valor').classList.add('hidden'); document.getElementById('loading-pix').classList.remove('hidden');
             try {
                 const res = await fetch(MAKE_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ codigo_cliente: usuarioAtual.codigo, valor: valor, nome: usuarioAtual.nome, origem: "Drop App" }) });
@@ -456,6 +448,3 @@
     </script>
 </body>
 </html>
-
-
-                          
