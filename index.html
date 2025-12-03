@@ -3,113 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flash Entregas - Central</title>
+    <title>Drop Entregas</title>
+    <!-- Bibliotecas -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- QR Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; }
         
-        .spinner { border: 3px solid rgba(0, 0, 0, 0.1); border-left-color: #2563EB; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        /* Animações */
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Cores e Botões */
+        .btn-primary { background-color: #1E40AF; color: white; }
+        .btn-primary:hover { background-color: #1E3A8A; }
+        .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; }
+        
+        .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
+        
+        .spinner { border: 3px solid rgba(0,0,0,0.1); border-left-color: #1E40AF; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .toggle-checkbox { position: absolute; top: 0; left: 0; transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); }
-        .toggle-checkbox:checked { transform: translateX(100%); border-color: #2563EB; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #2563EB; }
+        
+        /* Toggle Switch */
+        .toggle-checkbox:checked { transform: translateX(100%); border-color: #1E40AF; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #1E40AF; }
         .transition-all-300 { transition: all 0.3s ease-in-out; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+    <!-- CONFIGURAÇÃO -->
+    <script>
+        // ⚠️ COLOQUE SUAS CHAVES AQUI ⚠️
+        const SUPABASE_URL = 'SUA_URL_SUPABASE_AQUI'; 
+        const SUPABASE_KEY = 'SUA_CHAVE_ANON_AQUI';
         
-        <div class="bg-blue-700 p-6 text-white text-center relative overflow-hidden">
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Link do Robô (Make)
+        const MAKE_WEBHOOK_URL = "SEU_WEBHOOK_MAKE_AQUI";
+
+        const CIDADE_FIXA = "Mossoró, Rio Grande do Norte, Brasil"; 
+        const NUMERO_ADMIN = "5584982005039"; 
+        const PRECO_BASE = 6.00; const PRECO_POR_KM = 1.80; const TAXA_RETORNO = 0.70; const TAXA_FIXA_CENTRAL = 0.50;
+
+        let usuarioAtual = { nome: "", telefone: "", codigo: "", saldo: 0 };
+        let distanciaFinal = 0;
+        let valorFinal = 0;
+    </script>
+
+    <!-- ========================================== -->
+    <!-- TELA 1: BOAS-VINDAS -->
+    <!-- ========================================== -->
+    <div id="screen-welcome" class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 text-center fade-in">
+        <div class="mb-8">
+            <div class="inline-block p-5 rounded-full bg-blue-50 text-blue-700 mb-4 shadow-sm">
+                <i class="fas fa-box-open text-5xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Drop Entregas</h1>
+            <p class="text-gray-500 text-sm">Logística rápida para seu negócio.</p>
+        </div>
+
+        <div class="space-y-4">
+            <button onclick="showScreen('register')" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition flex items-center justify-center gap-3">
+                <i class="fas fa-store"></i> Cadastrar Estabelecimento
+            </button>
+            <button onclick="showScreen('login')" class="w-full btn-outline font-bold py-4 rounded-xl shadow-sm transform active:scale-95 transition flex items-center justify-center gap-3">
+                <i class="fas fa-sign-in-alt"></i> Já tenho Código
+            </button>
+        </div>
+        <p class="mt-6 text-xs text-gray-400">Versão 4.0 - Mossoró/RN</p>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TELA 2: CADASTRO (NOVO FORMULÁRIO) -->
+    <!-- ========================================== -->
+    <div id="screen-register" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 fade-in relative">
+        <button onclick="showScreen('welcome')" class="absolute top-4 left-4 text-gray-400 hover:text-blue-700"><i class="fas fa-arrow-left text-xl"></i></button>
+        <div class="text-center mb-6 mt-2"><h2 class="text-xl font-bold text-gray-800">Novo Parceiro</h2></div>
+        
+        <div class="space-y-4">
+            <!-- Dados da Loja -->
+            <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                <p class="text-[10px] uppercase font-bold text-blue-600 mb-2">Dados do Estabelecimento</p>
+                <div class="space-y-2">
+                    <div><label class="text-[10px] text-gray-500 font-bold">NOME FANTASIA</label><input type="text" id="reg-nome-loja" class="w-full bg-white border rounded-lg p-2 text-sm outline-none focus:border-blue-600" placeholder="Ex: Pizzaria Sabor"></div>
+                    <div><label class="text-[10px] text-gray-500 font-bold">WHATSAPP DA LOJA</label><input type="text" id="reg-zap-loja" class="w-full bg-white border rounded-lg p-2 text-sm outline-none focus:border-blue-600" placeholder="(84) 90000-0000"></div>
+                </div>
+            </div>
+
+            <!-- Dados do Responsável -->
+            <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                <p class="text-[10px] uppercase font-bold text-gray-500 mb-2">Responsável</p>
+                <div class="space-y-2">
+                    <div><label class="text-[10px] text-gray-500 font-bold">NOME COMPLETO</label><input type="text" id="reg-nome-resp" class="w-full bg-white border rounded-lg p-2 text-sm outline-none focus:border-blue-600" placeholder="Ex: João Silva"></div>
+                    <div><label class="text-[10px] text-gray-500 font-bold">WHATSAPP PESSOAL</label><input type="text" id="reg-zap-resp" class="w-full bg-white border rounded-lg p-2 text-sm outline-none focus:border-blue-600" placeholder="(84) 90000-0000"></div>
+                </div>
+            </div>
+
+            <button onclick="fazerCadastro()" id="btn-cadastrar" class="w-full btn-primary font-bold py-3 rounded-xl shadow-lg mt-2 flex justify-center items-center gap-2">
+                <span>Gerar Código de Acesso</span>
+                <div id="loading-cad" class="spinner hidden"></div>
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TELA 3: LOGIN -->
+    <!-- ========================================== -->
+    <div id="screen-login" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 fade-in relative">
+        <button onclick="showScreen('welcome')" class="absolute top-4 left-4 text-gray-400 hover:text-blue-700"><i class="fas fa-arrow-left text-xl"></i></button>
+        <div class="text-center mb-8 mt-4"><h2 class="text-xl font-bold text-gray-800">Acesso Drop</h2><p class="text-xs text-gray-500">Digite seu código exclusivo.</p></div>
+        <div class="space-y-4">
+            <div><label class="text-xs font-bold text-gray-500 ml-1">CÓDIGO</label><input type="text" id="login-codigo" class="w-full bg-blue-50 border border-blue-100 rounded-xl p-4 text-center text-2xl font-bold tracking-widest outline-none focus:border-blue-600 text-blue-800" placeholder="0000"></div>
+            <button onclick="fazerLogin()" id="btn-login" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2"><span>Entrar</span><div id="loading-login" class="spinner hidden"></div></button>
+            <p class="text-center text-xs text-blue-600 cursor-pointer hover:underline mt-2" onclick="alert('Fale com o suporte: ' + NUMERO_ADMIN)">Esqueci meu código</p>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TELA 4: O APP (PEDIDO) -->
+    <!-- ========================================== -->
+    <div id="screen-app" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden fade-in relative">
+        
+        <!-- MODAL RECARGA -->
+        <div id="modal-recarga" class="hidden absolute inset-0 bg-black/90 z-50 flex items-center justify-center p-4 fade-in">
+            <div class="bg-white rounded-2xl p-6 w-full max-w-sm text-center">
+                <h3 class="font-bold text-lg mb-2">Recarregar Saldo</h3>
+                <p class="text-xs text-gray-500 mb-4">Crédito automático via Pix.</p>
+                <div id="step-valor">
+                    <input type="number" id="valor-recarga" class="w-full border rounded-lg p-3 text-center text-xl font-bold mb-4" placeholder="R$ 0,00">
+                    <button onclick="gerarPixRecarga()" id="btn-gerar-pix" class="w-full btn-primary font-bold py-3 rounded-xl">Gerar Pix</button>
+                </div>
+                <div id="step-qr" class="hidden">
+                    <div id="qrcode-container" class="flex justify-center mb-4 p-2 border rounded-lg"></div>
+                    <textarea id="pix-copia-cola" class="w-full text-[10px] bg-gray-100 p-2 rounded mb-2 h-16 text-gray-500" readonly></textarea>
+                    <button onclick="copiarPix()" class="w-full bg-green-600 text-white text-sm font-bold py-2 rounded-lg mb-2"><i class="far fa-copy mr-1"></i> Copiar Código</button>
+                </div>
+                <div id="loading-pix" class="hidden py-4"><div class="spinner mx-auto"></div><p class="text-xs mt-2">Conectando...</p></div>
+                <button onclick="fecharRecarga()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+
+        <!-- CABEÇALHO -->
+        <div class="bg-blue-700 p-6 text-white relative">
             <div class="absolute inset-0 opacity-20" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
-            <h1 class="font-bold text-2xl relative z-10">Flash Entregas ⚡</h1>
-            <p class="text-xs opacity-90 relative z-10">Solicite sua coleta rápida em Mossoró</p>
+            <div class="flex justify-between items-start relative z-10 mb-4">
+                <div><p class="text-xs opacity-80">Olá, <span id="app-user-name">Loja</span></p><h1 class="font-bold text-lg">Drop Entregas ⚡</h1></div>
+                <button onclick="sair()" class="text-xs bg-blue-800 px-3 py-1 rounded-full hover:bg-blue-900">Sair</button>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl relative z-10 flex justify-between items-center shadow-lg">
+                <div><p class="text-xs text-blue-100 uppercase tracking-wider mb-1">Seu Saldo</p><p class="text-2xl font-bold text-white" id="display-saldo">R$ 0,00</p></div>
+                <button onclick="abrirRecarga()" class="bg-white px-4 py-2 rounded-lg text-blue-700 text-xs font-bold shadow-lg hover:bg-blue-50 active:scale-95 transition flex items-center gap-1"><i class="fas fa-plus"></i> Add</button>
+            </div>
         </div>
 
         <div class="p-5 space-y-4">
-            
-            <div class="grid grid-cols-2 gap-3">
-                <input type="text" id="nome" class="w-full bg-gray-50 border rounded-lg p-3 text-sm outline-none focus:bg-white transition" placeholder="Seu Nome">
-                <input type="text" id="telefone" class="w-full bg-gray-50 border rounded-lg p-3 text-sm outline-none focus:bg-white transition" placeholder="WhatsApp">
-            </div>
-
+            <!-- 1. ROTA -->
             <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3">
-                <p class="text-[10px] text-center text-blue-500 font-bold uppercase tracking-wider">📍 Rota (Para Calcular)</p>
-                
-                <div class="relative">
-                    <i class="fas fa-map-marker-alt text-blue-600 absolute left-3 top-3"></i>
-                    <input type="text" id="origem" placeholder="Buscar onde? (Bairro ou Rua)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500">
-                </div>
-
-                <div class="relative">
-                    <i class="fas fa-flag-checkered text-green-600 absolute left-3 top-3"></i>
-                    <input type="text" id="destino" placeholder="Levar pra onde? (Bairro ou Rua)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-green-500">
-                </div>
-                
-                <button onclick="calcularDistancia()" class="w-full bg-blue-600 text-white text-sm font-bold py-3 rounded-lg hover:bg-blue-700 flex justify-center items-center gap-2 shadow-md active:scale-95 transition mt-2">
-                    <span id="btn-text">Calcular Valor</span>
-                    <div id="loading" class="spinner hidden"></div>
-                </button>
+                <p class="text-[10px] text-center text-blue-500 font-bold uppercase tracking-wider">📍 Rota (Apenas Rua/Bairro)</p>
+                <div class="relative"><i class="fas fa-map-marker-alt text-blue-600 absolute left-3 top-3"></i><input type="text" id="origem" placeholder="Retirada (Ex: Minha Loja)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500"></div>
+                <div class="relative"><i class="fas fa-flag-checkered text-green-600 absolute left-3 top-3"></i><input type="text" id="destino" placeholder="Entrega (Ex: Centro)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-green-500"></div>
             </div>
 
-            <div id="detalhes-box" class="hidden space-y-3 bg-gray-50 p-3 rounded-xl border border-gray-200">
-                <p class="text-[10px] text-center text-gray-500 font-bold uppercase tracking-wider">📝 Detalhes da Entrega</p>
-                
-                <div class="grid grid-cols-3 gap-2">
-                    <div class="col-span-1">
-                        <label class="text-[10px] text-gray-500 font-bold ml-1">Número</label>
-                        <input type="text" id="numero" placeholder="Nº 123" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500">
-                    </div>
-                    <div class="col-span-2">
-                        <label class="text-[10px] text-gray-500 font-bold ml-1">Complemento</label>
-                        <input type="text" id="complemento" placeholder="Ex: Apto 102, Bloco C" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500">
-                    </div>
-                </div>
-                <div>
-                    <label class="text-[10px] text-gray-500 font-bold ml-1">Ponto de Referência</label>
-                    <input type="text" id="referencia" placeholder="Ex: Próximo à Padaria..." class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500">
-                </div>
-            </div>
-
-            <div id="resultado-box" class="hidden bg-green-50 border border-green-200 p-4 rounded-xl flex justify-between items-center animate-pulse">
-                <div>
-                    <p class="text-xs text-gray-500">Distância Estimada</p>
-                    <p class="font-bold text-gray-800"><span id="km-display">0</span> km</p>
-                </div>
-                <div class="text-right">
-                    <p class="text-xs text-gray-500">Valor Frete</p>
-                    <p class="font-bold text-2xl text-green-700">R$ <span id="valor-display">0,00</span></p>
-                </div>
-            </div>
-
+            <!-- 2. DETALHES -->
             <div class="space-y-3">
-                <div id="box-retorno" class="flex items-center justify-between bg-gray-50 p-3 rounded-xl border border-gray-100 transition-all-300">
-                    <div class="flex items-center gap-2">
-                        <i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i>
-                        <span id="text-retorno" class="text-sm font-bold text-gray-500">Com retorno?</span>
-                    </div>
-                    <div class="relative inline-block w-12 mr-2">
-                        <input onchange="recalcularTotal(); mudarStatusRetorno()" type="checkbox" id="retorno" class="toggle-checkbox block w-6 h-6 rounded-full bg-white border-4 cursor-pointer border-gray-300"/>
-                        <label for="retorno" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-                    </div>
+                <p class="text-[10px] text-center text-gray-400 font-bold uppercase mt-2">📝 Detalhes para o Motoboy</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="col-span-1"><input type="text" id="numero" placeholder="Nº" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500"></div>
+                    <div class="col-span-2"><input type="text" id="complemento" placeholder="Apto / Bloco" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500"></div>
                 </div>
+                <input type="text" id="referencia" placeholder="Ponto de Referência" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500">
 
-                <div class="grid grid-cols-2 gap-3">
+                <!-- Pagamentos Separados -->
+                <div class="grid grid-cols-2 gap-3 pt-2">
                     <div>
                         <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Pgto Entrega</label>
-                        <select id="pagamento_entrega" class="w-full bg-gray-50 border rounded-lg p-2 text-sm text-gray-700 outline-none focus:bg-white border-blue-300">
+                        <select id="pagamento_entrega" class="w-full bg-white border rounded-lg p-2 text-sm text-gray-700 outline-none border-blue-300 font-bold">
                             <option value="PIX">💠 PIX</option>
                             <option value="Dinheiro">💵 Dinheiro</option>
+                            <option value="Carteira">💳 Saldo em Conta</option>
                         </select>
                     </div>
                     <div>
                         <label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Pgto Produto</label>
-                        <select id="pagamento_produto" class="w-full bg-gray-50 border rounded-lg p-2 text-sm text-gray-700 outline-none focus:bg-white border-green-300">
+                        <select id="pagamento_produto" class="w-full bg-white border rounded-lg p-2 text-sm text-gray-700 outline-none border-green-300">
                             <option value="Já Pago">✅ Já Pago</option>
                             <option value="Cartão">💳 Cartão</option>
                             <option value="PIX">💠 PIX</option>
@@ -117,79 +201,175 @@
                         </select>
                     </div>
                 </div>
+
+                <!-- Retorno -->
+                <div id="box-retorno" class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 transition-all-300">
+                    <div class="flex items-center gap-2"><i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i><span id="text-retorno" class="text-sm font-bold text-gray-500">Com retorno?</span></div>
+                    <div class="relative inline-block w-12 mr-2">
+                        <input onchange="recalcularTotal(); mudarStatusRetorno()" type="checkbox" id="retorno" class="toggle-checkbox block w-6 h-6 rounded-full bg-white border-4 cursor-pointer border-gray-300"/>
+                        <label for="retorno" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                    </div>
+                </div>
             </div>
 
-            <button onclick="enviarParaCentral()" id="btn-enviar" class="hidden w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-green-700 flex justify-center items-center gap-2 transform active:scale-95 transition">
-                <i class="fab fa-whatsapp text-2xl"></i> Solicitar Motoboy
+            <!-- Botões -->
+            <button onclick="calcularDistancia()" id="btn-calcular" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2">
+                <span id="btn-text">Calcular Frete</span><div id="loading" class="spinner hidden"></div>
             </button>
-            
+
+            <!-- Resultado -->
+            <div id="resultado-box" class="hidden bg-green-50 border border-green-200 p-4 rounded-xl flex justify-between items-center animate-pulse">
+                <div><p class="text-xs text-gray-500">Distância</p><p class="font-bold text-gray-800"><span id="km-display">0</span> km</p></div>
+                <div class="text-right"><p class="text-xs text-gray-500">Total Frete</p><p class="font-bold text-2xl text-green-700">R$ <span id="valor-display">0,00</span></p></div>
+            </div>
+
+            <button onclick="enviarParaCentral()" id="btn-enviar" class="hidden w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2">
+                <i class="fab fa-whatsapp text-2xl"></i> Confirmar Pedido
+            </button>
         </div>
     </div>
 
     <script>
-        $(document).ready(function(){ $('#telefone').mask('(00) 00000-0000'); });
+        $(document).ready(function(){ 
+            $('#reg-zap-loja').mask('(00) 00000-0000'); 
+            $('#reg-zap-resp').mask('(00) 00000-0000'); 
+            // $('#login-codigo').mask('0000'); // Opcional
+        });
 
-        // --- CONFIGURAÇÃO ---
-        const CIDADE_FIXA = "Mossoró, Rio Grande do Norte, Brasil"; 
-        const PRECO_BASE = 5.00;      
-        const PRECO_POR_KM = 1.00;    
-        const TAXA_RETORNO = 0.20;
-        const TAXA_FIXA_CENTRAL = 1.00; 
+        function showScreen(id) {
+            ['welcome', 'register', 'login', 'app'].forEach(s => document.getElementById('screen-'+s).classList.add('hidden'));
+            document.getElementById('screen-'+id).classList.remove('hidden');
+        }
 
-        let distanciaFinal = 0;
-        let valorFinal = 0;
+        // --- CADASTRO NOVO (LOJA + RESPONSÁVEL) ---
+        async function fazerCadastro() {
+            const loja = document.getElementById('reg-nome-loja').value;
+            const zapLoja = document.getElementById('reg-zap-loja').value;
+            const resp = document.getElementById('reg-nome-resp').value;
+            const zapResp = document.getElementById('reg-zap-resp').value;
+            
+            const btn = document.getElementById('btn-cadastrar');
+            const load = document.getElementById('loading-cad');
 
-        // 1. Busca Endereço
+            if(!loja || !zapLoja || !resp || !zapResp) { alert("Preencha todos os campos!"); return; }
+
+            btn.disabled = true; load.classList.remove('hidden');
+
+            try {
+                // Gera Código 4 Digitos
+                const novoCodigo = Math.floor(1000 + Math.random() * 9000).toString();
+
+                // Salva no Supabase
+                // Nota: Salvamos o Nome da Loja como principal, e o Responsável concatenado no nome ou separado se tiver coluna
+                // Para simplificar e não quebrar tabelas antigas, vamos concatenar se necessário ou usar campos padrão.
+                // Vamos assumir a tabela 'clientes' padrão: nome, whatsapp, codigo_cliente, saldo.
+                // Para guardar tudo, vamos salvar "Loja - Resp" no nome.
+                
+                const nomeCompletoRegistro = `${loja} (Resp: ${resp})`;
+
+                const { error } = await supabase.from('clientes').insert([{ 
+                    codigo_cliente: novoCodigo, 
+                    nome: nomeCompletoRegistro, // Salva Loja + Resp para vc saber quem é
+                    whatsapp: zapLoja, // Zap principal
+                    saldo: 0 
+                }]);
+
+                if(error) { 
+                    if(error.code === '23505') alert("Erro ao gerar código. Tente novamente.");
+                    else alert("Erro no cadastro.");
+                    throw error;
+                }
+
+                alert(`🎉 Cadastro Sucesso!\n\nSEU CÓDIGO DE ACESSO: ${novoCodigo}\n\nAnote este número para entrar.`);
+                
+                document.getElementById('login-codigo').value = novoCodigo;
+                showScreen('login');
+
+            } catch (e) { console.error(e); } 
+            finally { btn.disabled = false; load.classList.add('hidden'); }
+        }
+        // --- LOGIN ---
+        async function fazerLogin() {
+            const codigo = document.getElementById('login-codigo').value.trim();
+            const btn = document.getElementById('btn-login');
+            const load = document.getElementById('loading-login');
+
+            if(!codigo) { alert("Digite o código."); return; }
+            btn.disabled = true; load.classList.remove('hidden');
+
+            try {
+                const { data } = await supabase.from('clientes').select('*').eq('codigo_cliente', codigo);
+                
+                if (data && data.length > 0) {
+                    usuarioAtual = { nome: data[0].nome.split('(')[0].trim(), // Pega só o nome da loja antes do parenteses
+                                     telefone: data[0].whatsapp, 
+                                     codigo: data[0].codigo_cliente, 
+                                     saldo: data[0].saldo };
+                    
+                    monitorarSaldo();
+                    document.getElementById('app-user-name').innerText = usuarioAtual.nome;
+                    document.getElementById('display-saldo').innerText = usuarioAtual.saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    
+                    // Preenche Origem Automaticamente com o Nome da Loja
+                    document.getElementById('origem').value = usuarioAtual.nome;
+                    
+                    showScreen('app');
+                } else {
+                    alert("Código não encontrado.");
+                }
+            } catch (e) { alert("Erro de conexão."); }
+            finally { btn.disabled = false; load.classList.add('hidden'); }
+        }
+
+        function monitorarSaldo() {
+            supabase.channel('custom-all-channel').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'clientes', filter: `codigo_cliente=eq.${usuarioAtual.codigo}` }, (payload) => {
+                usuarioAtual.saldo = payload.new.saldo;
+                document.getElementById('display-saldo').innerText = usuarioAtual.saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            }).subscribe();
+        }
+
+        function sair() { location.reload(); }
+
+        // --- APP E CÁLCULO ---
         async function calcularDistancia() {
-            const origemInput = document.getElementById('origem').value;
-            const destinoInput = document.getElementById('destino').value;
-
-            if(!origemInput || !destinoInput) { alert("Preencha Origem e Destino!"); return; }
+            const origem = document.getElementById('origem').value;
+            const destino = document.getElementById('destino').value;
+            if(!origem || !destino) { alert("Preencha a Rota!"); return; }
 
             document.getElementById('btn-text').innerText = "Calculando...";
             document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('btn-calcular').classList.add('opacity-50');
 
             try {
-                const buscaA = `${origemInput}, ${CIDADE_FIXA}`;
-                const buscaB = `${destinoInput}, ${CIDADE_FIXA}`;
+                const urlA = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(origem + ', ' + CIDADE_FIXA)}`;
+                const urlB = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destino + ', ' + CIDADE_FIXA)}`;
+                const [resA, resB] = await Promise.all([fetch(urlA), fetch(urlB)]);
+                const [dataA, dataB] = await Promise.all([resA.json(), resB.json()]);
 
-                const resA = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(buscaA)}`);
-                const dataA = await resA.json();
-                
-                const resB = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(buscaB)}`);
-                const dataB = await resB.json();
-
-                if(dataA.length === 0 || dataB.length === 0) {
-                    alert("Endereço não encontrado. Tente usar apenas o nome do Bairro.");
-                    resetBotao();
-                    return;
-                }
+                if(dataA.length === 0 || dataB.length === 0) { alert("Endereço não encontrado."); resetBotao(); return; }
 
                 const dist = getDistanceFromLatLonInKm(dataA[0].lat, dataA[0].lon, dataB[0].lat, dataB[0].lon);
-                distanciaFinal = (dist * 1.3).toFixed(1); 
-                if(distanciaFinal < 1) distanciaFinal = 1;
-
+                distanciaFinal = (dist * 1.3).toFixed(1); if(distanciaFinal < 1) distanciaFinal = 1;
                 recalcularTotal();
 
-                // Mostra campos de detalhes
+                document.getElementById('btn-calcular').classList.add('hidden');
                 document.getElementById('resultado-box').classList.remove('hidden');
-                document.getElementById('detalhes-box').classList.remove('hidden'); 
                 document.getElementById('btn-enviar').classList.remove('hidden');
                 document.getElementById('resultado-box').classList.remove('animate-pulse');
-                
-            } catch (error) {
-                alert("Erro de conexão. Verifique sua internet.");
-            }
-            resetBotao();
+            } catch (e) { alert("Erro de conexão."); resetBotao(); }
         }
 
-        // 2. Calcula Preço
+        function resetBotao() { 
+            document.getElementById('btn-text').innerText = "Calcular Frete"; 
+            document.getElementById('loading').classList.add('hidden'); 
+            document.getElementById('btn-calcular').classList.remove('opacity-50');
+        }
+
         function recalcularTotal() {
             if(distanciaFinal == 0) return;
             let preco = PRECO_BASE + (distanciaFinal * PRECO_POR_KM);
             if(document.getElementById('retorno').checked) preco += (preco * TAXA_RETORNO);
             valorFinal = preco.toFixed(2);
-            
             document.getElementById('km-display').innerText = distanciaFinal.replace('.', ',');
             document.getElementById('valor-display').innerText = valorFinal.replace('.', ',');
         }
@@ -199,106 +379,83 @@
             const box = document.getElementById('box-retorno');
             const txt = document.getElementById('text-retorno');
             const ico = document.getElementById('icon-retorno');
-
             if(checked) {
-                box.classList.replace('bg-gray-50', 'bg-blue-50'); box.classList.replace('border-gray-100', 'border-blue-200');
+                box.classList.replace('bg-white', 'bg-blue-50'); box.classList.replace('border-gray-200', 'border-blue-200');
                 txt.innerText = "Sim, com retorno"; txt.classList.replace('text-gray-500', 'text-blue-700');
                 ico.className = "fas fa-exchange-alt text-blue-600";
             } else {
-                box.classList.replace('bg-blue-50', 'bg-gray-50'); box.classList.replace('border-blue-200', 'border-gray-100');
+                box.classList.replace('bg-blue-50', 'bg-white'); box.classList.replace('border-blue-200', 'border-gray-200');
                 txt.innerText = "Precisa de retorno?"; txt.classList.replace('text-blue-700', 'text-gray-500');
                 ico.className = "fas fa-arrow-right text-gray-400";
             }
         }
 
-        // 4. Envio
-        function enviarParaCentral() {
-            const nome = document.getElementById('nome').value;
+        // --- ENVIO ---
+        async function enviarParaCentral() {
             const origem = document.getElementById('origem').value;
             const destino = document.getElementById('destino').value;
-            
-            // Detalhes
             const numero = document.getElementById('numero').value;
             const complemento = document.getElementById('complemento').value;
             const referencia = document.getElementById('referencia').value;
-            
-            // Pagamentos
             const pagEntrega = document.getElementById('pagamento_entrega').value;
             const pagProduto = document.getElementById('pagamento_produto').value;
             const retorno = document.getElementById('retorno').checked ? "COM RETORNO" : "SEM RETORNO";
             
-            if(!nome || !numero) {
-                alert("Preencha Nome e Número do local de entrega.");
-                if(!numero) document.getElementById('numero').focus();
-                return;
+            if(!numero) { alert("Informe o número do local!"); document.getElementById('numero').focus(); return; }
+
+            if(pagEntrega === "Carteira") {
+                const valorFloat = parseFloat(valorFinal);
+                if(valorFloat > usuarioAtual.saldo) { alert(`Saldo Insuficiente!`); return; }
+                const novoSaldo = usuarioAtual.saldo - valorFloat;
+                const { error } = await supabase.from('clientes').update({ saldo: novoSaldo }).eq('codigo_cliente', usuarioAtual.codigo);
+                if(error) { alert("Erro ao debitar."); return; }
+                usuarioAtual.saldo = novoSaldo;
+                document.getElementById('display-saldo').innerText = novoSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             }
 
-            // Protocolo
-            let valorTotalNumerico = parseFloat(valorFinal);
-            let valorParaMotoboy = valorTotalNumerico - TAXA_FIXA_CENTRAL;
-            if(valorParaMotoboy < 4.00) valorParaMotoboy = 4.00; 
-            let textoValorMotoboy = valorParaMotoboy.toFixed(2);
-            let codigoProtocolo = textoValorMotoboy.replace('.', ''); 
+            await supabase.from('pedidos').insert([{
+                cliente_id: usuarioAtual.codigo,
+                nome_cliente: usuarioAtual.nome,
+                origem: origem, destino: destino, valor_frete: parseFloat(valorFinal),
+                forma_pagamento: pagEntrega, status: 'Solicitado'
+            }]);
+
+            let avisoPagamento = pagEntrega === "Carteira" ? "✅ *PAGO VIA CARTEIRA*" : `🛵 *Pgto Entrega:* ${pagEntrega}`;
+            let valorParaMotoboy = parseFloat(valorFinal) - TAXA_FIXA_CENTRAL;
+            if(valorParaMotoboy < 4.00) valorParaMotoboy = 4.00;
+            let codigoProtocolo = valorParaMotoboy.toFixed(2).replace('.', '');
             while(codigoProtocolo.length < 5) { codigoProtocolo = "0" + codigoProtocolo; }
 
-            const btn = document.getElementById('btn-enviar');
-            const textoOriginal = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
-            btn.disabled = true;
-
-            const dadosParaPlanilha = {
-                'Data': new Date().toLocaleString('pt-BR'),
-                'Cliente': nome,
-                'Telefone': document.getElementById('telefone').value,
-                'Origem': origem,
-                'Destino': destino,
-                'Numero': numero,
-                'Complemento': complemento,
-                'Referencia': referencia,
-                'Pgto_Entrega': pagEntrega,
-                'Pgto_Produto': pagProduto,
-                'Valor_Frete': valorFinal
-            };
-
-            const urlSheetMonkey = "https://api.sheetmonkey.io/form/SEU_CODIGO_AQUI"; 
-
-            fetch(urlSheetMonkey, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dadosParaPlanilha)
-            }).then(() => {
-                
-                const numAdmin = "5584982005039"; 
-                
-                // Mensagem formatada com todos os detalhes
-                const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A` +
-                            `👤 *Cliente:* ${nome}%0A` +
-                            `📍 *DE:* ${origem}%0A` +
-                            `🏁 *PARA:* ${destino}%0A` +
-                            `🔢 *Nº:* ${numero} ${complemento ? '('+complemento+')' : ''}%0A` +
-                            `🏛️ *Ref:* ${referencia}%0A` +
-                            `--------------------------------%0A` +
-                            `📏 ${distanciaFinal}km | 🔄 ${retorno}%0A` +
-                            `🛵 *Pgto Entrega:* ${pagEntrega}%0A` +
-                            `📦 *Pgto Produto:* ${pagProduto}%0A` +
-                            `💲 *FRETE: R$ ${valorFinal}*%0A` +
-                            `🔑 *Prot:* %23${codigoProtocolo}`;
-
-                window.open(`https://wa.me/${numAdmin}?text=${msg}`, '_blank');
-                btn.innerHTML = textoOriginal;
-                btn.disabled = false;
-
-            }).catch(erro => {
-                const numAdmin = "5584982005039"; 
-                window.open(`https://wa.me/${numAdmin}?text=ERRO NO SITE - PEDIDO MANUAL: ${nome}`, '_blank');
-                btn.innerHTML = textoOriginal;
-                btn.disabled = false;
-            });
+            const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A👤 *Loja:* ${usuarioAtual.nome} (Cód: ${usuarioAtual.codigo})%0A📍 *DE:* ${origem}%0A🏁 *PARA:* ${destino}%0A🔢 *Nº:* ${numero} ${complemento ? '('+complemento+')' : ''}%0A🏛️ *Ref:* ${referencia}%0A--------------------------------%0A📏 ${distanciaFinal}km | 🔄 ${retorno}%0A${avisoPagamento}%0A📦 *Pgto Produto:* ${pagProduto}%0A💲 *FRETE: R$ ${valorFinal}*%0A🔑 *Prot:* %23${codigoProtocolo}`;
+            window.open(`https://wa.me/${NUMERO_ADMIN}?text=${msg}`, '_blank');
+            location.reload();
         }
 
-        function resetBotao() { document.getElementById('btn-text').innerText = "Recalcular"; document.getElementById('loading').classList.add('hidden'); }
+        // --- RECARGA (MANTIDA) ---
+        function abrirRecarga() { document.getElementById('modal-recarga').classList.remove('hidden'); document.getElementById('step-valor').classList.remove('hidden'); document.getElementById('step-qr').classList.add('hidden'); }
+        function fecharRecarga() { document.getElementById('modal-recarga').classList.add('hidden'); }
+        async function gerarPixRecarga() {
+            const valor = parseFloat(document.getElementById('valor-recarga').value);
+            if(!valor || valor < 5) { alert("Mínimo R$ 5,00"); return; }
+            document.getElementById('step-valor').classList.add('hidden'); document.getElementById('loading-pix').classList.remove('hidden');
+            try {
+                const res = await fetch(MAKE_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ codigo_cliente: usuarioAtual.codigo, valor: valor, nome: usuarioAtual.nome, origem: "Drop App" }) });
+                const data = await res.json();
+                if(data.payload) {
+                    document.getElementById('loading-pix').classList.add('hidden'); document.getElementById('step-qr').classList.remove('hidden');
+                    document.getElementById('pix-copia-cola').value = data.payload;
+                    document.getElementById('qrcode-container').innerHTML = "";
+                    new QRCode(document.getElementById("qrcode-container"), { text: data.payload, width: 128, height: 128 });
+                } else { alert("Erro ao gerar Pix."); fecharRecarga(); }
+            } catch(e) { alert("Erro de comunicação."); fecharRecarga(); }
+        }
+        function copiarPix() { document.getElementById('pix-copia-cola').select(); document.execCommand("copy"); alert("Copiado!"); }
+
         function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) { var R = 6371; var dLat = deg2rad(lat2-lat1); var dLon = deg2rad(lon2-lon1); var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R * c; }
         function deg2rad(deg) { return deg * (Math.PI/180); }
     </script>
 </body>
 </html>
+
+
+                          
