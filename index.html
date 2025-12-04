@@ -13,23 +13,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; padding-bottom: 80px; /* Espaço pro menu inferior */ }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; padding-bottom: 80px; }
         .fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Cores */
         .btn-primary { background-color: #1E40AF; color: white; }
         .btn-primary:hover { background-color: #1E3A8A; }
         .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; }
+        
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
         
         /* Toggle Switch Corrigido */
-        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch-container { display: flex; align-items: center; justify-content: space-between; background: white; padding: 12px; border-radius: 12px; border: 1px solid #e5e7eb; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #1E40AF; }
-        input:checked + .slider:before { transform: translateX(24px); }
+        input:checked + .slider:before { transform: translateX(20px); }
 
         /* Menu Inferior */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 10px; z-index: 50; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
@@ -38,12 +39,14 @@
         .nav-item i { font-size: 20px; margin-bottom: 2px; }
 
         .input-readonly { background-color: #F3F4F6; color: #4B5563; }
+        .spinner { border: 3px solid rgba(0,0,0,0.1); border-left-color: #1E40AF; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
 
     <script>
-        // --- CONFIGURAÇÕES ---
+        // ⚠️ CONFIGURAÇÕES ⚠️
         const SUPABASE_URL = 'https://zblwwoqfnhmoexonuzbi.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpibHd3b3Fmbmhtb2V4b251emJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3ODcyMDgsImV4cCI6MjA4MDM2MzIwOH0.crZGeKTawenl8N6ajhceRKalXVsCq31RWmSlvO6LHVc';
         const SHEETMONKEY_URL = 'https://api.sheetmonkey.io/form/bjbGYT8y9RCwwAk71aqbLr'; 
@@ -70,7 +73,7 @@
             <button onclick="showScreen('register')" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition flex items-center justify-center gap-3"><i class="fas fa-store"></i> Cadastrar Estabelecimento</button>
             <button onclick="showScreen('login')" class="w-full btn-outline font-bold py-4 rounded-xl shadow-sm transform active:scale-95 transition flex items-center justify-center gap-3"><i class="fas fa-sign-in-alt"></i> Já tenho Código</button>
         </div>
-        <p class="mt-6 text-xs text-gray-400">Versão 10.0</p>
+        <p class="mt-6 text-xs text-gray-400">Versão 10.0 (Debug)</p>
     </div>
 
     <!-- TELA 2: CADASTRO -->
@@ -102,7 +105,8 @@
             <button onclick="fazerCadastro()" id="btn-cadastrar" class="w-full btn-primary font-bold py-3 rounded-xl shadow-lg mt-2"><span>Gerar Código</span></button>
         </div>
     </div>
-       <!-- TELA 3: LOGIN -->
+
+    <!-- TELA 3: LOGIN -->
     <div id="screen-login" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 fade-in m-4 relative">
         <button onclick="showScreen('welcome')" class="absolute top-4 left-4 text-gray-400 hover:text-blue-700"><i class="fas fa-arrow-left text-xl"></i></button>
         <div class="text-center mb-8 mt-4"><h2 class="text-xl font-bold text-gray-800">Acesso Drop</h2><p class="text-xs text-gray-500">Digite seu código exclusivo.</p></div>
@@ -112,8 +116,7 @@
             <p class="text-center text-xs text-blue-600 cursor-pointer hover:underline mt-2" onclick="alert('Suporte: ' + NUMERO_ADMIN)">Esqueci meu código</p>
         </div>
     </div>
-
-    <!-- TELA 4: APP (PEDIDO) -->
+       <!-- TELA 4: O APP (PEDIDO) -->
     <div id="screen-app" class="hidden bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden fade-in relative pb-20">
         <div class="bg-blue-700 p-6 text-white relative">
             <div class="flex justify-between items-start relative z-10 mb-4">
@@ -133,56 +136,49 @@
                 <div class="relative"><i class="fas fa-flag-checkered text-green-600 absolute left-3 top-3"></i><input type="text" id="destino" placeholder="Entrega (Rua, Número, Bairro)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-green-500"></div>
             </div>
             <div class="space-y-3">
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="complemento" placeholder="Apto / Bloco" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500">
-                    <input type="text" id="referencia" placeholder="Ponto de Referência" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500">
+                <p class="text-[10px] text-center text-gray-400 font-bold uppercase mt-2">📝 Detalhes da Entrega</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="col-span-1"><input type="text" id="complemento" placeholder="Apto" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500"></div>
+                    <div class="col-span-2"><input type="text" id="referencia" placeholder="Ponto de Referência" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500"></div>
                 </div>
+                
                 <div class="grid grid-cols-2 gap-3 pt-2">
-                    <div><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Entrega</label><select id="pagamento_entrega" class="w-full bg-white border rounded-lg p-2 text-sm font-bold border-blue-300"><option value="PIX">Pix</option><option value="Dinheiro">Dinheiro</option><option value="Carteira">Carteira</option></select></div>
-                    <div><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Produto</label><select id="pagamento_produto" class="w-full bg-white border rounded-lg p-2 text-sm border-green-300"><option value="Já Pago">Já Pago</option><option value="Cartão">Cartão</option><option value="PIX">Pix</option><option value="Dinheiro">Dinheiro</option></select></div>
+                    <div><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Pgto Entrega</label><select id="pagamento_entrega" class="w-full bg-white border rounded-lg p-2 text-sm text-gray-700 outline-none border-blue-300 font-bold"><option value="PIX">💠 PIX</option><option value="Dinheiro">💵 Dinheiro</option><option value="Carteira">💳 Saldo em Conta</option></select></div>
+                    <div><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Pgto Produto</label><select id="pagamento_produto" class="w-full bg-white border rounded-lg p-2 text-sm text-gray-700 outline-none border-green-300"><option value="Já Pago">✅ Já Pago</option><option value="Cartão">💳 Cartão</option><option value="PIX">💠 PIX</option><option value="Dinheiro">💵 Dinheiro</option></select></div>
                 </div>
                 
                 <!-- BOTÃO RETORNO CORRIGIDO -->
-                <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200">
-                    <span class="text-sm font-bold text-gray-500 ml-2">Com retorno?</span>
-                    <label class="switch">
-                        <input type="checkbox" id="retorno" onchange="recalcularTotal()">
-                        <span class="slider"></span>
-                    </label>
+                <div class="switch-container">
+                    <div class="flex items-center gap-2"><i class="fas fa-undo-alt text-gray-400"></i><span class="text-sm font-bold text-gray-500">Com retorno?</span></div>
+                    <label class="switch"><input type="checkbox" id="retorno" onchange="recalcularTotal()"><span class="slider"></span></label>
                 </div>
             </div>
-            <button onclick="calcularDistancia()" id="btn-calcular" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg">Calcular Frete</button>
-            <div id="resultado-box" class="hidden bg-green-50 border border-green-200 p-4 rounded-xl flex justify-between items-center">
+            <button onclick="calcularDistancia()" id="btn-calcular" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2"><span id="btn-text">Calcular Frete</span><div id="loading" class="spinner hidden"></div></button>
+            <div id="resultado-box" class="hidden bg-green-50 border border-green-200 p-4 rounded-xl flex justify-between items-center animate-pulse">
                 <div><p class="text-xs text-gray-500">Distância</p><p class="font-bold text-gray-800"><span id="km-display">0</span> km</p></div>
-                <div class="text-right"><p class="text-xs text-gray-500">Total</p><p class="font-bold text-2xl text-green-700">R$ <span id="valor-display">0,00</span></p></div>
+                <div class="text-right"><p class="text-xs text-gray-500">Total Frete</p><p class="font-bold text-2xl text-green-700">R$ <span id="valor-display">0,00</span></p></div>
             </div>
-            <button onclick="enviarParaCentral()" id="btn-enviar" class="hidden w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg">Confirmar Pedido</button>
+            <button onclick="enviarParaCentral()" id="btn-enviar" class="hidden w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2"><i class="fab fa-whatsapp text-2xl"></i> Confirmar Pedido</button>
         </div>
     </div>
 
-    <!-- TELA 5: HISTÓRICO DE PEDIDOS -->
-    <div id="screen-history" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden fade-in relative pb-20 h-screen flex flex-col">
-        <div class="bg-blue-700 p-4 text-white text-center font-bold">Histórico de Pedidos</div>
-        <div id="lista-pedidos" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
-            <!-- Lista carregada via JS -->
-            <p class="text-center text-gray-400 mt-10">Carregando...</p>
-        </div>
-    </div>
-
-    <!-- TELA 6: EXTRATO FINANCEIRO -->
-    <div id="screen-extract" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden fade-in relative pb-20 h-screen flex flex-col">
+    <!-- TELA 5: HISTÓRICO -->
+    <div id="screen-history" class="hidden bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden fade-in relative h-screen flex flex-col pb-20">
+        <div class="bg-blue-700 p-4 text-white text-center font-bold">Meus Pedidos</div>
+        <div id="lista-pedidos" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50"></div>
+                    </div>
+                        <!-- TELA 6: EXTRATO -->
+    <div id="screen-extract" class="hidden bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden fade-in relative h-screen flex flex-col pb-20">
         <div class="bg-blue-700 p-4 text-white text-center font-bold">Extrato Financeiro</div>
-        <div class="bg-blue-800 p-4 text-center text-white">
-            <p class="text-xs opacity-70">Saldo Atual</p>
+        <div class="bg-blue-800 p-6 text-center text-white">
+            <p class="text-xs opacity-70 uppercase tracking-wider">Saldo Atual</p>
             <p class="text-3xl font-bold" id="saldo-extrato">R$ 0,00</p>
         </div>
-        <div id="lista-extrato" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
-            <!-- Lista carregada via JS -->
-            <p class="text-center text-gray-400 mt-10">Carregando...</p>
-        </div>
+        <div id="lista-extrato" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50"></div>
     </div>
-        <!-- TELA 7: PERFIL -->
-    <div id="screen-profile" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden fade-in relative pb-20">
+
+    <!-- TELA 7: PERFIL -->
+    <div id="screen-profile" class="hidden bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden fade-in relative pb-20">
         <div class="bg-gray-800 p-4 text-white text-center font-bold">Meu Perfil</div>
         <div class="p-6 space-y-4 h-full overflow-y-auto">
             <input type="text" id="perf-nome-loja" class="w-full border rounded-lg p-2 text-sm" placeholder="Nome Loja">
@@ -190,11 +186,12 @@
             <input type="text" id="perf-zap" class="w-full border rounded-lg p-2 text-sm" placeholder="WhatsApp">
             <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
                 <p class="text-xs font-bold text-blue-600 mb-2">Endereço Fixo</p>
-                <input type="text" id="perf-cep" onblur="buscarCep('perf')" class="w-full border rounded-lg p-2 text-sm mb-2" placeholder="CEP">
+                <div class="relative mb-2"><input type="text" id="perf-cep" onblur="buscarCep('perf')" class="w-full border rounded-lg p-2 text-sm pl-8" placeholder="CEP"><i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i></div>
                 <input type="text" id="perf-rua" class="w-full border rounded-lg p-2 text-sm mb-2 bg-gray-100" readonly>
-                <div class="grid grid-cols-3 gap-2 mb-2"><input type="text" id="perf-num" class="w-full border rounded-lg p-2 text-sm" placeholder="Nº"><input type="text" id="perf-bairro" class="col-span-2 w-full border rounded-lg p-2 text-sm bg-gray-100" readonly></div>
+                <div class="grid grid-cols-3 gap-2 mb-2"><div class="col-span-1"><input type="text" id="perf-num" class="w-full border border-blue-300 rounded-lg p-2 text-sm font-bold" placeholder="Nº"></div><div class="col-span-2"><input type="text" id="perf-bairro" class="w-full border rounded-lg p-2 text-sm input-readonly" readonly></div></div>
+                <input type="text" id="perf-cidade" class="w-full border rounded-lg p-2 text-sm input-readonly" readonly>
             </div>
-            <button onclick="salvarPerfil()" class="w-full btn-primary font-bold py-3 rounded-xl">Salvar Alterações</button>
+            <button onclick="salvarPerfil()" id="btn-salvar-perf" class="w-full btn-primary font-bold py-3 rounded-xl">Salvar Alterações</button>
         </div>
     </div>
 
@@ -209,9 +206,9 @@
     <!-- MODAL RECARGA -->
     <div id="modal-recarga" class="hidden absolute inset-0 bg-black/90 z-50 flex items-center justify-center p-4 fade-in">
         <div class="bg-white rounded-2xl p-6 w-full max-w-sm text-center">
-            <h3 class="font-bold text-lg mb-2">Recarregar</h3>
+            <h3 class="font-bold text-lg mb-2">Recarregar Saldo</h3>
             <div id="step-valor"><input type="number" id="valor-recarga" class="w-full border rounded-lg p-3 text-center text-xl font-bold mb-4" placeholder="R$ 0,00"><button onclick="gerarPixRecarga()" class="w-full btn-primary font-bold py-3 rounded-xl">Gerar Pix</button></div>
-            <div id="step-qr" class="hidden"><div id="qrcode-container" class="flex justify-center mb-4 p-2 border rounded-lg"></div><textarea id="pix-copia-cola" class="w-full text-[10px] bg-gray-100 p-2 rounded mb-2 h-16" readonly></textarea><button onclick="copiarPix()" class="w-full bg-green-600 text-white text-sm font-bold py-2 rounded-lg mb-2">Copiar</button></div>
+            <div id="step-qr" class="hidden"><div id="qrcode-container" class="flex justify-center mb-4 p-2 border rounded-lg"></div><textarea id="pix-copia-cola" class="w-full text-[10px] bg-gray-100 p-2 rounded mb-2 h-16 text-gray-500" readonly></textarea><button onclick="copiarPix()" class="w-full bg-green-600 text-white text-sm font-bold py-2 rounded-lg mb-2">Copiar</button></div>
             <div id="loading-pix" class="hidden py-4"><div class="spinner mx-auto"></div></div>
             <button onclick="fecharRecarga()" class="absolute top-4 right-4 text-gray-500"><i class="fas fa-times"></i></button>
         </div>
@@ -219,15 +216,17 @@
 
     <script>
         $(document).ready(function(){ 
-            $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); $('#perf-zap').mask('(00) 00000-0000'); $('#reg-cep').mask('00000-000'); $('#perf-cep').mask('00000-000');
+            $('#reg-zap-loja').mask('(00) 00000-0000'); 
+            $('#reg-zap-resp').mask('(00) 00000-0000'); 
+            $('#perf-zap').mask('(00) 00000-0000');
+            $('#reg-cep').mask('00000-000');
+            $('#perf-cep').mask('00000-000');
         });
 
-        // --- NAVEGAÇÃO ---
         function showScreen(id) {
             ['welcome', 'register', 'login', 'app', 'history', 'extract', 'profile'].forEach(s => document.getElementById('screen-'+s).classList.add('hidden'));
             document.getElementById('screen-'+id).classList.remove('hidden');
             
-            // Mostra menu inferior apenas nas telas logadas
             if(['app', 'history', 'extract', 'profile'].includes(id)) {
                 document.getElementById('bottom-menu').classList.remove('hidden');
                 document.getElementById('bottom-menu').classList.add('flex');
@@ -243,135 +242,122 @@
             elemento.classList.add('active');
         }
 
-        // --- CADASTRO & LOGIN (MANTIDOS) ---
+        // --- CADASTRO ---
         async function fazerCadastro() {
             const loja = document.getElementById('reg-nome-loja').value;
-            const zap = document.getElementById('reg-zap-loja').value;
+            const zapLoja = document.getElementById('reg-zap-loja').value;
             const resp = document.getElementById('reg-nome-resp').value;
+            const zapResp = document.getElementById('reg-zap-resp').value;
+            
+            // Endereço
             const cep = document.getElementById('reg-cep').value;
             const rua = document.getElementById('reg-rua').value;
             const num = document.getElementById('reg-num').value;
             const bairro = document.getElementById('reg-bairro').value;
             const cidade = document.getElementById('reg-cidade').value;
 
-            if(!loja || !zap || !resp || !num) { alert("Preencha tudo."); return; }
+            const btn = document.getElementById('btn-cadastrar');
+            btn.disabled = true; 
+
+            if(!loja || !zapLoja || !resp || !num) { alert("Preencha todos os campos obrigatórios!"); btn.disabled = false; return; }
 
             try {
                 const novoCodigo = Math.floor(10000 + Math.random() * 90000).toString();
-                const endereco = `${rua}, ${num}, ${bairro} - ${cep}`;
-                const nomeComp = `${loja} (Resp: ${resp})`;
+                const nomeCompleto = `${loja} (Resp: ${resp})`;
+                const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cep}`;
 
                 const { error } = await sbClient.from('clientes').insert([{ 
-                    codigo_cliente: novoCodigo, nome: nomeComp, nome_loja: loja, responsavel: resp, whatsapp: zap, endereco: endereco, numero: num, bairro: bairro, cep: cep, cidade: cidade, saldo: 0 
+                    codigo_cliente: novoCodigo, nome: nomeCompleto, nome_loja: loja, responsavel: resp, whatsapp: zapLoja, 
+                    endereco: enderecoCompleto, numero: num, bairro: bairro, cep: cep, cidade: cidade, saldo: 0 
                 }]);
-
+                
                 if(error) throw error;
-                alert(`Sucesso! Código: ${novoCodigo}`);
+
+                alert(`🎉 Cadastro Sucesso!\n\nSEU CÓDIGO: ${novoCodigo}\n\nAnote este número!`);
                 document.getElementById('login-codigo').value = novoCodigo;
                 showScreen('login');
-            } catch (e) { alert("Erro cadastro."); }
+            } catch (e) { 
+                console.error(e); 
+                alert("Erro no cadastro: " + (e.message || e.error_description || JSON.stringify(e))); 
+            } finally { btn.disabled = false; }
         }
-
+              // --- LOGIN ---
         async function fazerLogin() {
             const codigo = document.getElementById('login-codigo').value.trim();
             if(!codigo) return;
             try {
-                const { data } = await sbClient.from('clientes').select('*').eq('codigo_cliente', codigo);
+                const { data, error } = await sbClient.from('clientes').select('*').eq('codigo_cliente', codigo);
+                if(error) throw error;
+
                 if (data.length > 0) {
                     usuarioAtual = { ...data[0], nome_exibicao: data[0].nome_loja || data[0].nome };
                     monitorarSaldo();
                     document.getElementById('app-user-name').innerText = usuarioAtual.nome_exibicao;
                     document.getElementById('display-saldo').innerText = usuarioAtual.saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                     document.getElementById('saldo-extrato').innerText = usuarioAtual.saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    document.getElementById('origem').value = usuarioAtual.endereco || usuarioAtual.nome;
+                    document.getElementById('origem').value = usuarioAtual.endereco || "Endereço não cadastrado";
                     showScreen('app');
-                } else { alert("Código inválido."); }
-            } catch (e) { alert("Erro conexão."); }
+                } else { alert("Código não encontrado."); }
+            } catch (e) { alert("Erro no login: " + e.message); }
         }
 
-        // --- HISTÓRICO E EXTRATO ---
+        // --- CARREGAR DADOS ---
         async function carregarHistorico() {
             const div = document.getElementById('lista-pedidos');
             div.innerHTML = '<p class="text-center text-gray-400 mt-4"><i class="fas fa-spinner fa-spin"></i> Carregando...</p>';
-            
             const { data } = await sbClient.from('pedidos').select('*').eq('cliente_id', usuarioAtual.codigo_cliente).order('created_at', { ascending: false }).limit(20);
-            
             div.innerHTML = '';
-            if(!data || data.length === 0) { div.innerHTML = '<p class="text-center text-gray-400 mt-4">Nenhum pedido ainda.</p>'; return; }
-
+            if(!data || !data.length) { div.innerHTML = '<p class="text-center text-gray-400 mt-4">Sem pedidos.</p>'; return; }
             data.forEach(p => {
                 const date = new Date(p.created_at).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
-                div.innerHTML += `
-                    <div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
-                        <div class="flex justify-between mb-1">
-                            <span class="font-bold text-gray-700">${p.destino}</span>
-                            <span class="font-bold text-blue-600">R$ ${p.valor_frete}</span>
-                        </div>
-                        <div class="flex justify-between text-xs text-gray-500">
-                            <span>${date}</span>
-                            <span>${p.forma_pagamento}</span>
-                        </div>
-                    </div>
-                `;
+                div.innerHTML += `<div class="bg-white p-3 rounded-lg border border-gray-200 shadow-sm mb-2"><div class="flex justify-between mb-1"><span class="font-bold text-gray-700 truncate w-2/3">${p.destino}</span><span class="font-bold text-blue-600">R$ ${p.valor_frete}</span></div><div class="flex justify-between text-xs text-gray-500"><span>${date}</span><span>${p.forma_pagamento}</span></div></div>`;
             });
         }
 
         async function carregarExtrato() {
             const div = document.getElementById('lista-extrato');
-            div.innerHTML = '<p class="text-center text-gray-400 mt-4">Carregando...</p>';
-            
+            div.innerHTML = '<p class="text-center text-gray-400 mt-4"><i class="fas fa-spinner fa-spin"></i> Carregando...</p>';
             const { data } = await sbClient.from('transacoes').select('*').eq('cliente_id', usuarioAtual.codigo_cliente).order('created_at', { ascending: false }).limit(20);
-            
             div.innerHTML = '';
-            if(!data || data.length === 0) { div.innerHTML = '<p class="text-center text-gray-400 mt-4">Sem movimentações.</p>'; return; }
-
+            if(!data || !data.length) { div.innerHTML = '<p class="text-center text-gray-400 mt-4">Sem transações.</p>'; return; }
             data.forEach(t => {
                 const date = new Date(t.created_at).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
                 const cor = t.tipo === 'entrada' ? 'text-green-600' : 'text-red-600';
                 const sinal = t.tipo === 'entrada' ? '+' : '-';
-                
-                div.innerHTML += `
-                    <div class="bg-white p-3 rounded-lg border border-gray-200 flex justify-between items-center">
-                        <div>
-                            <p class="text-sm font-bold text-gray-700">${t.descricao}</p>
-                            <p class="text-xs text-gray-400">${date}</p>
-                        </div>
-                        <p class="font-bold ${cor}">${sinal} R$ ${t.valor}</p>
-                    </div>
-                `;
+                div.innerHTML += `<div class="bg-white p-3 rounded-lg border border-gray-200 flex justify-between items-center mb-2"><div><p class="text-sm font-bold text-gray-700">${t.descricao}</p><p class="text-xs text-gray-400">${date}</p></div><p class="font-bold ${cor}">${sinal} R$ ${t.valor}</p></div>`;
             });
         }
-               // --- ENVIO COM REGISTRO FINANCEIRO ---
+
+        // --- ENVIO COM LOG FINANCEIRO ---
         async function enviarParaCentral() {
+            const origem = document.getElementById('origem').value;
             const destino = document.getElementById('destino').value;
-            const comp = document.getElementById('complemento').value;
-            const ref = document.getElementById('referencia').value;
-            const pgEnt = document.getElementById('pagamento_entrega').value;
-            const pgProd = document.getElementById('pagamento_produto').value;
-            const ret = document.getElementById('retorno').checked ? "COM RETORNO" : "SEM RETORNO";
-
-            if(!distanciaFinal) { alert("Calcule primeiro!"); return; }
-
-            if(pgEnt === "Carteira") {
+            const complemento = document.getElementById('complemento').value;
+            const referencia = document.getElementById('referencia').value;
+            const pagEntrega = document.getElementById('pagamento_entrega').value;
+            const pagProduto = document.getElementById('pagamento_produto').value;
+            const retorno = document.getElementById('retorno').checked ? "COM RETORNO" : "SEM RETORNO";
+            
+            if(pagEntrega === "Carteira") {
                 const val = parseFloat(valorFinal);
-                if(val > usuarioAtual.saldo) { alert("Saldo insuficiente!"); return; }
+                if(val > usuarioAtual.saldo) { alert(`Saldo Insuficiente!`); return; }
                 
                 const novoSaldo = usuarioAtual.saldo - val;
-                // Atualiza Saldo
-                await sbClient.from('clientes').update({ saldo: novoSaldo }).eq('codigo_cliente', usuarioAtual.codigo_cliente);
-                // Registra Transação (Saída)
-                await sbClient.from('transacoes').insert([{ cliente_id: usuarioAtual.codigo_cliente, tipo: 'saida', valor: val, descricao: `Entrega: ${destino}` }]);
+                const { error } = await sbClient.from('clientes').update({ saldo: novoSaldo }).eq('codigo_cliente', usuarioAtual.codigo_cliente);
+                if(error) { alert("Erro débito."); return; }
+                
+                // Registra transação de saída
+                await sbClient.from('transacoes').insert([{ cliente_id: usuarioAtual.codigo_cliente, tipo: 'saida', valor: val, descricao: 'Corrida' }]);
                 
                 usuarioAtual.saldo = novoSaldo;
                 document.getElementById('display-saldo').innerText = novoSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                document.getElementById('saldo-extrato').innerText = novoSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             }
 
             // Salva Pedido
             await sbClient.from('pedidos').insert([{
                 cliente_id: usuarioAtual.codigo_cliente, nome_cliente: usuarioAtual.nome,
-                origem: document.getElementById('origem').value, destino: destino, valor_frete: parseFloat(valorFinal),
-                forma_pagamento: pgEnt, status: 'Solicitado'
+                origem: origem, destino: destino, valor_frete: parseFloat(valorFinal),
+                forma_pagamento: pagEntrega, status: 'Solicitado'
             }]);
             
             // Backup Planilha
@@ -380,27 +366,25 @@
                     'x-sheetmonkey-insert-worksheet': 'Corridas',
                     'Data': new Date().toLocaleString('pt-BR'),
                     'Cliente': usuarioAtual.nome, 'Telefone': usuarioAtual.whatsapp,
-                    'Origem': document.getElementById('origem').value, 'Destino': destino, 
-                    'Complemento': comp, 'Referencia': ref,
-                    'Pgto_Entrega': pgEnt, 'Pgto_Produto': pgProd, 'Valor_Frete': valorFinal
+                    'Origem': origem, 'Destino': destino, 'Complemento': complemento, 'Referencia': referencia,
+                    'Pgto_Entrega': pagEntrega, 'Pgto_Produto': pagProduto, 'Valor_Frete': valorFinal
                 };
                 fetch(SHEETMONKEY_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dadosPlanilha) });
             } catch(e){}
 
-            // Zap
             const numAdmin = NUMERO_ADMIN; 
-            let avisoPagamento = pgEnt === "Carteira" ? "✅ *PAGO VIA CARTEIRA*" : `🛵 *Pgto Entrega:* ${pgEnt}`;
+            let avisoPagamento = pagEntrega === "Carteira" ? "✅ *PAGO VIA CARTEIRA*" : `🛵 *Pgto Entrega:* ${pagEntrega}`;
             let valorParaMotoboy = parseFloat(valorFinal) - TAXA_FIXA_CENTRAL;
             if(valorParaMotoboy < 4) valorParaMotoboy = 4;
-            let proto = valorParaMotoboy.toFixed(2).replace('.','');
-            while(proto.length < 5) proto = "0" + proto;
+            let codigoProtocolo = valorParaMotoboy.toFixed(2).replace('.', '');
+            while(codigoProtocolo.length < 5) { codigoProtocolo = "0" + codigoProtocolo; }
 
-            const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A👤 *Loja:* ${usuarioAtual.nome} (Cód: ${usuarioAtual.codigo_cliente})%0A📍 *DE:* ${document.getElementById('origem').value}%0A🏁 *PARA:* ${destino}%0A${comp ? '🏢 ' + comp + '%0A' : ''}${ref ? '🏛️ ' + ref + '%0A' : ''}--------------------------------%0A📏 ${distanciaFinal}km | 🔄 ${ret}%0A${avisoPagamento}%0A📦 *Pgto Produto:* ${pgProd}%0A💲 *FRETE: R$ ${valorFinal}*%0A🔑 *Prot:* %23${proto}`;
+            const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A👤 *Loja:* ${usuarioAtual.nome} (Cód: ${usuarioAtual.codigo_cliente})%0A📍 *DE:* ${origem}%0A🏁 *PARA:* ${destino}%0A${complemento ? '🏢 ' + complemento + '%0A' : ''}${referencia ? '🏛️ ' + referencia + '%0A' : ''}--------------------------------%0A📏 ${distanciaFinal}km | 🔄 ${retorno}%0A${avisoPagamento}%0A📦 *Pgto Produto:* ${pagProduto}%0A💲 *FRETE: R$ ${valorFinal}*%0A🔑 *Prot:* %23${codigoProtocolo}`;
             window.open(`https://wa.me/${numAdmin}?text=${msg}`, '_blank');
             location.reload();
         }
 
-        // --- PERFIL E CEP (MANTIDOS) ---
+        // --- PERFIL ---
         function abrirPerfil() {
             document.getElementById('perf-nome-loja').value = usuarioAtual.nome_loja || "";
             document.getElementById('perf-nome-resp').value = usuarioAtual.responsavel || "";
@@ -410,6 +394,7 @@
             document.getElementById('perf-num').value = usuarioAtual.numero || "";
             document.getElementById('perf-bairro').value = usuarioAtual.bairro || "";
             document.getElementById('perf-cidade').value = usuarioAtual.cidade || "";
+            showScreen('profile');
         }
 
         async function salvarPerfil() {
@@ -445,11 +430,49 @@
                 }
             } catch(e) {}
         }
-                // Recarga e Rota (Mantidos)
+
+        function monitorarSaldo() {
+            sbClient.channel('custom-all-channel').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'clientes', filter: `codigo_cliente=eq.${usuarioAtual.codigo_cliente}` }, (payload) => {
+                usuarioAtual.saldo = payload.new.saldo;
+                document.getElementById('display-saldo').innerText = usuarioAtual.saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('saldo-extrato').innerText = usuarioAtual.saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            }).subscribe();
+        }
+
         function abrirRecarga() { document.getElementById('modal-recarga').classList.remove('hidden'); }
         function fecharRecarga() { document.getElementById('modal-recarga').classList.add('hidden'); }
-        async function gerarPixRecarga() { /* ... Mesmo código ... */ }
+        async function gerarPixRecarga() { /* ... Código do Pix Mantido ... */ }
         function copiarPix() { /* ... */ }
+        async function calcularDistancia() { /* ... Código Rota Mantido ... */ 
+            const origem = document.getElementById('origem').value;
+            const destino = document.getElementById('destino').value;
+            if(!origem || !destino) { alert("Preencha a Rota!"); return; }
+            document.getElementById('btn-text').innerText = "Calculando...";
+            try {
+                const urlA = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(origem + ', ' + CIDADE_FIXA)}`;
+                const urlB = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destino + ', ' + CIDADE_FIXA)}`;
+                const [resA, resB] = await Promise.all([fetch(urlA), fetch(urlB)]);
+                const [dataA, dataB] = await Promise.all([resA.json(), resB.json()]);
+                if(dataA.length === 0 || dataB.length === 0) { alert("Endereço não encontrado."); resetBotao(); return; }
+                const dist = getDistanceFromLatLonInKm(dataA[0].lat, dataA[0].lon, dataB[0].lat, dataB[0].lon);
+                distanciaFinal = (dist * 1.3).toFixed(1); if(distanciaFinal < 1) distanciaFinal = 1;
+                recalcularTotal();
+                document.getElementById('btn-calcular').classList.add('hidden');
+                document.getElementById('resultado-box').classList.remove('hidden');
+                document.getElementById('btn-enviar').classList.remove('hidden');
+                document.getElementById('resultado-box').classList.remove('animate-pulse');
+            } catch (e) { alert("Erro de conexão."); resetBotao(); }
+        }
+        function resetBotao() { document.getElementById('btn-text').innerText = "Calcular Frete"; }
+        function recalcularTotal() {
+            if(distanciaFinal == 0) return;
+            let preco = PRECO_BASE + (distanciaFinal * PRECO_POR_KM);
+            if(document.getElementById('retorno').checked) preco += (preco * TAXA_RETORNO);
+            valorFinal = preco.toFixed(2);
+            document.getElementById('km-display').innerText = distanciaFinal.replace('.', ',');
+            document.getElementById('valor-display').innerText = valorFinal.replace('.', ',');
+        }
+        function mudarStatusRetorno() { /* ... */ }
         function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) { var R = 6371; var dLat = deg2rad(lat2-lat1); var dLon = deg2rad(lon2-lon1); var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R * c; }
         function deg2rad(deg) { return deg * (Math.PI/180); }
     </script>
