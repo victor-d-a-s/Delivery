@@ -9,8 +9,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-    
-    <!-- IMPORTANTE: Biblioteca do Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
@@ -18,90 +16,97 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; }
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
         .btn-primary { background-color: #1E40AF; color: white; }
         .btn-primary:hover { background-color: #1E3A8A; }
         .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; }
-        
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
-        
         .spinner { border: 3px solid rgba(0,0,0,0.1); border-left-color: #1E40AF; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
         .toggle-checkbox:checked { transform: translateX(100%); border-color: #1E40AF; }
         .toggle-checkbox:checked + .toggle-label { background-color: #1E40AF; }
         .transition-all-300 { transition: all 0.3s ease-in-out; }
+        
+        /* Inputs Readonly (Visual de Bloqueado) */
+        .input-readonly { background-color: #E5E7EB; color: #374151; cursor: not-allowed; border-color: #D1D5DB; font-weight: 600; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
 
     <script>
-        // ---------------------------------------------------------
-        // CHAVES DE CONFIGURAÇÃO
-        // ---------------------------------------------------------
+        // --- CONFIGURAÇÕES ---
         const SUPABASE_URL = 'https://zblwwoqfnhmoexonuzbi.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpibHd3b3Fmbmhtb2V4b251emJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3ODcyMDgsImV4cCI6MjA4MDM2MzIwOH0.crZGeKTawenl8N6ajhceRKalXVsCq31RWmSlvO6LHVc';
         const SHEETMONKEY_URL = 'https://api.sheetmonkey.io/form/bjbGYT8y9RCwwAk71aqbLr'; 
-        const MAKE_WEBHOOK_URL = ""; // Opcional (Pix Automático)
+        const MAKE_WEBHOOK_URL = ""; 
 
-        // --- CORREÇÃO DO ERRO: Mudamos o nome da variável para 'sbClient' ---
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Configurações de Negócio
         const CIDADE_FIXA = "Mossoró, Rio Grande do Norte, Brasil"; 
         const NUMERO_ADMIN = "5584982005039"; 
         const PRECO_BASE = 6.00; const PRECO_POR_KM = 1.80; const TAXA_RETORNO = 0.70; const TAXA_FIXA_CENTRAL = 0.50;
 
-        let usuarioAtual = { nome: "", telefone: "", codigo: "", saldo: 0 };
+        // Objeto Usuário Expandido
+        let usuarioAtual = { 
+            nome: "", nome_loja: "", responsavel: "", telefone: "", codigo: "", saldo: 0, 
+            cep: "", endereco: "", numero: "", bairro: "", cidade: ""
+        };
         let distanciaFinal = 0; let valorFinal = 0;
     </script>
 
     <!-- TELA 1: BOAS-VINDAS -->
     <div id="screen-welcome" class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 text-center fade-in">
         <div class="mb-8">
-            <div class="inline-block p-5 rounded-full bg-blue-50 text-blue-700 mb-4 shadow-sm">
-                <i class="fas fa-box-open text-5xl"></i>
-            </div>
+            <div class="inline-block p-5 rounded-full bg-blue-50 text-blue-700 mb-4 shadow-sm"><i class="fas fa-box-open text-5xl"></i></div>
             <h1 class="text-3xl font-bold text-gray-800 mb-2">Drop Entregas</h1>
             <p class="text-gray-500 text-sm">Logística rápida para seu negócio.</p>
         </div>
         <div class="space-y-4">
-            <button onclick="showScreen('register')" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition flex items-center justify-center gap-3">
-                <i class="fas fa-store"></i> Cadastrar Estabelecimento
-            </button>
-            <button onclick="showScreen('login')" class="w-full btn-outline font-bold py-4 rounded-xl shadow-sm transform active:scale-95 transition flex items-center justify-center gap-3">
-                <i class="fas fa-sign-in-alt"></i> Já tenho Código
-            </button>
+            <button onclick="showScreen('register')" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition flex items-center justify-center gap-3"><i class="fas fa-store"></i> Cadastrar Estabelecimento</button>
+            <button onclick="showScreen('login')" class="w-full btn-outline font-bold py-4 rounded-xl shadow-sm transform active:scale-95 transition flex items-center justify-center gap-3"><i class="fas fa-sign-in-alt"></i> Já tenho Código</button>
         </div>
-        <p class="mt-6 text-xs text-gray-400">Versão 5.1 (Fix)</p>
+        <p class="mt-6 text-xs text-gray-400">Versão 9.0 (Endereço Fixo)</p>
     </div>
 
     <!-- TELA 2: CADASTRO -->
     <div id="screen-register" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 fade-in relative">
         <button onclick="showScreen('welcome')" class="absolute top-4 left-4 text-gray-400 hover:text-blue-700"><i class="fas fa-arrow-left text-xl"></i></button>
         <div class="text-center mb-6 mt-2"><h2 class="text-xl font-bold text-gray-800">Novo Parceiro</h2></div>
-        <div class="space-y-4">
+        <div class="space-y-4 h-96 overflow-y-auto px-2">
+            <!-- Identificação -->
             <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                <p class="text-[10px] uppercase font-bold text-blue-600 mb-2">Dados do Estabelecimento</p>
+                <p class="text-[10px] uppercase font-bold text-blue-600 mb-2">Dados da Loja</p>
                 <div class="space-y-2">
-                    <div><label class="text-[10px] text-gray-500 font-bold">NOME FANTASIA</label><input type="text" id="reg-nome-loja" class="w-full bg-white border rounded-lg p-2 text-sm outline-none focus:border-blue-600" placeholder="Ex: Pizzaria Sabor"></div>
-                    <div><label class="text-[10px] text-gray-500 font-bold">WHATSAPP DA LOJA</label><input type="text" id="reg-zap-loja" class="w-full bg-white border rounded-lg p-2 text-sm outline-none focus:border-blue-600" placeholder="(84) 90000-0000"></div>
+                    <input type="text" id="reg-nome-loja" class="w-full bg-white border rounded-lg p-2 text-sm" placeholder="Nome Fantasia (Ex: Burger King)">
+                    <input type="text" id="reg-zap-loja" class="w-full bg-white border rounded-lg p-2 text-sm" placeholder="WhatsApp da Loja">
                 </div>
             </div>
+            <!-- Responsável -->
             <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
                 <p class="text-[10px] uppercase font-bold text-gray-500 mb-2">Responsável</p>
                 <div class="space-y-2">
-                    <div><label class="text-[10px] text-gray-500 font-bold">NOME COMPLETO</label><input type="text" id="reg-nome-resp" class="w-full bg-white border rounded-lg p-2 text-sm outline-none focus:border-blue-600" placeholder="Ex: João Silva"></div>
-                    <div><label class="text-[10px] text-gray-500 font-bold">WHATSAPP PESSOAL</label><input type="text" id="reg-zap-resp" class="w-full bg-white border rounded-lg p-2 text-sm outline-none focus:border-blue-600" placeholder="(84) 90000-0000"></div>
+                    <input type="text" id="reg-nome-resp" class="w-full bg-white border rounded-lg p-2 text-sm" placeholder="Nome Completo">
+                    <input type="text" id="reg-zap-resp" class="w-full bg-white border rounded-lg p-2 text-sm" placeholder="WhatsApp Pessoal">
                 </div>
             </div>
-            <button onclick="fazerCadastro()" id="btn-cadastrar" class="w-full btn-primary font-bold py-3 rounded-xl shadow-lg mt-2 flex justify-center items-center gap-2">
-                <span>Gerar Código de Acesso</span><div id="loading-cad" class="spinner hidden"></div>
-            </button>
+            <!-- Endereço -->
+            <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 relative">
+                <p class="text-[10px] uppercase font-bold text-gray-500 mb-2">Endereço Fixo de Coleta</p>
+                <div class="relative mb-2">
+                    <input type="text" id="reg-cep" onblur="buscarCep('reg')" class="w-full bg-white border rounded-lg p-2 text-sm pl-8" placeholder="CEP (00000-000)">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+                </div>
+                <div class="space-y-2">
+                    <input type="text" id="reg-rua" class="w-full bg-gray-100 border rounded-lg p-2 text-sm input-readonly" placeholder="Rua" readonly>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="col-span-1"><input type="text" id="reg-num" class="w-full bg-white border border-blue-300 rounded-lg p-2 text-sm font-bold" placeholder="Nº"></div>
+                        <div class="col-span-2"><input type="text" id="reg-bairro" class="w-full bg-gray-100 border rounded-lg p-2 text-sm input-readonly" placeholder="Bairro" readonly></div>
+                    </div>
+                    <input type="text" id="reg-cidade" class="w-full bg-gray-100 border rounded-lg p-2 text-sm input-readonly" placeholder="Cidade" readonly>
+                </div>
+            </div>
+            <button onclick="fazerCadastro()" id="btn-cadastrar" class="w-full btn-primary font-bold py-3 rounded-xl shadow-lg mt-2 flex justify-center items-center gap-2"><span>Gerar Código de Acesso</span><div id="loading-cad" class="spinner hidden"></div></button>
         </div>
     </div>
-
-    <!-- TELA 3: LOGIN -->
+        <!-- TELA 3: LOGIN -->
     <div id="screen-login" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 fade-in relative">
         <button onclick="showScreen('welcome')" class="absolute top-4 left-4 text-gray-400 hover:text-blue-700"><i class="fas fa-arrow-left text-xl"></i></button>
         <div class="text-center mb-8 mt-4"><h2 class="text-xl font-bold text-gray-800">Acesso Drop</h2><p class="text-xs text-gray-500">Digite seu código exclusivo.</p></div>
@@ -111,32 +116,19 @@
             <p class="text-center text-xs text-blue-600 cursor-pointer hover:underline mt-2" onclick="alert('Fale com o suporte: ' + NUMERO_ADMIN)">Esqueci meu código</p>
         </div>
     </div>
-      <!-- TELA 4: O APP -->
-    <div id="screen-app" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden fade-in relative">
-        <!-- MODAL RECARGA -->
-        <div id="modal-recarga" class="hidden absolute inset-0 bg-black/90 z-50 flex items-center justify-center p-4 fade-in">
-            <div class="bg-white rounded-2xl p-6 w-full max-w-sm text-center">
-                <h3 class="font-bold text-lg mb-2">Recarregar Saldo</h3>
-                <div id="step-valor">
-                    <input type="number" id="valor-recarga" class="w-full border rounded-lg p-3 text-center text-xl font-bold mb-4" placeholder="R$ 0,00">
-                    <button onclick="gerarPixRecarga()" id="btn-gerar-pix" class="w-full btn-primary font-bold py-3 rounded-xl">Gerar Pix</button>
-                </div>
-                <div id="step-qr" class="hidden">
-                    <div id="qrcode-container" class="flex justify-center mb-4 p-2 border rounded-lg"></div>
-                    <textarea id="pix-copia-cola" class="w-full text-[10px] bg-gray-100 p-2 rounded mb-2 h-16 text-gray-500" readonly></textarea>
-                    <button onclick="copiarPix()" class="w-full bg-green-600 text-white text-sm font-bold py-2 rounded-lg mb-2">Copiar Código</button>
-                </div>
-                <div id="loading-pix" class="hidden py-4"><div class="spinner mx-auto"></div><p class="text-xs mt-2">Conectando...</p></div>
-                <button onclick="fecharRecarga()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500"><i class="fas fa-times"></i></button>
-            </div>
-        </div>
 
+    <!-- TELA 4: O APP (PEDIDO) -->
+    <div id="screen-app" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden fade-in relative">
+        
         <!-- CABEÇALHO -->
         <div class="bg-blue-700 p-6 text-white relative">
-            <div class="absolute inset-0 opacity-20" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
             <div class="flex justify-between items-start relative z-10 mb-4">
-                <div><p class="text-xs opacity-80">Olá, <span id="app-user-name">Loja</span></p><h1 class="font-bold text-lg">Drop Entregas ⚡</h1></div>
-                <button onclick="sair()" class="text-xs bg-blue-800 px-3 py-1 rounded-full hover:bg-blue-900">Sair</button>
+                <div onclick="abrirPerfil()" class="cursor-pointer flex items-center gap-2">
+                    <div class="bg-white/20 p-2 rounded-full"><i class="fas fa-store text-sm"></i></div>
+                    <!-- NOME DA LOJA AQUI -->
+                    <div><p class="text-xs opacity-80">Loja</p><h1 class="font-bold text-lg leading-none" id="app-user-name">...</h1></div>
+                </div>
+                <button onclick="location.reload()" class="text-xs bg-blue-900 px-3 py-1 rounded-full hover:bg-blue-800 border border-blue-600"><i class="fas fa-sign-out-alt"></i> Sair</button>
             </div>
             <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl relative z-10 flex justify-between items-center shadow-lg">
                 <div><p class="text-xs text-blue-100 uppercase tracking-wider mb-1">Seu Saldo</p><p class="text-2xl font-bold text-white" id="display-saldo">R$ 0,00</p></div>
@@ -145,22 +137,33 @@
         </div>
 
         <div class="p-5 space-y-4">
+            <!-- ROTA (AGORA COM ORIGEM FIXA) -->
             <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3">
-                <p class="text-[10px] text-center text-blue-500 font-bold uppercase tracking-wider">📍 Rota (Apenas Rua/Bairro)</p>
-                <div class="relative"><i class="fas fa-map-marker-alt text-blue-600 absolute left-3 top-3"></i><input type="text" id="origem" placeholder="Retirada (Ex: Minha Loja)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500"></div>
-                <div class="relative"><i class="fas fa-flag-checkered text-green-600 absolute left-3 top-3"></i><input type="text" id="destino" placeholder="Entrega (Ex: Centro)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-green-500"></div>
-            </div>
-            <div class="space-y-3">
-                <p class="text-[10px] text-center text-gray-400 font-bold uppercase mt-2">📝 Detalhes para o Motoboy</p>
-                <div class="grid grid-cols-3 gap-2">
-                    <div class="col-span-1"><input type="text" id="numero" placeholder="Nº" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500"></div>
-                    <div class="col-span-2"><input type="text" id="complemento" placeholder="Apto / Bloco" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500"></div>
+                <p class="text-[10px] text-center text-blue-500 font-bold uppercase tracking-wider">📍 Rota</p>
+                
+                <!-- CAMPO ORIGEM TRAVADO (READONLY) -->
+                <div class="relative">
+                    <i class="fas fa-store text-blue-600 absolute left-3 top-3"></i>
+                    <input type="text" id="origem" class="pl-9 w-full p-2 text-sm rounded-lg border border-blue-200 input-readonly focus:outline-none" readonly>
+                    <p class="text-[9px] text-blue-400 ml-2 mt-1">*Endereço de coleta fixo</p>
                 </div>
-                <input type="text" id="referencia" placeholder="Ponto de Referência" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500">
+
+                <div class="relative"><i class="fas fa-flag-checkered text-green-600 absolute left-3 top-3"></i><input type="text" id="destino" placeholder="Entrega: Rua e Número" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-green-500"></div>
+            </div>
+
+            <!-- DETALHES -->
+            <div class="space-y-3">
+                <p class="text-[10px] text-center text-gray-400 font-bold uppercase mt-2">📝 Detalhes da Entrega</p>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="col-span-1"><input type="text" id="complemento" placeholder="Apto" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500"></div>
+                    <div class="col-span-2"><input type="text" id="referencia" placeholder="Ponto de Referência" class="bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-blue-500"></div>
+                </div>
+                
                 <div class="grid grid-cols-2 gap-3 pt-2">
                     <div><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Pgto Entrega</label><select id="pagamento_entrega" class="w-full bg-white border rounded-lg p-2 text-sm text-gray-700 outline-none border-blue-300 font-bold"><option value="PIX">💠 PIX</option><option value="Dinheiro">💵 Dinheiro</option><option value="Carteira">💳 Saldo em Conta</option></select></div>
                     <div><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Pgto Produto</label><select id="pagamento_produto" class="w-full bg-white border rounded-lg p-2 text-sm text-gray-700 outline-none border-green-300"><option value="Já Pago">✅ Já Pago</option><option value="Cartão">💳 Cartão</option><option value="PIX">💠 PIX</option><option value="Dinheiro">💵 Dinheiro</option></select></div>
                 </div>
+                
                 <div id="box-retorno" class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 transition-all-300">
                     <div class="flex items-center gap-2"><i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i><span id="text-retorno" class="text-sm font-bold text-gray-500">Com retorno?</span></div>
                     <div class="relative inline-block w-12 mr-2"><input onchange="recalcularTotal(); mudarStatusRetorno()" type="checkbox" id="retorno" class="toggle-checkbox block w-6 h-6 rounded-full bg-white border-4 cursor-pointer border-gray-300"/><label for="retorno" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label></div>
@@ -174,50 +177,98 @@
             <button onclick="enviarParaCentral()" id="btn-enviar" class="hidden w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2"><i class="fab fa-whatsapp text-2xl"></i> Confirmar Pedido</button>
         </div>
     </div>
+        <!-- TELA 5: MEU PERFIL -->
+    <div id="screen-profile" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden fade-in relative">
+        <div class="bg-gray-800 p-6 text-white">
+            <button onclick="showScreen('app')" class="absolute top-6 left-6 text-gray-400 hover:text-white"><i class="fas fa-arrow-left text-xl"></i></button>
+            <h2 class="text-xl font-bold text-center">Meu Perfil</h2>
+        </div>
+        <div class="p-6 space-y-5 h-96 overflow-y-auto">
+            <div><label class="text-xs font-bold text-gray-500 ml-1">NOME DA LOJA</label><input type="text" id="perf-nome-loja" class="w-full bg-gray-50 border rounded-lg p-3 text-sm"></div>
+            <div><label class="text-xs font-bold text-gray-500 ml-1">RESPONSÁVEL</label><input type="text" id="perf-nome-resp" class="w-full bg-gray-50 border rounded-lg p-3 text-sm"></div>
+            <div><label class="text-xs font-bold text-gray-500 ml-1">WHATSAPP</label><input type="text" id="perf-zap" class="w-full bg-gray-50 border rounded-lg p-3 text-sm"></div>
+            <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                <p class="text-[10px] uppercase font-bold text-blue-600 mb-2">Endereço Padrão (Retirada)</p>
+                <div class="relative mb-2"><input type="text" id="perf-cep" onblur="buscarCep('perf')" class="w-full bg-white border rounded-lg p-2 text-sm pl-8" placeholder="CEP"><i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i></div>
+                <input type="text" id="perf-rua" class="w-full bg-white border rounded-lg p-2 text-sm mb-2 input-readonly" readonly>
+                <div class="grid grid-cols-3 gap-2 mb-2"><div class="col-span-1"><input type="text" id="perf-num" class="w-full bg-white border border-blue-300 rounded-lg p-2 text-sm font-bold" placeholder="Nº"></div><div class="col-span-2"><input type="text" id="perf-bairro" class="w-full bg-white border rounded-lg p-2 text-sm input-readonly" readonly></div></div>
+                <input type="text" id="perf-cidade" class="w-full bg-white border rounded-lg p-2 text-sm input-readonly" readonly>
+            </div>
+            <button onclick="salvarPerfil()" id="btn-salvar-perf" class="w-full btn-primary font-bold py-3 rounded-xl shadow-lg flex justify-center items-center gap-2"><span>Salvar Alterações</span><div id="loading-perf" class="spinner hidden"></div></button>
+        </div>
+    </div>
+
+    <!-- MODAL RECARGA -->
+    <div id="modal-recarga" class="hidden absolute inset-0 bg-black/90 z-50 flex items-center justify-center p-4 fade-in">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm text-center">
+            <h3 class="font-bold text-lg mb-2">Recarregar Saldo</h3>
+            <div id="step-valor"><input type="number" id="valor-recarga" class="w-full border rounded-lg p-3 text-center text-xl font-bold mb-4" placeholder="R$ 0,00"><button onclick="gerarPixRecarga()" id="btn-gerar-pix" class="w-full btn-primary font-bold py-3 rounded-xl">Gerar Pix</button></div>
+            <div id="step-qr" class="hidden"><div id="qrcode-container" class="flex justify-center mb-4 p-2 border rounded-lg"></div><textarea id="pix-copia-cola" class="w-full text-[10px] bg-gray-100 p-2 rounded mb-2 h-16 text-gray-500" readonly></textarea><button onclick="copiarPix()" class="w-full bg-green-600 text-white text-sm font-bold py-2 rounded-lg mb-2">Copiar Código</button></div>
+            <div id="loading-pix" class="hidden py-4"><div class="spinner mx-auto"></div><p class="text-xs mt-2">Conectando...</p></div>
+            <button onclick="fecharRecarga()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
 
     <script>
         $(document).ready(function(){ 
             $('#reg-zap-loja').mask('(00) 00000-0000'); 
             $('#reg-zap-resp').mask('(00) 00000-0000'); 
+            $('#perf-zap').mask('(00) 00000-0000');
+            $('#reg-cep').mask('00000-000');
+            $('#perf-cep').mask('00000-000');
         });
 
         function showScreen(id) {
-            ['welcome', 'register', 'login', 'app'].forEach(s => document.getElementById('screen-'+s).classList.add('hidden'));
+            ['welcome', 'register', 'login', 'app', 'profile'].forEach(s => document.getElementById('screen-'+s).classList.add('hidden'));
             document.getElementById('screen-'+id).classList.remove('hidden');
         }
 
-        // --- CADASTRO (FIX) ---
+        // --- 1. CADASTRO (SALVA COLUNAS NOVAS) ---
         async function fazerCadastro() {
             const loja = document.getElementById('reg-nome-loja').value;
             const zapLoja = document.getElementById('reg-zap-loja').value;
             const resp = document.getElementById('reg-nome-resp').value;
             const zapResp = document.getElementById('reg-zap-resp').value;
+            
+            // Endereço
+            const cep = document.getElementById('reg-cep').value;
+            const rua = document.getElementById('reg-rua').value;
+            const num = document.getElementById('reg-num').value;
+            const bairro = document.getElementById('reg-bairro').value;
+            const cidade = document.getElementById('reg-cidade').value;
+
             const btn = document.getElementById('btn-cadastrar');
             const load = document.getElementById('loading-cad');
 
-            if(!loja || !zapLoja || !resp || !zapResp) { alert("Preencha todos os campos!"); return; }
+            if(!loja || !zapLoja || !resp || !num) { alert("Preencha todos os campos obrigatórios!"); return; }
             btn.disabled = true; load.classList.remove('hidden');
 
             try {
                 const novoCodigo = Math.floor(10000 + Math.random() * 90000).toString();
+                // Salva colunas separadas + o nome composto (para compatibilidade)
                 const nomeCompleto = `${loja} (Resp: ${resp})`;
+                const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cep}`;
 
-                // Usa 'sbClient' ao invés de 'supabase'
                 const { error } = await sbClient.from('clientes').insert([{ 
-                    codigo_cliente: novoCodigo, nome: nomeCompleto, whatsapp: zapLoja, saldo: 0 
+                    codigo_cliente: novoCodigo, 
+                    nome: nomeCompleto, 
+                    nome_loja: loja,         // Coluna Nova
+                    responsavel: resp,       // Coluna Nova
+                    whatsapp: zapLoja, 
+                    endereco: enderecoCompleto, 
+                    numero: num, bairro: bairro, cep: cep, cidade: cidade, 
+                    saldo: 0 
                 }]);
-
                 if(error) throw error;
 
-                alert(`🎉 Cadastro Sucesso!\n\nSEU CÓDIGO: ${novoCodigo}\n\nAnote este número para entrar.`);
+                alert(`🎉 Cadastro Sucesso!\n\nSEU CÓDIGO DE ACESSO: ${novoCodigo}\n\nAnote este número para entrar.`);
                 document.getElementById('login-codigo').value = novoCodigo;
                 showScreen('login');
-
-            } catch (e) { console.error(e); alert("Erro no cadastro: " + (e.message || "Verifique o Console")); } 
+            } catch (e) { console.error(e); alert("Erro no cadastro."); } 
             finally { btn.disabled = false; load.classList.add('hidden'); }
         }
 
-        // --- LOGIN ---
+        // --- 2. LOGIN ---
         async function fazerLogin() {
             const codigo = document.getElementById('login-codigo').value.trim();
             const btn = document.getElementById('btn-login');
@@ -228,29 +279,109 @@
 
             try {
                 const { data } = await sbClient.from('clientes').select('*').eq('codigo_cliente', codigo);
-                
                 if (data && data.length > 0) {
-                    usuarioAtual = { nome: data[0].nome.split('(')[0].trim(), telefone: data[0].whatsapp, codigo: data[0].codigo_cliente, saldo: data[0].saldo };
+                    // Preenche objeto global
+                    usuarioAtual = { 
+                        ...data[0],
+                        // Se tiver nome_loja (novo) usa ele, senão usa o antigo split
+                        nome_exibicao: data[0].nome_loja || data[0].nome.split('(')[0].trim() 
+                    };
+                    
                     monitorarSaldo();
-                    document.getElementById('app-user-name').innerText = usuarioAtual.nome;
-                    document.getElementById('display-saldo').innerText = usuarioAtual.saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    document.getElementById('origem').value = usuarioAtual.nome;
+                    atualizarInterfaceApp();
                     showScreen('app');
                 } else { alert("Código não encontrado."); }
             } catch (e) { alert("Erro de conexão."); }
             finally { btn.disabled = false; load.classList.add('hidden'); }
         }
 
+        function atualizarInterfaceApp() {
+            document.getElementById('app-user-name').innerText = usuarioAtual.nome_exibicao;
+            document.getElementById('display-saldo').innerText = usuarioAtual.saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            
+            // ENDEREÇO FIXO NA TELA DE PEDIDO
+            if(usuarioAtual.endereco) {
+                document.getElementById('origem').value = usuarioAtual.endereco;
+            } else {
+                document.getElementById('origem').value = "Endereço não cadastrado";
+            }
+        }
+                // --- 3. PERFIL (CARREGA E SALVA DADOS NOVOS) ---
+        function abrirPerfil() {
+            document.getElementById('perf-nome-loja').value = usuarioAtual.nome_loja || usuarioAtual.nome.split('(')[0].trim();
+            document.getElementById('perf-nome-resp').value = usuarioAtual.responsavel || "";
+            document.getElementById('perf-zap').value = usuarioAtual.whatsapp;
+            
+            document.getElementById('perf-cep').value = usuarioAtual.cep || "";
+            document.getElementById('perf-rua').value = usuarioAtual.endereco ? usuarioAtual.endereco.split(',')[0] : "";
+            document.getElementById('perf-num').value = usuarioAtual.numero || "";
+            document.getElementById('perf-bairro').value = usuarioAtual.bairro || "";
+            document.getElementById('perf-cidade').value = usuarioAtual.cidade || "";
+            showScreen('profile');
+        }
+
+        async function salvarPerfil() {
+            const loja = document.getElementById('perf-nome-loja').value;
+            const resp = document.getElementById('perf-nome-resp').value;
+            const novoZap = document.getElementById('perf-zap').value;
+            
+            const cep = document.getElementById('perf-cep').value;
+            const rua = document.getElementById('perf-rua').value;
+            const num = document.getElementById('perf-num').value;
+            const bairro = document.getElementById('perf-bairro').value;
+            const cidade = document.getElementById('perf-cidade').value;
+            
+            const novoEndereco = `${rua}, ${num}, ${bairro} - ${cep}`;
+            const nomeCompleto = `${loja} (Resp: ${resp})`;
+
+            const btn = document.getElementById('btn-salvar-perf');
+            const load = document.getElementById('loading-perf');
+            btn.disabled = true; load.classList.remove('hidden');
+
+            try {
+                const { error } = await sbClient.from('clientes').update({
+                    nome: nomeCompleto, 
+                    nome_loja: loja,
+                    responsavel: resp,
+                    whatsapp: novoZap,
+                    endereco: novoEndereco, numero: num, bairro: bairro, cep: cep, cidade: cidade
+                }).eq('codigo_cliente', usuarioAtual.codigo_cliente);
+
+                if(error) throw error;
+
+                usuarioAtual = { ...usuarioAtual, nome: nomeCompleto, nome_exibicao: loja, responsavel: resp, whatsapp: novoZap, endereco: novoEndereco, numero: num, bairro: bairro, cep: cep, cidade: cidade };
+                alert("Perfil atualizado!");
+                atualizarInterfaceApp();
+                showScreen('app');
+
+            } catch(e) { alert("Erro ao salvar."); }
+            finally { btn.disabled = false; load.classList.add('hidden'); }
+        }
+
+        // --- UTILITÁRIOS ---
+        async function buscarCep(prefixo) {
+            let cep = document.getElementById(prefixo + '-cep').value.replace(/\D/g, '');
+            if(cep.length !== 8) return;
+            try {
+                const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                const data = await res.json();
+                if(!data.erro) {
+                    document.getElementById(prefixo + '-rua').value = data.logradouro;
+                    document.getElementById(prefixo + '-bairro').value = data.bairro;
+                    document.getElementById(prefixo + '-cidade').value = `${data.localidade}/${data.uf}`;
+                    document.getElementById(prefixo + '-num').focus();
+                }
+            } catch(e) {}
+        }
+
         function monitorarSaldo() {
-            sbClient.channel('custom-all-channel').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'clientes', filter: `codigo_cliente=eq.${usuarioAtual.codigo}` }, (payload) => {
+            sbClient.channel('custom-all-channel').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'clientes', filter: `codigo_cliente=eq.${usuarioAtual.codigo_cliente}` }, (payload) => {
                 usuarioAtual.saldo = payload.new.saldo;
                 document.getElementById('display-saldo').innerText = usuarioAtual.saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             }).subscribe();
         }
 
-        function sair() { location.reload(); }
-
-        // --- CÁLCULO E ENVIO (IGUAIS) ---
+        // --- APP LÓGICA ---
         async function calcularDistancia() {
             const origem = document.getElementById('origem').value;
             const destino = document.getElementById('destino').value;
@@ -258,25 +389,21 @@
             document.getElementById('btn-text').innerText = "Calculando...";
             document.getElementById('loading').classList.remove('hidden');
             document.getElementById('btn-calcular').classList.add('opacity-50');
-
             try {
                 const urlA = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(origem + ', ' + CIDADE_FIXA)}`;
                 const urlB = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destino + ', ' + CIDADE_FIXA)}`;
                 const [resA, resB] = await Promise.all([fetch(urlA), fetch(urlB)]);
                 const [dataA, dataB] = await Promise.all([resA.json(), resB.json()]);
-
                 if(dataA.length === 0 || dataB.length === 0) { alert("Endereço não encontrado."); resetBotao(); return; }
                 const dist = getDistanceFromLatLonInKm(dataA[0].lat, dataA[0].lon, dataB[0].lat, dataB[0].lon);
                 distanciaFinal = (dist * 1.3).toFixed(1); if(distanciaFinal < 1) distanciaFinal = 1;
                 recalcularTotal();
-
                 document.getElementById('btn-calcular').classList.add('hidden');
                 document.getElementById('resultado-box').classList.remove('hidden');
                 document.getElementById('btn-enviar').classList.remove('hidden');
                 document.getElementById('resultado-box').classList.remove('animate-pulse');
-            } catch (e) { alert("Erro mapa."); resetBotao(); }
+            } catch (e) { alert("Erro de conexão."); resetBotao(); }
         }
-
         function resetBotao() { document.getElementById('btn-text').innerText = "Calcular Frete"; document.getElementById('loading').classList.add('hidden'); document.getElementById('btn-calcular').classList.remove('opacity-50'); }
         function recalcularTotal() {
             if(distanciaFinal == 0) return;
@@ -286,7 +413,7 @@
             document.getElementById('km-display').innerText = distanciaFinal.replace('.', ',');
             document.getElementById('valor-display').innerText = valorFinal.replace('.', ',');
         }
-        function mudarStatusRetorno() { /* Lógica visual de retorno */ 
+        function mudarStatusRetorno() {
              const checked = document.getElementById('retorno').checked;
             const box = document.getElementById('box-retorno');
             const txt = document.getElementById('text-retorno');
@@ -301,80 +428,63 @@
                 ico.className = "fas fa-arrow-right text-gray-400";
             }
         }
-
         async function enviarParaCentral() {
             const origem = document.getElementById('origem').value;
             const destino = document.getElementById('destino').value;
-            const numero = document.getElementById('numero').value;
             const complemento = document.getElementById('complemento').value;
             const referencia = document.getElementById('referencia').value;
             const pagEntrega = document.getElementById('pagamento_entrega').value;
             const pagProduto = document.getElementById('pagamento_produto').value;
             const retorno = document.getElementById('retorno').checked ? "COM RETORNO" : "SEM RETORNO";
             
-            if(!numero) { alert("Informe o número do local!"); document.getElementById('numero').focus(); return; }
-
-            const btn = document.getElementById('btn-enviar');
-            const textoOriginal = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-            btn.disabled = true;
-
-            // 1. DÉBITO EM CARTEIRA
             if(pagEntrega === "Carteira") {
                 const valorFloat = parseFloat(valorFinal);
                 if(valorFloat > usuarioAtual.saldo) { alert(`Saldo Insuficiente!`); btn.disabled = false; btn.innerHTML = textoOriginal; return; }
                 const novoSaldo = usuarioAtual.saldo - parseFloat(valorFinal);
-                const { error } = await sbClient.from('clientes').update({ saldo: novoSaldo }).eq('codigo_cliente', usuarioAtual.codigo);
+                const { error } = await sbClient.from('clientes').update({ saldo: novoSaldo }).eq('codigo_cliente', usuarioAtual.codigo_cliente);
                 if(error) { alert("Erro ao debitar."); return; }
                 usuarioAtual.saldo = novoSaldo;
                 document.getElementById('display-saldo').innerText = novoSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             }
 
-            // 2. SALVA NO SUPABASE
             await sbClient.from('pedidos').insert([{
-                cliente_id: usuarioAtual.codigo, nome_cliente: usuarioAtual.nome,
+                cliente_id: usuarioAtual.codigo_cliente, nome_cliente: usuarioAtual.nome,
                 origem: origem, destino: destino, valor_frete: parseFloat(valorFinal),
                 forma_pagamento: pagEntrega, status: 'Solicitado'
             }]);
 
-                // 3. BACKUP NA PLANILHA
-            if(SHEETMONKEY_URL) {
-                try {
-                    const dadosParaPlanilha = {
-                        'x-sheetmonkey-insert-worksheet': 'Corridas', // Aba da Planilha
-                        'Data': new Date().toLocaleString('pt-BR'),
-                        'Cliente': usuarioAtual.nome, 'Telefone': usuarioAtual.telefone,
-                        'Origem': origem, 'Destino': destino, 'Numero': numero, 'Complemento': complemento, 'Referencia': referencia,
-                        'Pgto_Entrega': pagEntrega, 'Pgto_Produto': pagProduto, 'Valor_Frete': valorFinal
-                    };
-                    await fetch(SHEETMONKEY_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dadosParaPlanilha) });
-                } catch(e) { console.log("Erro backup planilha"); }
-            }
+            try {
+                const dadosParaPlanilha = {
+                    'x-sheetmonkey-insert-worksheet': 'Corridas',
+                    'Data': new Date().toLocaleString('pt-BR'),
+                    'Cliente': usuarioAtual.nome_loja, 'Responsavel': usuarioAtual.responsavel, 'Telefone': usuarioAtual.whatsapp,
+                    'Origem': origem, 'Destino': destino, 'Complemento': complemento, 'Referencia': referencia,
+                    'Pgto_Entrega': pagEntrega, 'Pgto_Produto': pagProduto, 'Valor_Frete': valorFinal
+                };
+                await fetch(SHEETMONKEY_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dadosParaPlanilha) });
+            } catch(e){}
 
-            // 4. WHATSAPP
             const numAdmin = NUMERO_ADMIN; 
             let avisoPagamento = pagEntrega === "Carteira" ? "✅ *PAGO VIA CARTEIRA*" : `🛵 *Pgto Entrega:* ${pagEntrega}`;
             let valorParaMotoboy = parseFloat(valorFinal) - TAXA_FIXA_CENTRAL;
-            if(valorParaMotoboy < 4.00) valorParaMotoboy = 4.00;
+            if(valorParaMotoboy < 4) valorParaMotoboy = 4;
             let codigoProtocolo = valorParaMotoboy.toFixed(2).replace('.', '');
             while(codigoProtocolo.length < 5) { codigoProtocolo = "0" + codigoProtocolo; }
 
-            const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A👤 *Loja:* ${usuarioAtual.nome} (Cód: ${usuarioAtual.codigo})%0A📍 *DE:* ${origem}%0A🏁 *PARA:* ${destino}%0A🔢 *Nº:* ${numero} ${complemento ? ' - ' + complemento : ''}%0A🏛️ *Ref:* ${referencia}%0A--------------------------------%0A📏 ${distanciaFinal}km | 🔄 ${retorno}%0A${avisoPagamento}%0A📦 *Pgto Produto:* ${pagProduto}%0A💲 *FRETE: R$ ${valorFinal}*%0A🔑 *Prot:* %23${codigoProtocolo}`;
+            const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A🏪 *${usuarioAtual.nome_loja}*%0A👤 Resp: ${usuarioAtual.responsavel}%0A📍 *DE:* ${origem}%0A🏁 *PARA:* ${destino}%0A${complemento ? '🏢 ' + complemento + '%0A' : ''}${referencia ? '🏛️ ' + referencia + '%0A' : ''}--------------------------------%0A📏 ${distanciaFinal}km | 🔄 ${retorno}%0A${avisoPagamento}%0A📦 *Pgto Produto:* ${pagProduto}%0A💲 *FRETE: R$ ${valorFinal}*%0A🔑 *Prot:* %23${codigoProtocolo}`;
             window.open(`https://wa.me/${numAdmin}?text=${msg}`, '_blank');
             location.reload();
         }
 
-        // --- RECARGA ---
         function abrirRecarga() { document.getElementById('modal-recarga').classList.remove('hidden'); document.getElementById('step-valor').classList.remove('hidden'); document.getElementById('step-qr').classList.add('hidden'); }
         function fecharRecarga() { document.getElementById('modal-recarga').classList.add('hidden'); }
         async function gerarPixRecarga() {
             const valor = parseFloat(document.getElementById('valor-recarga').value);
             if(!valor || valor < 5) { alert("Mínimo R$ 5,00"); return; }
             if(!MAKE_WEBHOOK_URL) { alert("Recarga indisponível no momento."); return; }
-            
             document.getElementById('step-valor').classList.add('hidden'); document.getElementById('loading-pix').classList.remove('hidden');
             try {
-                const res = await fetch(MAKE_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ codigo_cliente: usuarioAtual.codigo, valor: valor, nome: usuarioAtual.nome, origem: "Drop App" }) });
+                const res = await fetch(MAKE_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ codigo_cliente: usuarioAtual.codigo_cliente, valor: valor, nome: usuarioAtual.nome, origem: "Drop App" }) });
                 const data = await res.json();
                 if(data.payload) {
                     document.getElementById('loading-pix').classList.add('hidden'); document.getElementById('step-qr').classList.remove('hidden');
@@ -385,7 +495,6 @@
             } catch(e) { alert("Erro de comunicação."); fecharRecarga(); }
         }
         function copiarPix() { document.getElementById('pix-copia-cola').select(); document.execCommand("copy"); alert("Copiado!"); }
-
         function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) { var R = 6371; var dLat = deg2rad(lat2-lat1); var dLon = deg2rad(lon2-lon1); var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R * c; }
         function deg2rad(deg) { return deg * (Math.PI/180); }
     </script>
