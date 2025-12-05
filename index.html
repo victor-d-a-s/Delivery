@@ -104,9 +104,7 @@
             </div>
             <button onclick="fazerCadastro()" id="btn-cadastrar" class="w-full btn-primary font-bold py-3 rounded-xl shadow-lg mt-2"><span>Gerar Código</span></button>
         </div>
-    </div>
-
-    <!-- TELA 3: LOGIN -->
+                  <!-- TELA 3: LOGIN -->
     <div id="screen-login" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 fade-in m-4 relative">
         <button onclick="showScreen('welcome')" class="absolute top-4 left-4 text-gray-400 hover:text-blue-700"><i class="fas fa-arrow-left text-xl"></i></button>
         <div class="text-center mb-8 mt-4"><h2 class="text-xl font-bold text-gray-800">Acesso Drop</h2><p class="text-xs text-gray-500">Digite seu código exclusivo.</p></div>
@@ -116,7 +114,8 @@
             <p class="text-center text-xs text-blue-600 cursor-pointer hover:underline mt-2" onclick="alert('Suporte: ' + NUMERO_ADMIN)">Esqueci meu código</p>
         </div>
     </div>
-       <!-- TELA 4: O APP (PEDIDO) -->
+
+    <!-- TELA 4: O APP (PEDIDO) -->
     <div id="screen-app" class="hidden bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden fade-in relative pb-20">
         <div class="bg-blue-700 p-6 text-white relative">
             <div class="flex justify-between items-start relative z-10 mb-4">
@@ -160,14 +159,15 @@
             </div>
             <button onclick="enviarParaCentral()" id="btn-enviar" class="hidden w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2"><i class="fab fa-whatsapp text-2xl"></i> Confirmar Pedido</button>
         </div>
+                    </div> 
     </div>
-
-    <!-- TELA 5: HISTÓRICO -->
+        <!-- TELA 5: HISTÓRICO -->
     <div id="screen-history" class="hidden bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden fade-in relative h-screen flex flex-col pb-20">
         <div class="bg-blue-700 p-4 text-white text-center font-bold">Meus Pedidos</div>
         <div id="lista-pedidos" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50"></div>
-                    </div>
-                        <!-- TELA 6: EXTRATO -->
+    </div>
+
+    <!-- TELA 6: EXTRATO -->
     <div id="screen-extract" class="hidden bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden fade-in relative h-screen flex flex-col pb-20">
         <div class="bg-blue-700 p-4 text-white text-center font-bold">Extrato Financeiro</div>
         <div class="bg-blue-800 p-6 text-center text-white">
@@ -281,7 +281,8 @@
                 alert("Erro no cadastro: " + (e.message || e.error_description || JSON.stringify(e))); 
             } finally { btn.disabled = false; }
         }
-              // --- LOGIN ---
+
+        // --- LOGIN ---
         async function fazerLogin() {
             const codigo = document.getElementById('login-codigo').value.trim();
             if(!codigo) return;
@@ -383,8 +384,7 @@
             window.open(`https://wa.me/${numAdmin}?text=${msg}`, '_blank');
             location.reload();
         }
-
-        // --- PERFIL ---
+       // --- PERFIL ---
         function abrirPerfil() {
             document.getElementById('perf-nome-loja').value = usuarioAtual.nome_loja || "";
             document.getElementById('perf-nome-resp').value = usuarioAtual.responsavel || "";
