@@ -19,10 +19,12 @@
         
         .btn-primary { background-color: #1E40AF; color: white; transition: all 0.2s; }
         .btn-primary:hover { background-color: #1E3A8A; transform: scale(1.02); }
-        .btn-primary:active { transform: scale(0.98); }
         .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; transform: none; }
         
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
+        
+        .spinner { border: 3px solid rgba(0,0,0,0.1); border-left-color: #1E40AF; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         /* Toggle Switch */
         .switch-container { display: flex; align-items: center; justify-content: space-between; background: white; padding: 12px; border-radius: 12px; border: 1px solid #e5e7eb; transition: all 0.3s; }
@@ -33,31 +35,26 @@
         input:checked + .slider { background-color: #1E40AF; }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        /* Menu Inferior */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 10px; z-index: 50; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #9CA3AF; cursor: pointer; }
-        .nav-item.active { color: #1E40AF; font-weight: bold; }
-        .nav-item i { font-size: 20px; margin-bottom: 2px; }
-
         .input-readonly { background-color: #F3F4F6; color: #4B5563; }
-        .spinner { border: 3px solid rgba(0,0,0,0.1); border-left-color: #1E40AF; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
 
     <script>
-        // --- CONFIGURAÇÃO 100% BANCO DE DADOS ---
+        // ---------------------------------------------------------
+        // CONFIGURAÇÕES
+        // ---------------------------------------------------------
         const SUPABASE_URL = 'https://zblwwoqfnhmoexonuzbi.supabase.co'; 
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpibHd3b3Fmbmhtb2V4b251emJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3ODcyMDgsImV4cCI6MjA4MDM2MzIwOH0.crZGeKTawenl8N6ajhceRKalXVsCq31RWmSlvO6LHVc';
-        
-        const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const SHEETMONKEY_URL = 'https://api.sheetmonkey.io/form/bjbGYT8y9RCwwAk71aqbLr'; 
+        const MAKE_WEBHOOK_URL = ""; 
 
+        const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const CIDADE_FIXA = "Mossoró, Rio Grande do Norte, Brasil"; 
         const NUMERO_ADMIN = "5584982005039"; 
         const PRECO_BASE = 6.00; const PRECO_POR_KM = 1.80; const TAXA_RETORNO = 0.70; const TAXA_FIXA_CENTRAL = 0.50;
 
-        let usuarioAtual = { nome: "", telefone: "", codigo: "", saldo: 0 };
+        let usuarioAtual = { nome: "", telefone: "", codigo: "", saldo: 0, primeiro_acesso: false };
         let distanciaFinal = 0; let valorFinal = 0;
     </script>
 
@@ -69,13 +66,13 @@
             <p class="text-gray-500 text-sm">Logística rápida para seu negócio.</p>
         </div>
         <div class="space-y-4">
-            <button onclick="showScreen('register')" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-3"><i class="fas fa-store"></i> Cadastrar Estabelecimento</button>
-            <button onclick="showScreen('login')" class="w-full btn-outline font-bold py-4 rounded-xl shadow-sm flex items-center justify-center gap-3"><i class="fas fa-sign-in-alt"></i> Já tenho Código</button>
+            <button onclick="showScreen('register')" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition flex items-center justify-center gap-3"><i class="fas fa-store"></i> Cadastrar Estabelecimento</button>
+            <button onclick="showScreen('login')" class="w-full btn-outline font-bold py-4 rounded-xl shadow-sm transform active:scale-95 transition flex items-center justify-center gap-3"><i class="fas fa-lock"></i> Acessar Conta</button>
         </div>
-        <p class="mt-6 text-xs text-gray-400">Versão 12.0 (Rápida)</p>
+        <p class="mt-6 text-xs text-gray-400">Versão 13.0 (Secure)</p>
     </div>
 
-    <!-- TELA 2: CADASTRO (AJUSTADO PARA VELOCIDADE) -->
+    <!-- TELA 2: CADASTRO -->
     <div id="screen-register" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 fade-in m-4 relative">
         <button onclick="showScreen('welcome')" class="absolute top-4 left-4 text-gray-400 hover:text-blue-700"><i class="fas fa-arrow-left text-xl"></i></button>
         <div class="text-center mb-6 mt-2"><h2 class="text-xl font-bold text-gray-800">Novo Parceiro</h2></div>
@@ -102,38 +99,70 @@
                 <input type="text" id="reg-cidade" class="w-full bg-gray-100 border rounded-lg p-2 text-sm input-readonly" readonly>
             </div>
             <button onclick="fazerCadastro()" id="btn-cadastrar" class="w-full btn-primary font-bold py-3 rounded-xl shadow-lg mt-2 flex justify-center items-center gap-2">
-                <span id="btn-text-cad">Gerar Código de Acesso</span>
+                <span id="btn-text-cad">Gerar Credenciais</span>
                 <div id="loading-cad" class="spinner hidden"></div>
             </button>
         </div>
     </div>
-    <!-- TELA 3: LOGIN -->
+
+        <!-- TELA 3: LOGIN (COM SENHA E OLHINHO) -->
     <div id="screen-login" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 fade-in m-4 relative">
         <button onclick="showScreen('welcome')" class="absolute top-4 left-4 text-gray-400 hover:text-blue-700"><i class="fas fa-arrow-left text-xl"></i></button>
-        <div class="text-center mb-8 mt-4"><h2 class="text-xl font-bold text-gray-800">Acesso Drop</h2><p class="text-xs text-gray-500">Digite seu código exclusivo.</p></div>
+        <div class="text-center mb-8 mt-4"><h2 class="text-xl font-bold text-gray-800">Acesso Seguro</h2><p class="text-xs text-gray-500">Identifique-se para continuar.</p></div>
         <div class="space-y-4">
-            <input type="text" id="login-codigo" class="w-full bg-blue-50 border border-blue-100 rounded-xl p-4 text-center text-2xl font-bold tracking-widest text-blue-800" placeholder="00000" maxlength="5">
+            <div>
+                <label class="text-xs font-bold text-gray-500 ml-1">CÓDIGO</label>
+                <input type="text" id="login-codigo" class="w-full bg-blue-50 border border-blue-100 rounded-xl p-4 text-center text-xl font-bold tracking-widest text-blue-800 outline-none focus:border-blue-600" placeholder="00000" maxlength="5">
+            </div>
+            <div>
+                <label class="text-xs font-bold text-gray-500 ml-1">SENHA</label>
+                <div class="relative">
+                    <input type="password" id="login-senha" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-center text-xl outline-none focus:border-blue-600" placeholder="•••••">
+                    <button onclick="toggleSenha('login-senha', this)" class="absolute right-4 top-4 text-gray-400 hover:text-blue-600"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
             <button onclick="fazerLogin()" id="btn-login" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2"><span>Entrar</span><div id="loading-login" class="spinner hidden"></div></button>
-            <p class="text-center text-xs text-blue-600 cursor-pointer hover:underline mt-2" onclick="alert('Fale com o suporte: ' + NUMERO_ADMIN)">Esqueci meu código</p>
+            <p class="text-center text-xs text-blue-600 cursor-pointer hover:underline mt-2" onclick="alert('Fale com o suporte: ' + NUMERO_ADMIN)">Esqueci minha senha</p>
         </div>
     </div>
 
-    <!-- TELA 4: O APP (PEDIDO) -->
+    <!-- TELA 3.5: TROCA DE SENHA (BLOQUEIO) -->
+    <div id="screen-new-password" class="hidden bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 text-center fade-in m-4">
+        <div class="mb-6 text-yellow-500"><i class="fas fa-lock text-5xl"></i></div>
+        <h2 class="text-xl font-bold text-gray-800 mb-2">Senha Temporária</h2>
+        <p class="text-sm text-gray-500 mb-6">Para sua segurança, crie uma nova senha pessoal para liberar seu acesso.</p>
+        
+        <div class="space-y-4">
+            <div class="relative">
+                <input type="password" id="nova-senha" class="w-full border rounded-lg p-3 text-center outline-none focus:border-blue-600" placeholder="Nova Senha">
+                <button onclick="toggleSenha('nova-senha', this)" class="absolute right-3 top-3 text-gray-400"><i class="fas fa-eye"></i></button>
+            </div>
+            <div class="relative">
+                <input type="password" id="confirma-senha" class="w-full border rounded-lg p-3 text-center outline-none focus:border-blue-600" placeholder="Confirme a Senha">
+            </div>
+            <button onclick="salvarNovaSenha()" id="btn-new-pass" class="w-full btn-primary font-bold py-3 rounded-xl shadow-lg flex justify-center items-center gap-2"><span>Salvar e Entrar</span><div id="loading-newpass" class="spinner hidden"></div></button>
+        </div>
+    </div>
+
+    <!-- TELA 4: O APP -->
     <div id="screen-app" class="hidden bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden fade-in relative pb-20">
         <div class="bg-blue-700 p-6 text-white relative">
             <div class="flex justify-between items-start relative z-10 mb-4">
-                <div class="flex items-center gap-2"><div class="bg-white/20 p-2 rounded-full"><i class="fas fa-store text-sm"></i></div><div><p class="text-xs opacity-80">Olá,</p><h1 class="font-bold text-lg leading-none" id="app-user-name">Loja</h1></div></div>
-                <button onclick="location.reload()" class="text-xs bg-blue-900 px-3 py-1 rounded-full hover:bg-blue-800 border border-blue-600"><i class="fas fa-sign-out-alt"></i></button>
+                <div onclick="abrirPerfil()" class="cursor-pointer flex items-center gap-2">
+                    <div class="bg-white/20 p-2 rounded-full"><i class="fas fa-store text-sm"></i></div>
+                    <div><p class="text-xs opacity-80">Olá,</p><h1 class="font-bold text-lg leading-none" id="app-user-name">Loja</h1></div>
+                </div>
+                <button onclick="location.reload()" class="text-xs bg-blue-900 px-3 py-1 rounded-full hover:bg-blue-800 border border-blue-600"><i class="fas fa-sign-out-alt"></i> Sair</button>
             </div>
-            <div class="bg-white/10 p-4 rounded-xl relative z-10 flex justify-between items-center shadow-lg">
+            <div class="bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-xl relative z-10 flex justify-between items-center shadow-lg">
                 <div><p class="text-xs text-blue-100 uppercase tracking-wider mb-1">Seu Saldo</p><p class="text-2xl font-bold text-white" id="display-saldo">R$ 0,00</p></div>
-                <button onclick="alert('Solicite recarga ao suporte.')" class="bg-white px-4 py-2 rounded-lg text-blue-700 text-xs font-bold shadow-lg hover:bg-blue-50 active:scale-95 transition flex items-center gap-1"><i class="fas fa-plus"></i> Add</button>
+                <button onclick="abrirRecarga()" class="bg-white px-4 py-2 rounded-lg text-blue-700 text-xs font-bold shadow-lg hover:bg-blue-50 active:scale-95 transition flex items-center gap-1"><i class="fas fa-plus"></i> Add</button>
             </div>
         </div>
 
         <div class="p-5 space-y-4">
             <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3">
-                <p class="text-[10px] text-center text-blue-500 font-bold uppercase tracking-wider">📍 Mossoró</p>
+                <p class="text-[10px] text-center text-blue-500 font-bold uppercase tracking-wider">📍 Rota</p>
                 <div class="relative"><i class="fas fa-map-marker-alt text-blue-600 absolute left-3 top-3"></i><input type="text" id="origem" placeholder="Retirada" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg font-bold text-gray-700" readonly></div>
                 <div class="relative"><i class="fas fa-flag-checkered text-green-600 absolute left-3 top-3"></i><input type="text" id="destino" placeholder="Entrega (Rua, Número, Bairro)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-green-500"></div>
             </div>
@@ -149,12 +178,8 @@
                     <div><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Produto</label><select id="pagamento_produto" class="w-full bg-white border rounded-lg p-2 text-sm text-gray-700 outline-none border-green-300"><option value="Já Pago">✅ Já Pago</option><option value="Cartão">💳 Cartão</option><option value="PIX">💠 PIX</option><option value="Dinheiro">💵 Dinheiro</option></select></div>
                 </div>
                 
-                <!-- BOTÃO RETORNO AJUSTADO COM MUDANÇA DE TEXTO -->
-                <div id="box-retorno" class="switch-container">
-                    <div class="flex items-center gap-2">
-                        <i id="icon-retorno" class="fas fa-undo-alt text-gray-400 text-lg"></i>
-                        <span id="text-retorno" class="text-sm font-bold text-gray-500">Com retorno?</span>
-                    </div>
+                <div class="switch-container">
+                    <div class="flex items-center gap-2"><i class="fas fa-undo-alt text-gray-400"></i><span id="text-retorno" class="text-sm font-bold text-gray-500">Com retorno?</span></div>
                     <label class="switch"><input type="checkbox" id="retorno" onchange="recalcularTotal(); mudarStatusRetorno()"><span class="slider"></span></label>
                 </div>
             </div>
@@ -165,7 +190,8 @@
             </div>
             <button onclick="enviarParaCentral()" id="btn-enviar" class="hidden w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2"><i class="fab fa-whatsapp text-2xl"></i> Confirmar Pedido</button>
         </div>
-    </div>
+                                              </div>
+
     <!-- TELA 5: HISTÓRICO -->
     <div id="screen-history" class="hidden bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden fade-in relative h-screen flex flex-col pb-20">
         <div class="bg-blue-700 p-4 text-white text-center font-bold">Meus Pedidos</div>
@@ -200,12 +226,23 @@
         </div>
     </div>
 
-    <!-- MENU INFERIOR -->
+       <!-- MENU INFERIOR -->
     <div id="bottom-menu" class="hidden bottom-nav w-full max-w-md rounded-t-xl">
         <div class="nav-item active" onclick="navegar('app', this)"><i class="fas fa-home"></i><span>Início</span></div>
         <div class="nav-item" onclick="navegar('history', this); carregarHistorico()"><i class="fas fa-list"></i><span>Pedidos</span></div>
         <div class="nav-item" onclick="navegar('extract', this); carregarExtrato()"><i class="fas fa-file-invoice-dollar"></i><span>Extrato</span></div>
         <div class="nav-item" onclick="navegar('profile', this); abrirPerfil()"><i class="fas fa-user"></i><span>Perfil</span></div>
+    </div>
+
+    <!-- MODAL RECARGA -->
+    <div id="modal-recarga" class="hidden absolute inset-0 bg-black/90 z-50 flex items-center justify-center p-4 fade-in">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm text-center">
+            <h3 class="font-bold text-lg mb-2">Recarregar Saldo</h3>
+            <div id="step-valor"><input type="number" id="valor-recarga" class="w-full border rounded-lg p-3 text-center text-xl font-bold mb-4" placeholder="R$ 0,00"><button onclick="gerarPixRecarga()" class="w-full btn-primary font-bold py-3 rounded-xl">Gerar Pix</button></div>
+            <div id="step-qr" class="hidden"><div id="qrcode-container" class="flex justify-center mb-4 p-2 border rounded-lg"></div><textarea id="pix-copia-cola" class="w-full text-[10px] bg-gray-100 p-2 rounded mb-2 h-16 text-gray-500" readonly></textarea><button onclick="copiarPix()" class="w-full bg-green-600 text-white text-sm font-bold py-2 rounded-lg mb-2">Copiar Código</button></div>
+            <div id="loading-pix" class="hidden py-4"><div class="spinner mx-auto"></div></div>
+            <button onclick="fecharRecarga()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500"><i class="fas fa-times"></i></button>
+        </div>
     </div>
 
     <script>
@@ -218,7 +255,7 @@
         });
 
         function showScreen(id) {
-            ['welcome', 'register', 'login', 'app', 'history', 'extract', 'profile'].forEach(s => document.getElementById('screen-'+s).classList.add('hidden'));
+            ['welcome', 'register', 'login', 'app', 'history', 'extract', 'profile', 'new-password'].forEach(s => document.getElementById('screen-'+s).classList.add('hidden'));
             document.getElementById('screen-'+id).classList.remove('hidden');
             
             if(['app', 'history', 'extract', 'profile'].includes(id)) {
@@ -236,14 +273,13 @@
             elemento.classList.add('active');
         }
 
-        // --- CADASTRO OTIMIZADO ---
+        // --- CADASTRO (GERA SENHA E CÓDIGO) ---
         async function fazerCadastro() {
             const loja = document.getElementById('reg-nome-loja').value;
             const zapLoja = document.getElementById('reg-zap-loja').value;
             const resp = document.getElementById('reg-nome-resp').value;
             const zapResp = document.getElementById('reg-zap-resp').value;
             
-            // Endereço
             const cep = document.getElementById('reg-cep').value;
             const rua = document.getElementById('reg-rua').value;
             const num = document.getElementById('reg-num').value;
@@ -256,26 +292,34 @@
 
             if(!loja || !zapLoja || !resp || !num) { alert("Preencha todos os campos obrigatórios!"); return; }
             
-            // Bloqueia botão imediatamente
             btn.disabled = true; 
             if(txtBtn) txtBtn.innerText = "Gerando...";
             load.classList.remove('hidden');
 
             try {
                 const novoCodigo = Math.floor(10000 + Math.random() * 90000).toString();
+                const senhaProv = "12345";
                 const nomeCompleto = `${loja} (Resp: ${resp})`;
                 const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cep}`;
 
                 const { error } = await sbClient.from('clientes').insert([{ 
-                    codigo_cliente: novoCodigo, nome: nomeCompleto, nome_loja: loja, responsavel: resp, whatsapp: zapLoja, 
-                    endereco: enderecoCompleto, numero: num, bairro: bairro, cep: cep, cidade: cidade, saldo: 0 
+                    codigo_cliente: novoCodigo, 
+                    nome: nomeCompleto, 
+                    nome_loja: loja,
+                    responsavel: resp,
+                    whatsapp: zapLoja, 
+                    endereco: enderecoCompleto, numero: num, bairro: bairro, cep: cep, cidade: cidade, 
+                    saldo: 0,
+                    senha: senhaProv,
+                    primeiro_acesso: true
                 }]);
                 
                 if(error) throw error;
 
-                alert(`🎉 Cadastro Sucesso!\n\nSEU CÓDIGO DE ACESSO: ${novoCodigo}\n\nAnote este número para entrar.`);
+                alert(`🎉 Cadastro Sucesso!\n\nCÓDIGO: ${novoCodigo}\nSENHA: ${senhaProv}\n\nGuarde bem!`);
                 document.getElementById('login-codigo').value = novoCodigo;
                 showScreen('login');
+
             } catch (e) { console.error(e); alert("Erro no cadastro. Tente novamente."); } 
             finally { 
                 btn.disabled = false; 
@@ -283,24 +327,63 @@
                 if(txtBtn) txtBtn.innerText = "Gerar Código de Acesso";
             }
         }
-       // --- LOGIN ---
+
+               // --- LOGIN (COM SENHA) ---
         async function fazerLogin() {
             const codigo = document.getElementById('login-codigo').value.trim();
+            const senha = document.getElementById('login-senha').value.trim();
             const btn = document.getElementById('btn-login');
             const load = document.getElementById('loading-login');
 
-            if(!codigo) { alert("Digite o código."); return; }
+            if(!codigo || !senha) { alert("Digite código e senha."); return; }
             btn.disabled = true; load.classList.remove('hidden');
 
             try {
-                const { data } = await sbClient.from('clientes').select('*').eq('codigo_cliente', codigo);
+                const { data } = await sbClient.from('clientes').select('*')
+                    .eq('codigo_cliente', codigo)
+                    .eq('senha', senha);
+
                 if (data && data.length > 0) {
                     usuarioAtual = { ...data[0], nome_exibicao: data[0].nome_loja || data[0].nome.split('(')[0].trim() };
-                    monitorarSaldo();
-                    atualizarInterfaceApp();
-                    showScreen('app');
-                } else { alert("Código não encontrado."); }
+                    
+                    if(usuarioAtual.primeiro_acesso) {
+                        showScreen('new-password');
+                    } else {
+                        monitorarSaldo();
+                        atualizarInterfaceApp();
+                        showScreen('app');
+                    }
+                } else { alert("Dados incorretos."); }
             } catch (e) { alert("Erro de conexão."); }
+            finally { btn.disabled = false; load.classList.add('hidden'); }
+        }
+
+        // --- SENHA ---
+        function toggleSenha(id, btn) {
+            const input = document.getElementById(id);
+            if(input.type === "password") { input.type = "text"; btn.innerHTML = '<i class="fas fa-eye-slash"></i>'; }
+            else { input.type = "password"; btn.innerHTML = '<i class="fas fa-eye"></i>'; }
+        }
+
+        async function salvarNovaSenha() {
+            const nova = document.getElementById('nova-senha').value;
+            const confirma = document.getElementById('confirma-senha').value;
+            const btn = document.getElementById('btn-new-pass');
+            const load = document.getElementById('loading-newpass');
+            
+            if(nova.length < 4) { alert("Senha curta."); return; }
+            if(nova !== confirma) { alert("Senhas não batem."); return; }
+
+            btn.disabled = true; load.classList.remove('hidden');
+
+            try {
+                const { error } = await sbClient.from('clientes').update({ senha: nova, primeiro_acesso: false }).eq('codigo_cliente', usuarioAtual.codigo_cliente);
+                if(error) throw error;
+                alert("Senha alterada!");
+                monitorarSaldo();
+                atualizarInterfaceApp();
+                showScreen('app');
+            } catch(e) { alert("Erro ao salvar."); }
             finally { btn.disabled = false; load.classList.add('hidden'); }
         }
 
@@ -316,7 +399,6 @@
             document.getElementById('perf-nome-loja').value = usuarioAtual.nome_loja || usuarioAtual.nome.split('(')[0].trim();
             document.getElementById('perf-nome-resp').value = usuarioAtual.responsavel || "";
             document.getElementById('perf-zap').value = usuarioAtual.whatsapp;
-            
             document.getElementById('perf-cep').value = usuarioAtual.cep || "";
             document.getElementById('perf-rua').value = usuarioAtual.endereco ? usuarioAtual.endereco.split(',')[0] : "";
             document.getElementById('perf-num').value = usuarioAtual.numero || "";
@@ -380,7 +462,7 @@
             }).subscribe();
         }
 
-        // --- DADOS ---
+        // --- HISTÓRICO E EXTRATO ---
         async function carregarHistorico() {
             const div = document.getElementById('lista-pedidos');
             div.innerHTML = '<p class="text-center text-gray-400 mt-4"><i class="fas fa-spinner fa-spin"></i> Carregando...</p>';
@@ -407,7 +489,7 @@
             });
         }
 
-        // --- APP ---
+                // --- CÁLCULO ---
         async function calcularDistancia() {
             const origem = document.getElementById('origem').value;
             const destino = document.getElementById('destino').value;
@@ -481,6 +563,17 @@
                 forma_pagamento: pagEntrega, status: 'Solicitado'
             }]);
 
+            try {
+                const dadosPlanilha = {
+                    'x-sheetmonkey-insert-worksheet': 'Corridas',
+                    'Data': new Date().toLocaleString('pt-BR'),
+                    'Cliente': usuarioAtual.nome, 'Telefone': usuarioAtual.whatsapp,
+                    'Origem': origem, 'Destino': destino, 'Complemento': complemento, 'Referencia': referencia,
+                    'Pgto_Entrega': pagEntrega, 'Pgto_Produto': pagProduto, 'Valor_Frete': valorFinal
+                };
+                fetch(SHEETMONKEY_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dadosPlanilha) });
+            } catch(e){}
+
             const numAdmin = NUMERO_ADMIN; 
             let avisoPagamento = pagEntrega === "Carteira" ? "✅ *PAGO VIA CARTEIRA*" : `🛵 *Pgto Entrega:* ${pagEntrega}`;
             let valorParaMotoboy = parseFloat(valorFinal) - TAXA_FIXA_CENTRAL;
@@ -488,10 +581,29 @@
             let codigoProtocolo = valorParaMotoboy.toFixed(2).replace('.', '');
             while(codigoProtocolo.length < 5) { codigoProtocolo = "0" + codigoProtocolo; }
 
-            const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A👤 *Loja:* ${usuarioAtual.nome} (Cód: ${usuarioAtual.codigo})%0A📍 *DE:* ${origem}%0A🏁 *PARA:* ${destino}%0A${complemento ? '🏢 ' + complemento + '%0A' : ''}${referencia ? '🏛️ ' + referencia + '%0A' : ''}--------------------------------%0A📏 ${distanciaFinal}km | 🔄 ${retorno}%0A${avisoPagamento}%0A📦 *Pgto Produto:* ${pagProduto}%0A💲 *FRETE: R$ ${valorFinal}*%0A🔑 *Prot:* %23${codigoProtocolo}`;
+            const msg = `🚨 *NOVA CORRIDA* 🚨%0A%0A👤 *Loja:* ${usuarioAtual.nome} (Cód: ${usuarioAtual.codigo_cliente})%0A📍 *DE:* ${origem}%0A🏁 *PARA:* ${destino}%0A${complemento ? '🏢 ' + complemento + '%0A' : ''}${referencia ? '🏛️ ' + referencia + '%0A' : ''}--------------------------------%0A📏 ${distanciaFinal}km | 🔄 ${retorno}%0A${avisoPagamento}%0A📦 *Pgto Produto:* ${pagProduto}%0A💲 *FRETE: R$ ${valorFinal}*%0A🔑 *Prot:* %23${codigoProtocolo}`;
             window.open(`https://wa.me/${numAdmin}?text=${msg}`, '_blank');
             location.reload();
         }
+        function abrirRecarga() { document.getElementById('modal-recarga').classList.remove('hidden'); }
+        function fecharRecarga() { document.getElementById('modal-recarga').classList.add('hidden'); }
+        async function gerarPixRecarga() {
+            const valor = parseFloat(document.getElementById('valor-recarga').value);
+            if(!valor || valor < 5) { alert("Mínimo R$ 5,00"); return; }
+            if(!MAKE_WEBHOOK_URL) { alert("Recarga indisponível no momento."); return; }
+            document.getElementById('step-valor').classList.add('hidden'); document.getElementById('loading-pix').classList.remove('hidden');
+            try {
+                const res = await fetch(MAKE_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ codigo_cliente: usuarioAtual.codigo_cliente, valor: valor, nome: usuarioAtual.nome, origem: "Drop App" }) });
+                const data = await res.json();
+                if(data.payload) {
+                    document.getElementById('loading-pix').classList.add('hidden'); document.getElementById('step-qr').classList.remove('hidden');
+                    document.getElementById('pix-copia-cola').value = data.payload;
+                    document.getElementById('qrcode-container').innerHTML = "";
+                    new QRCode(document.getElementById("qrcode-container"), { text: data.payload, width: 128, height: 128 });
+                } else { alert("Erro ao gerar Pix."); fecharRecarga(); }
+            } catch(e) { alert("Erro de comunicação."); fecharRecarga(); }
+        }
+        function copiarPix() { document.getElementById('pix-copia-cola').select(); document.execCommand("copy"); alert("Copiado!"); }
         function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) { var R = 6371; var dLat = deg2rad(lat2-lat1); var dLon = deg2rad(lon2-lon1); var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R * c; }
         function deg2rad(deg) { return deg * (Math.PI/180); }
     </script>
