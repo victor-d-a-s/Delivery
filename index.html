@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Drop Entregas</title>
+    <title>Drop Entregas - Mossoró</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -20,7 +20,7 @@
         .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; }
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
         
-        .switch-container { display: flex; align-items: center; justify-content: space-between; background: white; padding: 12px; border-radius: 12px; border: 1px solid #e5e7eb; cursor: pointer; }
+        .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #9CA3AF; transition: .4s; border-radius: 34px; }
@@ -41,8 +41,8 @@
         /* Menu */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; max-width: 28rem; margin: 0 auto; }
         @media (min-width: 768px) { .bottom-nav { border-radius: 0 0 1.5rem 1.5rem; } }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #9CA3AF; cursor: pointer; flex: 1; }
-        .nav-item.active { color: #1E40AF; font-weight: bold; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.2s; }
+        .nav-item.active { color: #1E40AF; font-weight: bold; transform: translateY(-2px); }
         .nav-item i { font-size: 22px; margin-bottom: 4px; }
         .spinner { border: 3px solid rgba(0,0,0,0.1); border-left-color: #1E40AF; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -51,46 +51,40 @@
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
 
     <script>
-        // CHAVES EXATAS (SEM ESPAÇOS)
+        // --- CHAVES SUPABASE (CUIDADO AO COPIAR) ---
         const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJvZnBubmlqa2hnc2phcml4b3loZyIsImJvbGUiOiJhbm9uIiwiaWF0IjoxNzY1MDY1Mjc2LCJleHAiOjIwODA2NDEyNzZ9.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU'; 
 
         let sbClient = null;
 
-        // INICIALIZAÇÃO SEGURA
         try {
             if (typeof supabase !== 'undefined') {
                 sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            } else {
-                console.error("Biblioteca Supabase não carregou.");
-            }
-        } catch (e) {
-            console.error("Erro config:", e);
-        }
+            } else { console.error("Biblioteca Supabase não carregou."); }
+        } catch (e) { console.error("Erro config:", e); }
 
-        // --- CONFIGURAÇÕES GERAIS ---
         const NUMERO_ADMIN = "5584982005039"; 
         
-        // CORREÇÃO 1: Variáveis que faltavam
-        const CIDADE_FIXA = "Mossoró, RN"; // <--- ALTERE PARA A SUA CIDADE DE ATUAÇÃO
-        const TAXA_RETORNO = 0.50; // 20% a mais
-        
+        // --- CONFIGURAÇÕES MOSSORÓ ---
+        const CIDADE_FIXA = "Mossoró, RN"; 
+        const TAXA_RETORNO = 0.20; // 20%
         const PRECO_BASE = 5.00; 
         const PRECO_POR_KM = 1.00; 
-        const TAXA_FIXA_CENTRAL = 2.00;
+        
+        // Esta taxa agora é INTERNA (comissão do motoboy), não aparece pro cliente
+        // const TAXA_FIXA_CENTRAL = 0.50; 
         
         let userSession = null; 
         let userProfile = null; 
         let distanciaFinal = 0; 
         let valorFinal = 0;
 
-        // CORREÇÃO 2: Listener de Auth para gerenciar sessão em tempo real
         if (sbClient) {
             sbClient.auth.onAuthStateChange((event, session) => {
                 if (event === 'SIGNED_IN' && session) {
                     userSession = session;
                     carregarPerfil(); 
-                    showScreen('app');
+                    showScreen('app'); 
                 } else if (event === 'SIGNED_OUT') {
                     userSession = null;
                     userProfile = null;
@@ -100,28 +94,15 @@
         }
 
         window.onload = async function() {
-            if(!sbClient) return alert("Erro: Biblioteca não carregada. Atualize a página.");
-            
+            if(!sbClient) return alert("Erro: Biblioteca não carregada.");
             try {
-                // Checagem inicial
-                const { data: { session }, error } = await sbClient.auth.getSession();
-                
+                const { data: { session } } = await sbClient.auth.getSession();
                 if (session) {
-                    // O onAuthStateChange vai lidar com a renderização, 
-                    // mas definimos aqui para evitar flicker se já tiver cache
                     userSession = session;
                     await carregarPerfil();
                     showScreen('app');
-                } else {
-                    showScreen('welcome');
-                }
-            } catch(e) {
-                if(e.message && e.message.includes('Invalid API')) {
-                    alert("Erro Crítico: Chave de API Inválida. Contate o suporte.");
-                } else {
-                    showScreen('welcome');
-                }
-            }
+                } else { showScreen('welcome'); }
+            } catch(e) { showScreen('welcome'); }
             document.getElementById('global-loading').style.display = 'none';
         };
 
@@ -174,7 +155,7 @@
     <div id="screen-app" class="hidden app-container fade-in relative">
         <div class="bg-blue-700 p-6 text-white relative">
             <div class="flex justify-between items-start mb-4"><div><p class="text-xs opacity-80">Olá, <span id="app-user-name">...</span></p><p class="text-xs opacity-60">ID: <span id="app-user-code">...</span></p></div><button onclick="fazerLogout()" class="text-xs bg-blue-900 px-3 py-1 rounded-full"><i class="fas fa-sign-out-alt"></i></button></div>
-            <div class="bg-white/10 p-4 rounded-xl flex justify-between items-center shadow-lg"><div><p class="text-xs text-blue-100">Saldo</p><p class="text-2xl font-bold" id="display-saldo">R$ 0,00</p></div><button class="bg-white px-4 py-2 rounded-lg text-blue-700 text-xs font-bold">Add</button></div>
+            <div class="bg-white/10 p-4 rounded-xl flex justify-between items-center shadow-lg"><div><p class="text-xs text-blue-100">Saldo</p><p class="text-2xl font-bold" id="display-saldo">R$ 0,00</p></div><button onclick="solicitarSaldo()" class="bg-white px-4 py-2 rounded-lg text-blue-700 text-xs font-bold active:scale-95 transition-transform">Add</button></div>
         </div>
         <div class="p-5 space-y-4">
             <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3"><p class="text-[10px] text-center text-blue-500 font-bold uppercase tracking-wider">📍 Rota</p><div class="relative"><i class="fas fa-map-marker-alt text-blue-600 absolute left-3 top-3"></i><input type="text" id="origem" placeholder="Retirada" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg font-bold text-gray-700" readonly></div><div class="relative"><i class="fas fa-flag-checkered text-green-600 absolute left-3 top-3"></i><input type="text" id="destino" placeholder="Entrega (Rua, Número, Bairro)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-green-500"></div></div>
@@ -186,7 +167,18 @@
                     <div class="relative"><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Entrega</label><button type="button" class="custom-select-btn border-blue-300 font-bold text-gray-700" onclick="toggleDropdown('entrega')"><span id="display-entrega">💠 PIX</span><i class="fas fa-chevron-down text-xs"></i></button><input type="hidden" id="pagamento_entrega" value="PIX"><div id="list-entrega" class="custom-options"><div class="custom-option" onclick="selectOption('entrega', 'PIX', '💠 PIX')">💠 PIX</div><div class="custom-option" onclick="selectOption('entrega', 'Dinheiro', '💵 Dinheiro')">💵 Dinheiro</div><div class="custom-option" onclick="selectOption('entrega', 'Carteira', '💳 Saldo em Conta')">💳 Saldo em Conta</div></div></div>
                     <div class="relative"><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Produto</label><button type="button" class="custom-select-btn border-green-300 text-gray-700" onclick="toggleDropdown('produto')"><span id="display-produto">✅ Já Pago</span><i class="fas fa-chevron-down text-xs"></i></button><input type="hidden" id="pagamento_produto" value="Já Pago"><div id="list-produto" class="custom-options"><div class="custom-option" onclick="selectOption('produto', 'Já Pago', '✅ Já Pago')">✅ Já Pago</div><div class="custom-option" onclick="selectOption('produto', 'Cartão', '💳 Cartão')">💳 Cartão</div><div class="custom-option" onclick="selectOption('produto', 'PIX', '💠 PIX')">💠 PIX</div><div class="custom-option" onclick="selectOption('produto', 'Dinheiro', '💵 Dinheiro')">💵 Dinheiro</div></div></div>
                 </div>
-                <div id="box-retorno" class="switch-container bg-white border border-gray-200 cursor-pointer" onclick="document.getElementById('retorno').click()"><div class="flex items-center gap-2"><i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i><span id="text-retorno" class="text-sm font-bold text-gray-500">Sem retorno!</span></div><label class="switch"><input type="checkbox" id="retorno" onchange="recalcularTotal(); mudarStatusRetorno()"><span class="slider"></span></label></div>
+                
+                <label id="box-retorno" class="switch-container p-3 flex items-center justify-between cursor-pointer">
+                    <div class="flex items-center gap-2">
+                        <i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i>
+                        <span id="text-retorno" class="text-sm font-bold text-gray-500">Sem retorno!</span>
+                    </div>
+                    <div class="switch">
+                        <input type="checkbox" id="retorno" onchange="recalcularTotal(); mudarStatusRetorno()">
+                        <span class="slider"></span>
+                    </div>
+                </label>
+
             </div>
             <button onclick="calcularDistancia()" id="btn-calcular" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2"><span id="btn-text">Calcular Frete</span><div id="loading" class="spinner hidden"></div></button>
             <div id="resultado-box" class="hidden bg-green-50 border border-green-200 p-4 rounded-xl flex justify-between items-center animate-pulse"><div><p class="text-xs text-gray-500">Distância</p><p class="font-bold text-gray-800"><span id="km-display">0</span> km</p></div><div class="text-right"><p class="text-xs text-gray-500">Total Frete</p><p class="font-bold text-2xl text-green-700">R$ <span id="valor-display">0,00</span></p></div></div>
@@ -194,23 +186,81 @@
         </div>
     </div>
 
+    <div id="screen-pedidos" class="hidden app-container p-6 fade-in text-center flex flex-col items-center justify-center">
+        <i class="fas fa-list text-6xl text-gray-200 mb-4"></i>
+        <h2 class="text-xl font-bold text-gray-700">Meus Pedidos</h2>
+        <p class="text-gray-500 mt-2">Histórico será exibido aqui.</p>
+    </div>
+
+    <div id="screen-extrato" class="hidden app-container p-6 fade-in text-center flex flex-col items-center justify-center">
+        <i class="fas fa-file-invoice-dollar text-6xl text-gray-200 mb-4"></i>
+        <h2 class="text-xl font-bold text-gray-700">Extrato</h2>
+        <p class="text-gray-500 mt-2">Movimentações financeiras.</p>
+    </div>
+
+    <div id="screen-perfil" class="hidden app-container p-6 fade-in">
+        <h2 class="text-xl font-bold mb-4">Meu Perfil</h2>
+        <div class="bg-white p-4 rounded-lg border shadow-sm space-y-2">
+            <p><strong>Loja:</strong> <span id="perf-nome">...</span></p>
+            <p><strong>Email:</strong> <span id="perf-email">...</span></p>
+            <button onclick="fazerLogout()" class="mt-4 w-full bg-red-100 text-red-600 font-bold py-2 rounded-lg">Sair do App</button>
+        </div>
+    </div>
+
     <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[60] flex items-center justify-center p-4 fade-in"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Pedido Enviado!</h2><p class="text-sm text-gray-500 mb-6">Código para o motoboy:</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
 
-    <div id="bottom-menu" class="hidden bottom-nav w-full max-w-md"><div class="nav-item active"><i class="fas fa-home"></i><span>Início</span></div><div class="nav-item"><i class="fas fa-list"></i><span>Pedidos</span></div><div class="nav-item"><i class="fas fa-file-invoice-dollar"></i><span>Extrato</span></div><div class="nav-item"><i class="fas fa-user"></i><span>Perfil</span></div></div>
+    <div id="bottom-menu" class="hidden bottom-nav w-full max-w-md">
+        <div class="nav-item active" onclick="navegar('app', this)"><i class="fas fa-home"></i><span>Início</span></div>
+        <div class="nav-item" onclick="navegar('pedidos', this)"><i class="fas fa-list"></i><span>Pedidos</span></div>
+        <div class="nav-item" onclick="navegar('extrato', this)"><i class="fas fa-file-invoice-dollar"></i><span>Extrato</span></div>
+        <div class="nav-item" onclick="navegar('perfil', this)"><i class="fas fa-user"></i><span>Perfil</span></div>
+    </div>
 
     <script>
         $(document).ready(function(){ 
-            $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); $('#perf-zap').mask('(00) 00000-0000'); 
-            $('#reg-cep').mask('00000-000'); $('#perf-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
+            $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
+            $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
         });
-        // --- FUNÇÕES ---
+
+       // --- FUNÇÕES ---
         function toggleDropdown(id) { const list = document.getElementById(`list-${id}`); if(id === 'entrega') document.getElementById('list-produto').classList.remove('show'); else document.getElementById('list-entrega').classList.remove('show'); list.classList.toggle('show'); }
         function selectOption(id, value, text) { document.getElementById(`pagamento_${id}`).value = value; document.getElementById(`display-${id}`).innerText = text; document.getElementById(`list-${id}`).classList.remove('show'); }
         document.addEventListener('click', function(e) { if (!e.target.closest('.relative')) { document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show')); } });
-        function showScreen(id) { ['welcome', 'register', 'login', 'app'].forEach(s => document.getElementById('screen-'+s).classList.add('hidden')); document.getElementById('screen-'+id).classList.remove('hidden'); if(id==='app') { document.getElementById('bottom-menu').classList.remove('hidden'); document.getElementById('bottom-menu').classList.add('flex'); } else { document.getElementById('bottom-menu').classList.add('hidden'); } }
-        function navegar(tela, elemento) { showScreen(tela); } 
+        
+        function showScreen(id) { 
+            ['welcome', 'register', 'login', 'app', 'pedidos', 'extrato', 'perfil'].forEach(s => {
+                const el = document.getElementById('screen-'+s);
+                if(el) el.classList.add('hidden');
+            });
+            document.getElementById('screen-'+id).classList.remove('hidden'); 
+            
+            if(['app', 'pedidos', 'extrato', 'perfil'].includes(id)) { 
+                document.getElementById('bottom-menu').classList.remove('hidden'); 
+                document.getElementById('bottom-menu').classList.add('flex'); 
+            } else { 
+                document.getElementById('bottom-menu').classList.add('hidden'); 
+            } 
+        }
+
+        function navegar(tela, elemento) { 
+            showScreen(tela);
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            elemento.classList.add('active');
+            
+            if(tela === 'perfil' && userProfile) {
+                safeText('perf-nome', userProfile.nome_loja);
+                safeText('perf-email', userSession.user.email);
+            }
+        }
+
         function fazerLogout() { sbClient.auth.signOut(); location.reload(); }
         
+        function solicitarSaldo() {
+            if(!userProfile) return;
+            const msg = `Olá, sou da loja *${userProfile.nome_loja}* e gostaria de adicionar saldo.`;
+            window.open(`https://wa.me/${NUMERO_ADMIN}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
         // --- CADASTRO ---
         async function fazerCadastro() {
             const email = document.getElementById('reg-email').value; const senha = document.getElementById('reg-senha').value; const loja = document.getElementById('reg-nome-loja').value; const zap = document.getElementById('reg-zap-loja').value; const resp = document.getElementById('reg-nome-resp').value; const cep = document.getElementById('reg-cep').value; const rua = document.getElementById('reg-rua').value; const num = document.getElementById('reg-num').value; const bairro = document.getElementById('reg-bairro').value; const cidade = document.getElementById('reg-cidade').value;
@@ -226,7 +276,6 @@
                 });
                 if (error) throw error;
                 alert("Conta criada! Entrando...");
-                // onAuthStateChange lidará com o login
             } catch (e) { alert("Erro: " + e.message); } finally { btn.disabled = false; load.classList.add('hidden'); }
         }
 
@@ -238,7 +287,6 @@
             try {
                 const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: senha });
                 if (error) throw error;
-                // onAuthStateChange lidará com o redirecionamento
             } catch (e) { alert("Login falhou."); } finally { btn.disabled = false; load.classList.add('hidden'); }
         }
 
@@ -261,7 +309,6 @@
             if(!origem || !destino) return alert("Preencha endereços");
             document.getElementById('btn-text').innerText = "Calculando..."; document.getElementById('loading').classList.remove('hidden'); document.getElementById('btn-calcular').classList.add('opacity-50');
             try {
-                // Simulação com Nominatim (OpenStreetMap)
                 const urlA = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(origem + ', ' + CIDADE_FIXA)}`;
                 const urlB = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destino + ', ' + CIDADE_FIXA)}`;
                 const [resA, resB] = await Promise.all([fetch(urlA), fetch(urlB)]);
@@ -274,7 +321,27 @@
             } catch (e) { alert("Erro conexão."); resetBotao(); }
         }
         function resetBotao() { document.getElementById('btn-text').innerText = "Calcular Frete"; document.getElementById('loading').classList.add('hidden'); document.getElementById('btn-calcular').classList.remove('opacity-50'); }
-        function recalcularTotal() { if(distanciaFinal == 0) return; let preco = PRECO_BASE + (distanciaFinal * PRECO_POR_KM); if(document.getElementById('retorno').checked) preco += (preco * TAXA_RETORNO); valorFinal = preco.toFixed(2); document.getElementById('km-display').innerText = distanciaFinal.replace('.', ','); document.getElementById('valor-display').innerText = valorFinal.replace('.', ','); }
+        
+        // --- CÁLCULO ATUALIZADO (TAXA REMOVIDA DA SOMA) ---
+        function recalcularTotal() { 
+            if(distanciaFinal == 0) return; 
+            
+            // 1. Base + Km
+            let preco = PRECO_BASE + (distanciaFinal * PRECO_POR_KM); 
+            
+            // 2. Retorno (se houver)
+            if(document.getElementById('retorno').checked) {
+                preco += (preco * TAXA_RETORNO);
+            }
+            
+            // OBS: A taxa da plataforma NÃO é somada aqui pois é descontada do entregador.
+            // O cliente vê apenas o valor do frete puro.
+
+            valorFinal = preco.toFixed(2); 
+            document.getElementById('km-display').innerText = distanciaFinal.replace('.', ','); 
+            document.getElementById('valor-display').innerText = valorFinal.replace('.', ','); 
+        }
+
         function mudarStatusRetorno() { const checked = document.getElementById('retorno').checked; const txt = document.getElementById('text-retorno'); const ico = document.getElementById('icon-retorno'); if(checked) { txt.innerText = "Sim, com retorno!"; txt.classList.replace('text-gray-500', 'text-blue-700'); ico.className = "fas fa-exchange-alt text-blue-600"; } else { txt.innerText = "Sem retorno!"; txt.classList.replace('text-blue-700', 'text-gray-500'); ico.className = "fas fa-arrow-right text-gray-400"; } }
 
         async function enviarParaCentral() {
