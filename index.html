@@ -226,7 +226,7 @@
         </div>
     </div>
 
-    <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[60] flex items-center justify-center p-4 fade-in"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Pedido Criado!</h2><p class="text-sm text-gray-500 mb-6">Aguardando entregador...</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
+   <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[60] flex items-center justify-center p-4 fade-in"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Pedido Criado!</h2><p class="text-sm text-gray-500 mb-6">Aguardando entregador...</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
 
     <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in">
         <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
@@ -253,7 +253,8 @@
             $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
             $('#edit-zap-loja').mask('(00) 00000-0000'); $('#edit-resp-zap').mask('(00) 00000-0000');
         });
-               // --- LÓGICA DE INTERFACE ---
+
+        // --- LÓGICA DE INTERFACE ---
         function toggleDropdown(id) { const list = document.getElementById(`list-${id}`); if(id === 'entrega') document.getElementById('list-produto').classList.remove('show'); else document.getElementById('list-entrega').classList.remove('show'); list.classList.toggle('show'); }
         function selectOption(id, value, text) { document.getElementById(`pagamento_${id}`).value = value; document.getElementById(`display-${id}`).innerText = text; document.getElementById(`list-${id}`).classList.remove('show'); }
         document.addEventListener('click', function(e) { if (!e.target.closest('.relative')) { document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show')); } });
@@ -280,8 +281,7 @@
         }
 
         function fazerLogout() { sbClient.auth.signOut(); location.reload(); }
-
-        // --- LÓGICA DE PERFIL (CORRIGIDA) ---
+                // --- LÓGICA DE PERFIL (CORRIGIDA) ---
         async function carregarPerfil() {
             try {
                 const { data: { user } } = await sbClient.auth.getUser();
@@ -439,15 +439,38 @@
             } catch (e) { alert("Erro: " + e.message); } finally { btn.disabled = false; load.classList.add('hidden'); }
         }
 
-        // --- LOGIN E FRETE (INALTERADOS) ---
+        // --- LOGIN COM TRATAMENTO DE ERRO (ATUALIZADO) ---
         async function fazerLogin() {
-            const email = document.getElementById('log-email').value; const senha = document.getElementById('log-senha').value;
-            const btn = document.getElementById('btn-log'); const load = document.getElementById('load-log');
+            const email = document.getElementById('log-email').value; 
+            const senha = document.getElementById('log-senha').value;
+            const btn = document.getElementById('btn-log'); 
+            const load = document.getElementById('load-log');
+            
+            if(!email || !senha) return alert("Por favor, preencha e-mail e senha.");
+
             btn.disabled = true; load.classList.remove('hidden');
+            
             try {
                 const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: senha });
-                if (error) throw error;
-            } catch (e) { alert("Login falhou."); } finally { btn.disabled = false; load.classList.add('hidden'); }
+                
+                if (error) {
+                    // Tradução dos erros mais comuns
+                    if(error.message.includes("Invalid login credentials")) {
+                        throw new Error("E-mail ou senha incorretos. Verifique e tente novamente.");
+                    } else if(error.message.includes("Email not confirmed")) {
+                        throw new Error("Seu e-mail ainda não foi confirmado.");
+                    } else {
+                        throw new Error(error.message); // Outro erro
+                    }
+                }
+                
+                // Se não deu erro, o onAuthStateChange vai redirecionar automaticamente
+                
+            } catch (e) { 
+                alert("Atenção: " + e.message); 
+            } finally { 
+                btn.disabled = false; load.classList.add('hidden'); 
+            }
         }
 
         async function buscarCep(prefixo) { let cep = document.getElementById(prefixo + '-cep').value.replace(/\D/g, ''); if(cep.length !== 8) return; try { const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`); const data = await res.json(); if(!data.erro) { document.getElementById(prefixo + '-rua').value = data.logradouro; document.getElementById(prefixo + '-bairro').value = data.bairro; document.getElementById(prefixo + '-cidade').value = `${data.localidade}/${data.uf}`; document.getElementById(prefixo + '-num').focus(); } } catch(e){} }
