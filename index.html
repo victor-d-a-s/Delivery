@@ -32,13 +32,11 @@
         .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 80px; }
         @media (min-width: 768px) { .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; margin: auto; } body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } }
         
-        /* Dropdown */
         .custom-select-btn { width: 100%; background: white; border: 1px solid #E5E7EB; border-radius: 0.5rem; padding: 0.75rem; font-size: 0.875rem; text-align: left; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .custom-options { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #E5E7EB; border-radius: 0.5rem; margin-top: 4px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 40; overflow: hidden; display: none; }
         .custom-options.show { display: block; animation: fadeIn 0.2s; }
         .custom-option { padding: 10px; font-size: 0.875rem; cursor: pointer; border-bottom: 1px solid #F3F4F6; display: flex; align-items: center; gap: 8px; }
         
-        /* Menu Bottom */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; max-width: 28rem; margin: 0 auto; }
         @media (min-width: 768px) { .bottom-nav { border-radius: 0 0 1.5rem 1.5rem; } }
         .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.2s; }
@@ -52,11 +50,12 @@
 
     <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
         <div class="spinner w-10 h-10 border-4 mb-4"></div>
-        <p class="text-gray-500 text-sm font-bold">Conectando...</p>
+        <p id="loading-msg" class="text-gray-500 text-sm font-bold">Conectando...</p>
+        <button onclick="location.reload()" class="mt-4 text-xs text-blue-500 underline hidden" id="btn-reload">Demorando? Recarregar</button>
     </div>
 
     <script>
-        // CONFIGURAÇÕES
+        // CONFIGURAÇÕES GERAIS
         const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
 
@@ -64,7 +63,11 @@
         try {
             if (typeof supabase !== 'undefined') {
                 sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            } else { console.error("Supabase JS não carregou."); }
+            } else { 
+                console.error("Supabase JS falhou."); 
+                document.getElementById('loading-msg').innerText = "Erro ao carregar sistema.";
+                document.getElementById('loading-msg').classList.add('text-red-500');
+            }
         } catch (e) { console.error("Erro config:", e); }
 
         const NUMERO_ADMIN = "5584982005039"; 
@@ -80,68 +83,70 @@
         let pendingAction = null;
         let isRegistering = false; 
 
-        // --- SISTEMA DE INICIALIZAÇÃO ROBUSTO ---
+        // --- INICIALIZAÇÃO SEGURA (SEM TELA BRANCA) ---
         window.onload = async function() {
-            // 1. Fail-Safe: Se demorar mais de 5s, força a tela inicial para não ficar branco
-            const safetyTimeout = setTimeout(() => {
+            // Timer de segurança: Se travar por 5s, força a tela inicial
+            setTimeout(() => {
                 const loader = document.getElementById('global-loading');
-                if (loader && loader.style.display !== 'none') {
-                    console.warn("Timeout: Forçando tela inicial.");
-                    loader.style.display = 'none';
-                    if(!userSession) showScreen('welcome');
+                if(loader && loader.style.display !== 'none') {
+                    document.getElementById('btn-reload').classList.remove('hidden');
+                    // Se não tiver sessão carregada, libera o welcome para não ficar branco
+                    if(!userSession) {
+                        loader.style.display = 'none';
+                        showScreen('welcome');
+                    }
                 }
             }, 5000);
 
-            if(!sbClient) {
-                alert("Erro: Falha na conexão com o servidor. Recarregue.");
-                return;
-            }
+            if(!sbClient) return;
 
             try {
-                // Tenta pegar a sessão
-                const { data, error } = await sbClient.auth.getSession();
+                // 1. Tenta pegar sessão
+                const { data: { session }, error } = await sbClient.auth.getSession();
                 
-                if (error) throw error;
+                if (session) {
+                    userSession = session;
+                    // 2. Tenta pegar perfil
+                    const { data: profile, error: profileError } = await sbClient
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', session.user.id)
+                        .single();
 
-                if (data.session) {
-                    userSession = data.session;
-                    await carregarPerfil();
-                    // Se carregarPerfil der certo, ele chama showScreen('app')
+                    if (profile) {
+                        userProfile = profile;
+                        preencherDadosPerfil(profile);
+                        showScreen('app'); // Sucesso: Vai pro App
+                    } else {
+                        // Tem login mas não tem perfil (Erro Zumbi): Força Logout
+                        await sbClient.auth.signOut();
+                        showScreen('welcome'); 
+                    }
                 } else {
-                    showScreen('welcome');
+                    showScreen('welcome'); // Sem sessão: Vai pro Welcome
                 }
             } catch(e) {
-                console.error("Erro init:", e);
-                showScreen('welcome'); // Joga pro login se der erro
+                console.error("Erro fatal init:", e);
+                showScreen('welcome'); // Erro geral: Vai pro Welcome
             } finally {
-                // Limpa o timer e garante que o loader suma
-                clearTimeout(safetyTimeout);
-                const loader = document.getElementById('global-loading');
-                if(loader) loader.style.display = 'none';
+                document.getElementById('global-loading').style.display = 'none';
             }
         };
 
-        // --- LISTENER DE SESSÃO ---
-        if (sbClient) {
-            sbClient.auth.onAuthStateChange(async (event, session) => {
-                if (isRegistering) return; // Não interfere no cadastro
+        // --- FUNÇÕES DE DADOS ---
+        function preencherDadosPerfil(data) {
+            safeText('app-user-name', data.nome_loja || 'Minha Loja');
+            const displayId = data.codigo_visual || userSession.user.id.slice(0, 4).toUpperCase();
+            safeText('app-user-code', displayId);
+            safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
+            safeVal('origem', data.endereco || data.nome_loja);
 
-                if (event === 'SIGNED_IN' && session) {
-                    userSession = session;
-                    await carregarPerfil();
-                    
-                    // Só redireciona se estiver na tela de login/welcome
-                    const welcome = document.getElementById('screen-welcome');
-                    const login = document.getElementById('screen-login');
-                    if(!welcome.classList.contains('hidden') || !login.classList.contains('hidden')) {
-                        showScreen('app');
-                    }
-                } else if (event === 'SIGNED_OUT') {
-                    userSession = null;
-                    userProfile = null;
-                    showScreen('welcome');
-                }
-            });
+            safeVal('edit-nome-loja', data.nome_loja);
+            safeVal('edit-zap-loja', data.whatsapp_loja || data.whatsapp || ''); 
+            safeVal('edit-endereco', data.endereco || '');
+            safeVal('edit-resp-nome', data.responsavel || '');
+            safeVal('edit-resp-zap', data.whatsapp_responsavel || '');
+            safeVal('edit-pin', data.pin_carteira || '');
         }
 
         // --- UTILITÁRIOS ---
@@ -276,7 +281,8 @@
         <div class="nav-item" onclick="navegar('extrato', this)"><i class="fas fa-file-invoice-dollar"></i><span>Extrato</span></div>
         <div class="nav-item" onclick="navegar('perfil', this)"><i class="fas fa-user"></i><span>Perfil</span></div>
     </div>
-        <script>
+
+    <script>
         $(document).ready(function(){ 
             $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
             $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
@@ -312,94 +318,7 @@
             try { await sbClient.auth.signOut(); } catch (error) { console.error(error); } 
             finally { location.reload(); }
         }
-
-        async function fazerCadastro() {
-            const email = document.getElementById('reg-email').value; 
-            const senha = document.getElementById('reg-senha').value; 
-            const loja = document.getElementById('reg-nome-loja').value; 
-            const zap = document.getElementById('reg-zap-loja').value; 
-            const resp = document.getElementById('reg-nome-resp').value; 
-            const cep = document.getElementById('reg-cep').value; 
-            const rua = document.getElementById('reg-rua').value; 
-            const num = document.getElementById('reg-num').value; 
-            const bairro = document.getElementById('reg-bairro').value; 
-            const cidade = document.getElementById('reg-cidade').value;
-            
-            const btn = document.getElementById('btn-cad'); 
-            const load = document.getElementById('load-cad');
-
-            if(!email || !senha || !loja || !num) return alert("Preencha todos os campos!");
-            if(senha.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
-
-            btn.disabled = true; load.classList.remove('hidden');
-            isRegistering = true; 
-
-            try {
-                // 1. Cria Auth
-                const { data, error } = await sbClient.auth.signUp({ email, password: senha });
-                if (error) throw error;
-                
-                // 2. Insere Perfil no Banco (Espera terminar)
-                if (data.user) {
-                    const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cidade}`;
-                    const { error: perfilErro } = await sbClient.from('profiles').insert([{
-                        id: data.user.id,
-                        nome_loja: loja,
-                        whatsapp_loja: zap,
-                        responsavel: resp,
-                        endereco: enderecoCompleto,
-                        email: email
-                    }]);
-                    if (perfilErro) throw perfilErro;
-
-                    alert("Conta criada com sucesso! Entrando...");
-                    
-                    // 3. Define Sessão e Redireciona
-                    userSession = data.session;
-                    await carregarPerfil();
-                    showScreen('app'); // Redirecionamento explícito
-                    isRegistering = false; 
-                }
-            } catch (e) { 
-                isRegistering = false;
-                let msg = e.message;
-                if(msg.includes("User already registered")) msg = "Este e-mail já possui cadastro.";
-                alert("Erro: " + msg); 
-            } finally { 
-                btn.disabled = false; load.classList.add('hidden'); 
-            }
-        }
-
-        async function fazerLogin() {
-            const email = document.getElementById('log-email').value; 
-            const senha = document.getElementById('log-senha').value;
-            const btn = document.getElementById('btn-log'); 
-            const load = document.getElementById('load-log');
-            
-            if(!email || !senha) return alert("Preencha e-mail e senha.");
-
-            btn.disabled = true; load.classList.remove('hidden');
-            
-            try {
-                const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: senha });
-                
-                if (error) {
-                    if(error.message.includes("Invalid login credentials")) {
-                        throw new Error("E-mail ou senha incorretos.");
-                    } else if(error.message.includes("Email not confirmed")) {
-                        throw new Error("E-mail não confirmado.");
-                    } else {
-                        throw new Error(error.message);
-                    }
-                }
-                // Sucesso: o listener onAuthStateChange fará o resto
-            } catch (e) { 
-                alert(e.message); 
-            } finally { 
-                btn.disabled = false; load.classList.add('hidden'); 
-            }
-        }
-
+               // --- GATEKEEPER ---
         async function carregarPerfil() {
             try {
                 if (!userSession) {
@@ -410,38 +329,24 @@
                 if(!userSession) return;
 
                 const { data, error } = await sbClient.from('profiles').select('*').eq('id', userSession.user.id).single();
-                                // VERIFICA SE O CADASTRO EXISTE (IMPEDE USUÁRIO ZUMBI)
+                
                 if (!data) {
                     if (!isRegistering) {
                         await sbClient.auth.signOut();
-                        alert("Erro: Cadastro incompleto ou não encontrado.");
+                        alert("Acesso Negado: Cadastro não encontrado.");
                         location.reload();
                     }
                     return;
                 }
 
                 userProfile = data;
-                safeText('app-user-name', data.nome_loja || 'Minha Loja');
-                const displayId = data.codigo_visual || userSession.user.id.slice(0, 4).toUpperCase();
-                safeText('app-user-code', displayId);
-                safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
-                safeVal('origem', data.endereco || data.nome_loja);
-
-                safeVal('edit-nome-loja', data.nome_loja);
-                safeVal('edit-zap-loja', data.whatsapp_loja || data.whatsapp || ''); 
-                safeVal('edit-endereco', data.endereco || '');
-                safeVal('edit-resp-nome', data.responsavel || '');
-                safeVal('edit-resp-zap', data.whatsapp_responsavel || '');
-                safeVal('edit-pin', data.pin_carteira || '');
-                
-                // Se já estiver na tela de login/welcome, avança
-                const currentScreen = document.querySelector('.app-container:not(.hidden)').id;
-                if(currentScreen === 'screen-welcome' || currentScreen === 'screen-login') {
-                    showScreen('app');
-                }
+                preencherDadosPerfil(data);
+                showScreen('app'); // Sucesso garantido aqui
 
             } catch (e) {
                 console.error("Erro perfil:", e);
+                // Se der erro grave no perfil, desloga
+                if(!isRegistering) fazerLogout();
             }
         }
 
@@ -483,6 +388,136 @@
             btn.innerText = "Salvar Alterações"; btn.disabled = false;
         }
 
+        // --- LÓGICA DE PIN E SEGURANÇA ---
+        function verificarPinParaSaldo() {
+            if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil antes de usar esta função.");
+            pendingAction = 'saldo';
+            document.getElementById('input-confirm-pin').value = '';
+            document.getElementById('modal-pin').classList.remove('hidden');
+            document.getElementById('input-confirm-pin').focus();
+        }
+
+        function iniciarPedido() {
+            const pgEnt = document.getElementById('pagamento_entrega').value;
+            if(pgEnt === 'Carteira') {
+                if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil para usar o Saldo em Conta.");
+                pendingAction = 'pedido';
+                document.getElementById('input-confirm-pin').value = '';
+                document.getElementById('modal-pin').classList.remove('hidden');
+                document.getElementById('input-confirm-pin').focus();
+            } else {
+                enviarParaCentral();
+            }
+        }
+
+        function confirmarPin() {
+            const pinDigitado = document.getElementById('input-confirm-pin').value;
+            if(pinDigitado !== userProfile.pin_carteira) {
+                alert("PIN Incorreto!");
+                return;
+            }
+            document.getElementById('modal-pin').classList.add('hidden');
+            if(pendingAction === 'saldo') {
+                solicitarSaldoZap();
+            } else if (pendingAction === 'pedido') {
+                enviarParaCentral();
+            }
+            pendingAction = null;
+        }
+
+        function solicitarSaldoZap() {
+            const msg = `Olá, sou da loja *${userProfile.nome_loja}* e gostaria de adicionar saldo.`;
+            window.open(`https://wa.me/${NUMERO_ADMIN}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        // --- CADASTRO ---
+        async function fazerCadastro() {
+            const email = document.getElementById('reg-email').value; 
+            const senha = document.getElementById('reg-senha').value; 
+            const loja = document.getElementById('reg-nome-loja').value; 
+            const zap = document.getElementById('reg-zap-loja').value; 
+            const resp = document.getElementById('reg-nome-resp').value; 
+            const cep = document.getElementById('reg-cep').value; 
+            const rua = document.getElementById('reg-rua').value; 
+            const num = document.getElementById('reg-num').value; 
+            const bairro = document.getElementById('reg-bairro').value; 
+            const cidade = document.getElementById('reg-cidade').value;
+            
+            const btn = document.getElementById('btn-cad'); 
+            const load = document.getElementById('load-cad');
+
+            if(!email || !senha || !loja || !num) return alert("Preencha todos os campos obrigatórios!");
+            if(senha.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
+
+            btn.disabled = true; load.classList.remove('hidden');
+            isRegistering = true; 
+
+            try {
+                const { data, error } = await sbClient.auth.signUp({ email: email, password: senha });
+                if (error) throw error;
+                
+                if (data.user) {
+                    const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cidade}`;
+                    const { error: perfilErro } = await sbClient.from('profiles').insert([{
+                        id: data.user.id,
+                        nome_loja: loja,
+                        whatsapp_loja: zap,
+                        responsavel: resp,
+                        endereco: enderecoCompleto,
+                        email: email
+                    }]);
+                    if (perfilErro) throw perfilErro;
+
+                    alert("Conta criada com sucesso! Entrando...");
+                    userSession = data.session;
+                    
+                    // CARREGA E REDIRECIONA MANUALMENTE (SEM DEPENDER DO LISTENER)
+                    const { data: profile } = await sbClient.from('profiles').select('*').eq('id', data.user.id).single();
+                    userProfile = profile;
+                    preencherDadosPerfil(profile);
+                    
+                    showScreen('app'); 
+                    isRegistering = false;
+                }
+            } catch (e) { 
+                isRegistering = false;
+                let msg = e.message;
+                if(msg.includes("User already registered")) msg = "Este e-mail já possui cadastro.";
+                alert("Erro: " + msg); 
+            } finally { 
+                btn.disabled = false; load.classList.add('hidden'); 
+            }
+        }
+
+        // --- LOGIN ---
+        async function fazerLogin() {
+            const email = document.getElementById('log-email').value; 
+            const senha = document.getElementById('log-senha').value;
+            const btn = document.getElementById('btn-log'); 
+            const load = document.getElementById('load-log');
+            
+            if(!email || !senha) return alert("Preencha e-mail e senha.");
+
+            btn.disabled = true; load.classList.remove('hidden');
+            
+            try {
+                const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: senha });
+                
+                if (error) {
+                    if(error.message.includes("Invalid login credentials")) {
+                        throw new Error("E-mail ou senha incorretos.");
+                    } else {
+                        throw new Error(error.message);
+                    }
+                }
+                // Sucesso: onAuthStateChange fará o resto
+            } catch (e) { 
+                alert(e.message); 
+            } finally { 
+                btn.disabled = false; load.classList.add('hidden'); 
+            }
+        }
+
         async function buscarCep(prefixo) { let cep = document.getElementById(prefixo + '-cep').value.replace(/\D/g, ''); if(cep.length !== 8) return; try { const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`); const data = await res.json(); if(!data.erro) { document.getElementById(prefixo + '-rua').value = data.logradouro; document.getElementById(prefixo + '-bairro').value = data.bairro; document.getElementById(prefixo + '-cidade').value = `${data.localidade}/${data.uf}`; document.getElementById(prefixo + '-num').focus(); } } catch(e){} }
         
         async function calcularDistancia() {
@@ -514,39 +549,6 @@
 
         function mudarStatusRetorno() { const checked = document.getElementById('retorno').checked; const txt = document.getElementById('text-retorno'); const ico = document.getElementById('icon-retorno'); if(checked) { txt.innerText = "Sim, com retorno!"; txt.classList.replace('text-gray-500', 'text-blue-700'); ico.className = "fas fa-exchange-alt text-blue-600"; } else { txt.innerText = "Sem retorno!"; txt.classList.replace('text-blue-700', 'text-gray-500'); ico.className = "fas fa-arrow-right text-gray-400"; } }
 
-        function verificarPinParaSaldo() {
-            if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil.");
-            pendingAction = 'saldo';
-            document.getElementById('input-confirm-pin').value = '';
-            document.getElementById('modal-pin').classList.remove('hidden');
-            document.getElementById('input-confirm-pin').focus();
-        }
-
-        function iniciarPedido() {
-            const pgEnt = document.getElementById('pagamento_entrega').value;
-            if(pgEnt === 'Carteira') {
-                if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil.");
-                pendingAction = 'pedido';
-                document.getElementById('input-confirm-pin').value = '';
-                document.getElementById('modal-pin').classList.remove('hidden');
-                document.getElementById('input-confirm-pin').focus();
-            } else { enviarParaCentral(); }
-        }
-
-        function confirmarPin() {
-            const pinDigitado = document.getElementById('input-confirm-pin').value;
-            if(pinDigitado !== userProfile.pin_carteira) { alert("PIN Incorreto!"); return; }
-            document.getElementById('modal-pin').classList.add('hidden');
-            if(pendingAction === 'saldo') solicitarSaldoZap();
-            else if (pendingAction === 'pedido') enviarParaCentral();
-            pendingAction = null;
-        }
-
-        function solicitarSaldoZap() {
-            const msg = `Olá, sou da loja *${userProfile.nome_loja}* e gostaria de adicionar saldo.`;
-            window.open(`https://wa.me/${NUMERO_ADMIN}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
         async function enviarParaCentral() {
             const pgEnt = document.getElementById('pagamento_entrega').value;
             const nomeDest = document.getElementById('nome_dest').value; const telDest = document.getElementById('tel_dest').value; const ref = document.getElementById('referencia').value;
@@ -564,7 +566,7 @@
                 telefone_destinatario: telDest
             }]);
 
-            if(error) { alert("Erro: " + error.message); return; }
+            if(error) { alert("Erro ao enviar pedido: " + error.message); return; }
             document.getElementById('display-pin').innerText = pinSeguranca;
             document.getElementById('modal-success').classList.remove('hidden');
         }
