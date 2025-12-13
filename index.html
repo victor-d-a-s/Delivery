@@ -49,7 +49,6 @@
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
 
     <script>
-        // CONFIGURAÇÕES GERAIS
         const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
 
@@ -72,21 +71,19 @@
         let distanciaFinal = 0; 
         let valorFinal = 0;
         let pendingAction = null;
-        let isRegistering = false; // Flag crítica para evitar loop no cadastro
+        let isRegistering = false; 
 
-        // --- MONITORAMENTO DE SESSÃO ---
+        // --- SISTEMA DE LOGIN E SESSÃO ---
         if (sbClient) {
             sbClient.auth.onAuthStateChange(async (event, session) => {
-                // Se estamos no processo de cadastro, não interfira, o cadastro cuidará do redirecionamento
                 if (isRegistering) return;
 
                 if (event === 'SIGNED_IN' && session) {
                     userSession = session;
                     await carregarPerfil(); 
                     
-                    // Só redireciona se estiver na tela de login/welcome
                     const currentScreen = document.querySelector('.app-container:not(.hidden)').id;
-                    if(currentScreen === 'screen-welcome' || currentScreen === 'screen-login' || currentScreen === 'screen-register') {
+                    if(currentScreen === 'screen-welcome' || currentScreen === 'screen-login') {
                         showScreen('app');
                     }
                 } else if (event === 'SIGNED_OUT') {
@@ -98,16 +95,40 @@
         }
 
         window.onload = async function() {
-            if(!sbClient) return alert("Erro crítico: Biblioteca Supabase falhou.");
+            // TRAVA DE SEGURANÇA: Se demorar mais de 6 segundos, força a tela de login
+            setTimeout(() => {
+                const loader = document.getElementById('global-loading');
+                if(loader && loader.style.display !== 'none') {
+                    console.warn("Tempo limite excedido. Forçando abertura.");
+                    loader.style.display = 'none';
+                    if(!userSession) showScreen('welcome');
+                }
+            }, 6000);
+
+            if(!sbClient) {
+                alert("Erro crítico: Verifique sua conexão.");
+                document.getElementById('global-loading').style.display = 'none';
+                return;
+            }
+
             try {
-                const { data: { session } } = await sbClient.auth.getSession();
+                const { data: { session }, error } = await sbClient.auth.getSession();
+                if (error) throw error;
+
                 if (session) {
                     userSession = session;
                     await carregarPerfil();
-                    showScreen('app');
-                } else { showScreen('welcome'); }
-            } catch(e) { showScreen('welcome'); }
-            document.getElementById('global-loading').style.display = 'none';
+                    // carregarPerfil já direciona ou desloga se der erro
+                } else { 
+                    showScreen('welcome'); 
+                }
+            } catch(e) { 
+                console.error("Erro init:", e);
+                showScreen('welcome'); 
+            } finally {
+                // Garante que o spinner suma SEMPRE
+                document.getElementById('global-loading').style.display = 'none';
+            }
         };
 
         function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
@@ -246,15 +267,13 @@
         <div class="nav-item" onclick="navegar('extrato', this)"><i class="fas fa-file-invoice-dollar"></i><span>Extrato</span></div>
         <div class="nav-item" onclick="navegar('perfil', this)"><i class="fas fa-user"></i><span>Perfil</span></div>
     </div>
-
-    <script>
+        <script>
         $(document).ready(function(){ 
             $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
             $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
             $('#edit-zap-loja').mask('(00) 00000-0000'); $('#edit-resp-zap').mask('(00) 00000-0000');
         });
 
-        // --- INTERFACE ---
         function toggleDropdown(id) { const list = document.getElementById(`list-${id}`); if(id === 'entrega') document.getElementById('list-produto').classList.remove('show'); else document.getElementById('list-entrega').classList.remove('show'); list.classList.toggle('show'); }
         function selectOption(id, value, text) { document.getElementById(`pagamento_${id}`).value = value; document.getElementById(`display-${id}`).innerText = text; document.getElementById(`list-${id}`).classList.remove('show'); }
         document.addEventListener('click', function(e) { if (!e.target.closest('.relative')) { document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show')); } });
@@ -285,7 +304,6 @@
             finally { location.reload(); }
         }
 
-        // --- CADASTRO (CORRIGIDO E SEGURO) ---
         async function fazerCadastro() {
             const email = document.getElementById('reg-email').value; 
             const senha = document.getElementById('reg-senha').value; 
@@ -305,14 +323,12 @@
             if(senha.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
 
             btn.disabled = true; load.classList.remove('hidden');
-            isRegistering = true; // Flag ativada
+            isRegistering = true; 
 
             try {
-                // 1. Cria Auth
                 const { data, error } = await sbClient.auth.signUp({ email, password: senha });
                 if (error) throw error;
                 
-                // 2. Insere Perfil no Banco (Espera terminar)
                 if (data.user) {
                     const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cidade}`;
                     const { error: perfilErro } = await sbClient.from('profiles').insert([{
@@ -325,12 +341,10 @@
                     }]);
                     if (perfilErro) throw perfilErro;
 
-                    alert("Conta criada com sucesso! Entrando...");
-                    
-                    // 3. Define Sessão e Redireciona
+                    alert("Sucesso! Entrando...");
                     userSession = data.session;
                     await carregarPerfil();
-                    showScreen('app'); // Redirecionamento explícito
+                    showScreen('app'); 
                     isRegistering = false; 
                 }
             } catch (e) { 
@@ -343,24 +357,32 @@
             }
         }
 
-        // --- LOGIN E PERFIL (GATEKEEPER) ---
         async function fazerLogin() {
             const email = document.getElementById('log-email').value; 
             const senha = document.getElementById('log-senha').value;
-            const btn = document.getElementById('btn-log'); const load = document.getElementById('load-log');
+            const btn = document.getElementById('btn-log'); 
+            const load = document.getElementById('load-log');
             
             if(!email || !senha) return alert("Preencha e-mail e senha.");
+
             btn.disabled = true; load.classList.remove('hidden');
             
             try {
-                const { data, error } = await sbClient.auth.signInWithPassword({ email, password: senha });
+                const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: senha });
                 if (error) {
-                    if(error.message.includes("Invalid login")) throw new Error("E-mail ou senha incorretos.");
-                    throw new Error(error.message);
+                    if(error.message.includes("Invalid login credentials")) {
+                        throw new Error("E-mail ou senha incorretos.");
+                    } else if(error.message.includes("Email not confirmed")) {
+                        throw new Error("E-mail não confirmado.");
+                    } else {
+                        throw new Error(error.message);
+                    }
                 }
-                // onAuthStateChange cuida do resto
-            } catch (e) { alert(e.message); } 
-            finally { btn.disabled = false; load.classList.add('hidden'); }
+            } catch (e) { 
+                alert(e.message); 
+            } finally { 
+                btn.disabled = false; load.classList.add('hidden'); 
+            }
         }
 
         async function carregarPerfil() {
@@ -374,36 +396,36 @@
 
                 const { data, error } = await sbClient.from('profiles').select('*').eq('id', userSession.user.id).single();
                 
-                // VERIFICA SE O CADASTRO EXISTE (IMPEDE USUÁRIO ZUMBI)
                 if (!data) {
                     if (!isRegistering) {
                         await sbClient.auth.signOut();
-                        alert("Erro: Cadastro incompleto ou não encontrado no banco de dados.");
+                        alert("Acesso Negado: Cadastro não encontrado.");
                         location.reload();
                     }
                     return;
                 }
 
                 userProfile = data;
-                
-                // HEADER
                 safeText('app-user-name', data.nome_loja || 'Minha Loja');
                 const displayId = data.codigo_visual || userSession.user.id.slice(0, 4).toUpperCase();
                 safeText('app-user-code', displayId);
                 safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
-
-                            // CAMPO ORIGEM
                 safeVal('origem', data.endereco || data.nome_loja);
 
-                // FORMULÁRIO PERFIL
                 safeVal('edit-nome-loja', data.nome_loja);
                 safeVal('edit-zap-loja', data.whatsapp_loja || data.whatsapp || ''); 
                 safeVal('edit-endereco', data.endereco || '');
                 safeVal('edit-resp-nome', data.responsavel || '');
                 safeVal('edit-resp-zap', data.whatsapp_responsavel || '');
                 safeVal('edit-pin', data.pin_carteira || '');
+                
+                if (document.getElementById('screen-welcome').classList.contains('hidden') === false) {
+                    showScreen('app');
+                }
 
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error("Erro perfil:", e);
+            }
         }
 
         async function salvarPerfil() {
@@ -415,7 +437,7 @@
             const pin = document.getElementById('edit-pin').value;
 
             if(!nomeLoja || !endereco) return alert("Nome e Endereço são obrigatórios.");
-            if(pin && pin.length !== 4) return alert("O PIN deve ter 4 dígitos.");
+            if(pin && pin.length !== 4) return alert("PIN deve ser 4 dígitos.");
 
             const btn = document.getElementById('btn-save-perf');
             btn.innerText = "Salvando..."; btn.disabled = true;
@@ -437,7 +459,6 @@
             btn.innerText = "Salvar Alterações"; btn.disabled = false;
         }
 
-        // --- MAPA E CÁLCULO ---
         async function buscarCep(prefixo) { let cep = document.getElementById(prefixo + '-cep').value.replace(/\D/g, ''); if(cep.length !== 8) return; try { const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`); const data = await res.json(); if(!data.erro) { document.getElementById(prefixo + '-rua').value = data.logradouro; document.getElementById(prefixo + '-bairro').value = data.bairro; document.getElementById(prefixo + '-cidade').value = `${data.localidade}/${data.uf}`; document.getElementById(prefixo + '-num').focus(); } } catch(e){} }
         
         async function calcularDistancia() {
@@ -454,7 +475,7 @@
                 distanciaFinal = (dist * 1.3).toFixed(1); if(distanciaFinal < 1) distanciaFinal = 1;
                 recalcularTotal();
                 document.getElementById('btn-calcular').classList.add('hidden'); document.getElementById('resultado-box').classList.remove('hidden'); document.getElementById('btn-enviar').classList.remove('hidden'); document.getElementById('resultado-box').classList.remove('animate-pulse');
-            } catch (e) { alert("Erro conexão."); resetBotao(); }
+            } catch (e) { alert("Erro de conexão."); resetBotao(); }
         }
         function resetBotao() { document.getElementById('btn-text').innerText = "Calcular Frete"; document.getElementById('loading').classList.add('hidden'); document.getElementById('btn-calcular').classList.remove('opacity-50'); }
         
@@ -519,7 +540,7 @@
                 telefone_destinatario: telDest
             }]);
 
-            if(error) { alert("Erro: " + error.message); return; }
+            if(error) { alert("Erro ao enviar: " + error.message); return; }
             document.getElementById('display-pin').innerText = pinSeguranca;
             document.getElementById('modal-success').classList.remove('hidden');
         }
@@ -528,4 +549,5 @@
         function deg2rad(deg) { return deg * (Math.PI/180); }
     </script>
 </body>
-</html>
+    </html>
+    
