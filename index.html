@@ -20,6 +20,7 @@
         .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; }
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
         
+        /* Switch Container */
         .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -32,11 +33,13 @@
         .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 80px; }
         @media (min-width: 768px) { .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; margin: auto; } body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } }
         
+        /* Dropdown */
         .custom-select-btn { width: 100%; background: white; border: 1px solid #E5E7EB; border-radius: 0.5rem; padding: 0.75rem; font-size: 0.875rem; text-align: left; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .custom-options { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #E5E7EB; border-radius: 0.5rem; margin-top: 4px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 40; overflow: hidden; display: none; }
         .custom-options.show { display: block; animation: fadeIn 0.2s; }
         .custom-option { padding: 10px; font-size: 0.875rem; cursor: pointer; border-bottom: 1px solid #F3F4F6; display: flex; align-items: center; gap: 8px; }
         
+        /* Menu Bottom */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; max-width: 28rem; margin: 0 auto; }
         @media (min-width: 768px) { .bottom-nav { border-radius: 0 0 1.5rem 1.5rem; } }
         .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.2s; }
@@ -49,10 +52,13 @@
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
 
     <script>
+        // --- CHAVES DO SUPABASE ---
         const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
 
         let sbClient = null;
+
+        // INICIALIZAÇÃO
         try {
             if (typeof supabase !== 'undefined') {
                 sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -60,8 +66,10 @@
         } catch (e) { console.error("Erro config:", e); }
 
         const NUMERO_ADMIN = "5584982005039"; 
+        
+        // --- CONFIGURAÇÕES MOSSORÓ ---
         const CIDADE_FIXA = "Mossoró, RN"; 
-        const TAXA_RETORNO = 0.20; 
+        const TAXA_RETORNO = 0.20; // 20%
         const PRECO_BASE = 5.00; 
         const PRECO_POR_KM = 1.00; 
         
@@ -69,8 +77,9 @@
         let userProfile = null; 
         let distanciaFinal = 0; 
         let valorFinal = 0;
-        let pendingAction = null; // Para guardar a ação pendente do PIN
+        let pendingAction = null;
 
+        // LISTENER DE SESSÃO
         if (sbClient) {
             sbClient.auth.onAuthStateChange((event, session) => {
                 if (event === 'SIGNED_IN' && session) {
@@ -216,7 +225,8 @@
             <button onclick="fazerLogout()" class="w-full text-red-500 font-bold py-4 rounded-xl text-sm">Sair do App</button>
         </div>
     </div>
-        <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[60] flex items-center justify-center p-4 fade-in"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Pedido Criado!</h2><p class="text-sm text-gray-500 mb-6">Aguardando entregador...</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
+
+    <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[60] flex items-center justify-center p-4 fade-in"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Pedido Criado!</h2><p class="text-sm text-gray-500 mb-6">Aguardando entregador...</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
 
     <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in">
         <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
@@ -243,7 +253,7 @@
             $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
             $('#edit-zap-loja').mask('(00) 00000-0000'); $('#edit-resp-zap').mask('(00) 00000-0000');
         });
-                // --- LÓGICA DE INTERFACE ---
+               // --- LÓGICA DE INTERFACE ---
         function toggleDropdown(id) { const list = document.getElementById(`list-${id}`); if(id === 'entrega') document.getElementById('list-produto').classList.remove('show'); else document.getElementById('list-entrega').classList.remove('show'); list.classList.toggle('show'); }
         function selectOption(id, value, text) { document.getElementById(`pagamento_${id}`).value = value; document.getElementById(`display-${id}`).innerText = text; document.getElementById(`list-${id}`).classList.remove('show'); }
         document.addEventListener('click', function(e) { if (!e.target.closest('.relative')) { document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show')); } });
@@ -271,27 +281,34 @@
 
         function fazerLogout() { sbClient.auth.signOut(); location.reload(); }
 
-        // --- LÓGICA DE PERFIL (CARREGAR E SALVAR) ---
+        // --- LÓGICA DE PERFIL (CORRIGIDA) ---
         async function carregarPerfil() {
-            const { data: { user } } = await sbClient.auth.getUser();
-            const { data } = await sbClient.from('profiles').select('*').eq('id', user.id).single();
-            if (data) {
-                userProfile = data;
-                // Header e Saldo
-                safeText('app-user-name', data.nome_loja);
-                safeText('app-user-code', data.codigo_visual || '...');
-                safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
-                
-                // Pedido (Origem)
-                safeVal('origem', data.endereco || data.nome_loja);
+            try {
+                const { data: { user } } = await sbClient.auth.getUser();
+                if(!user) return;
 
-                // Formulário de Edição
-                safeVal('edit-nome-loja', data.nome_loja);
-                safeVal('edit-zap-loja', data.whatsapp_loja || data.whatsapp || ''); // Tenta pegar whatsapp_loja, senão o antigo whatsapp
-                safeVal('edit-endereco', data.endereco);
-                safeVal('edit-resp-nome', data.responsavel);
-                safeVal('edit-resp-zap', data.whatsapp_responsavel || '');
-                safeVal('edit-pin', data.pin_carteira || '');
+                const { data, error } = await sbClient.from('profiles').select('*').eq('id', user.id).single();
+                if (data) {
+                    userProfile = data;
+                    
+                    // Header e Saldo
+                    safeText('app-user-name', data.nome_loja);
+                    safeText('app-user-code', data.codigo_visual || '...');
+                    safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
+                    
+                    // IMPORTANTE: Preenche o campo de Retirada (Início)
+                    safeVal('origem', data.endereco || data.nome_loja);
+
+                    // Formulário de Edição
+                    safeVal('edit-nome-loja', data.nome_loja);
+                    safeVal('edit-zap-loja', data.whatsapp_loja || data.whatsapp || ''); 
+                    safeVal('edit-endereco', data.endereco || '');
+                    safeVal('edit-resp-nome', data.responsavel || '');
+                    safeVal('edit-resp-zap', data.whatsapp_responsavel || '');
+                    safeVal('edit-pin', data.pin_carteira || '');
+                }
+            } catch (e) {
+                console.error("Erro ao carregar perfil:", e);
             }
         }
 
@@ -320,14 +337,21 @@
 
             if(error) {
                 alert("Erro ao salvar: " + error.message);
-                btn.innerText = "Salvar Alterações"; btn.disabled = false;
             } else {
                 alert("Perfil atualizado!");
-                await carregarPerfil(); // Recarrega para atualizar a variável global e o campo origem
-                btn.innerText = "Salvar Alterações"; btn.disabled = false;
+                // Atualização LOCAL IMEDIATA (sem reload)
+                if(userProfile) {
+                    userProfile.nome_loja = nomeLoja;
+                    userProfile.endereco = endereco;
+                    userProfile.pin_carteira = pin;
+                }
+                safeVal('origem', endereco); // Atualiza aba Início
+                safeText('app-user-name', nomeLoja); // Atualiza header
             }
+            btn.innerText = "Salvar Alterações"; btn.disabled = false;
         }
-                // --- LÓGICA DE PIN E SEGURANÇA ---
+
+        // --- LÓGICA DE PIN E SEGURANÇA ---
         
         function verificarPinParaSaldo() {
             if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil antes de usar esta função.");
@@ -374,26 +398,48 @@
             const msg = `Olá, sou da loja *${userProfile.nome_loja}* e gostaria de adicionar saldo.`;
             window.open(`https://wa.me/${NUMERO_ADMIN}?text=${encodeURIComponent(msg)}`, '_blank');
         }
-
-        // --- CADASTRO E LOGIN (INALTERADOS) ---
+                // --- CADASTRO ROBUSTO (CORRIGIDO) ---
         async function fazerCadastro() {
-            const email = document.getElementById('reg-email').value; const senha = document.getElementById('reg-senha').value; const loja = document.getElementById('reg-nome-loja').value; const zap = document.getElementById('reg-zap-loja').value; const resp = document.getElementById('reg-nome-resp').value; const cep = document.getElementById('reg-cep').value; const rua = document.getElementById('reg-rua').value; const num = document.getElementById('reg-num').value; const bairro = document.getElementById('reg-bairro').value; const cidade = document.getElementById('reg-cidade').value;
+            const email = document.getElementById('reg-email').value; 
+            const senha = document.getElementById('reg-senha').value; 
+            const loja = document.getElementById('reg-nome-loja').value; 
+            const zap = document.getElementById('reg-zap-loja').value; 
+            const resp = document.getElementById('reg-nome-resp').value; 
+            
+            // Monta Endereço Completo
+            const cep = document.getElementById('reg-cep').value; 
+            const rua = document.getElementById('reg-rua').value; 
+            const num = document.getElementById('reg-num').value; 
+            const bairro = document.getElementById('reg-bairro').value; 
+            const cidade = document.getElementById('reg-cidade').value;
+            const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cidade}`;
+
             const btn = document.getElementById('btn-cad'); const load = document.getElementById('load-cad');
 
             if(!email || !senha || !loja || !num) return alert("Preencha todos os campos obrigatórios!");
             btn.disabled = true; load.classList.remove('hidden');
 
             try {
-                // Salva o whatsapp da loja como whatsapp_loja também
-                const { data, error } = await sbClient.auth.signUp({
-                    email: email, password: senha,
-                    options: { data: { nome_loja: loja, whatsapp: zap, whatsapp_loja: zap, responsavel: resp, cep: cep, endereco: `${rua}, ${num}, ${bairro}`, numero: num, bairro: bairro, cidade: cidade } }
-                });
+                // 1. Cria Auth
+                const { data, error } = await sbClient.auth.signUp({ email: email, password: senha });
                 if (error) throw error;
+                
+                // 2. Cria Profile MANUALMENTE para garantir endereço
+                if (data.user) {
+                    await sbClient.from('profiles').insert([{
+                        id: data.user.id,
+                        nome_loja: loja,
+                        whatsapp_loja: zap,
+                        responsavel: resp,
+                        endereco: enderecoCompleto, // Aqui está a correção
+                        email: email
+                    }]);
+                }
                 alert("Conta criada! Entrando...");
             } catch (e) { alert("Erro: " + e.message); } finally { btn.disabled = false; load.classList.add('hidden'); }
         }
 
+        // --- LOGIN E FRETE (INALTERADOS) ---
         async function fazerLogin() {
             const email = document.getElementById('log-email').value; const senha = document.getElementById('log-senha').value;
             const btn = document.getElementById('btn-log'); const load = document.getElementById('load-log');
@@ -406,7 +452,6 @@
 
         async function buscarCep(prefixo) { let cep = document.getElementById(prefixo + '-cep').value.replace(/\D/g, ''); if(cep.length !== 8) return; try { const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`); const data = await res.json(); if(!data.erro) { document.getElementById(prefixo + '-rua').value = data.logradouro; document.getElementById(prefixo + '-bairro').value = data.bairro; document.getElementById(prefixo + '-cidade').value = `${data.localidade}/${data.uf}`; document.getElementById(prefixo + '-num').focus(); } } catch(e){} }
         
-        // --- CÁLCULO DE FRETE E ENVIO ---
         async function calcularDistancia() {
             const origem = document.getElementById('origem').value; const destino = document.getElementById('destino').value;
             if(!origem || !destino) return alert("Preencha endereços");
