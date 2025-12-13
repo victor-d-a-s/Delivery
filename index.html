@@ -20,7 +20,6 @@
         .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; }
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
         
-        /* Switch Container */
         .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -33,13 +32,11 @@
         .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 80px; }
         @media (min-width: 768px) { .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; margin: auto; } body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } }
         
-        /* Dropdown */
         .custom-select-btn { width: 100%; background: white; border: 1px solid #E5E7EB; border-radius: 0.5rem; padding: 0.75rem; font-size: 0.875rem; text-align: left; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .custom-options { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #E5E7EB; border-radius: 0.5rem; margin-top: 4px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 40; overflow: hidden; display: none; }
         .custom-options.show { display: block; animation: fadeIn 0.2s; }
         .custom-option { padding: 10px; font-size: 0.875rem; cursor: pointer; border-bottom: 1px solid #F3F4F6; display: flex; align-items: center; gap: 8px; }
         
-        /* Menu Bottom */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; max-width: 28rem; margin: 0 auto; }
         @media (min-width: 768px) { .bottom-nav { border-radius: 0 0 1.5rem 1.5rem; } }
         .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.2s; }
@@ -52,13 +49,10 @@
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
 
     <script>
-        // --- CHAVES DO SUPABASE ---
         const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
 
         let sbClient = null;
-
-        // INICIALIZAÇÃO
         try {
             if (typeof supabase !== 'undefined') {
                 sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -66,10 +60,8 @@
         } catch (e) { console.error("Erro config:", e); }
 
         const NUMERO_ADMIN = "5584982005039"; 
-        
-        // --- CONFIGURAÇÕES MOSSORÓ ---
         const CIDADE_FIXA = "Mossoró, RN"; 
-        const TAXA_RETORNO = 0.20; // 20%
+        const TAXA_RETORNO = 0.20; 
         const PRECO_BASE = 5.00; 
         const PRECO_POR_KM = 1.00; 
         
@@ -77,8 +69,8 @@
         let userProfile = null; 
         let distanciaFinal = 0; 
         let valorFinal = 0;
+        let pendingAction = null; // Para guardar a ação pendente do PIN
 
-        // LISTENER DE SESSÃO
         if (sbClient) {
             sbClient.auth.onAuthStateChange((event, session) => {
                 if (event === 'SIGNED_IN' && session) {
@@ -107,6 +99,7 @@
         };
 
         function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
+        function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
     </script>
 
     <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
@@ -155,7 +148,7 @@
     <div id="screen-app" class="hidden app-container fade-in relative">
         <div class="bg-blue-700 p-6 text-white relative">
             <div class="flex justify-between items-start mb-4"><div><p class="text-xs opacity-80">Olá, <span id="app-user-name">...</span></p><p class="text-xs opacity-60">ID: <span id="app-user-code">...</span></p></div><button onclick="fazerLogout()" class="text-xs bg-blue-900 px-3 py-1 rounded-full"><i class="fas fa-sign-out-alt"></i></button></div>
-            <div class="bg-white/10 p-4 rounded-xl flex justify-between items-center shadow-lg"><div><p class="text-xs text-blue-100">Saldo</p><p class="text-2xl font-bold" id="display-saldo">R$ 0,00</p></div><button onclick="solicitarSaldo()" class="bg-white px-4 py-2 rounded-lg text-blue-700 text-xs font-bold active:scale-95 transition-transform">Add</button></div>
+            <div class="bg-white/10 p-4 rounded-xl flex justify-between items-center shadow-lg"><div><p class="text-xs text-blue-100">Saldo</p><p class="text-2xl font-bold" id="display-saldo">R$ 0,00</p></div><button onclick="verificarPinParaSaldo()" class="bg-white px-4 py-2 rounded-lg text-blue-700 text-xs font-bold active:scale-95 transition-transform">Add</button></div>
         </div>
         <div class="p-5 space-y-4">
             <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 space-y-3"><p class="text-[10px] text-center text-blue-500 font-bold uppercase tracking-wider">📍 Rota</p><div class="relative"><i class="fas fa-map-marker-alt text-blue-600 absolute left-3 top-3"></i><input type="text" id="origem" placeholder="Retirada" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg font-bold text-gray-700" readonly></div><div class="relative"><i class="fas fa-flag-checkered text-green-600 absolute left-3 top-3"></i><input type="text" id="destino" placeholder="Entrega (Rua, Número, Bairro)" class="pl-9 bg-white border w-full p-2 text-sm rounded-lg outline-none focus:border-green-500"></div></div>
@@ -182,7 +175,7 @@
             </div>
             <button onclick="calcularDistancia()" id="btn-calcular" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2"><span id="btn-text">Calcular Frete</span><div id="loading" class="spinner hidden"></div></button>
             <div id="resultado-box" class="hidden bg-green-50 border border-green-200 p-4 rounded-xl flex justify-between items-center animate-pulse"><div><p class="text-xs text-gray-500">Distância</p><p class="font-bold text-gray-800"><span id="km-display">0</span> km</p></div><div class="text-right"><p class="text-xs text-gray-500">Total Frete</p><p class="font-bold text-2xl text-green-700">R$ <span id="valor-display">0,00</span></p></div></div>
-            <button onclick="enviarParaCentral()" id="btn-enviar" class="hidden w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2"><i class="fas fa-check text-2xl"></i> Confirmar Pedido</button>
+            <button onclick="iniciarPedido()" id="btn-enviar" class="hidden w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2"><i class="fas fa-check text-2xl"></i> Confirmar Pedido</button>
         </div>
     </div>
 
@@ -199,15 +192,43 @@
     </div>
 
     <div id="screen-perfil" class="hidden app-container p-6 fade-in">
-        <h2 class="text-xl font-bold mb-4">Meu Perfil</h2>
-        <div class="bg-white p-4 rounded-lg border shadow-sm space-y-2">
-            <p><strong>Loja:</strong> <span id="perf-nome">...</span></p>
-            <p><strong>Email:</strong> <span id="perf-email">...</span></p>
-            <button onclick="fazerLogout()" class="mt-4 w-full bg-red-100 text-red-600 font-bold py-2 rounded-lg">Sair do App</button>
+        <h2 class="text-xl font-bold mb-4">Editar Perfil</h2>
+        <div class="space-y-4 pb-20">
+            <div class="bg-white p-4 rounded-xl border space-y-3">
+                <p class="text-xs font-bold text-gray-400 uppercase">Estabelecimento</p>
+                <div><label class="text-xs text-gray-500">Nome da Loja</label><input type="text" id="edit-nome-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs text-gray-500">WhatsApp Loja</label><input type="text" id="edit-zap-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs text-gray-500">Endereço de Coleta (Atualiza Pedidos)</label><input type="text" id="edit-endereco" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
+            </div>
+            
+            <div class="bg-white p-4 rounded-xl border space-y-3">
+                <p class="text-xs font-bold text-gray-400 uppercase">Responsável</p>
+                <div><label class="text-xs text-gray-500">Nome Completo</label><input type="text" id="edit-resp-nome" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs text-gray-500">WhatsApp Pessoal</label><input type="text" id="edit-resp-zap" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
+            </div>
+
+            <div class="bg-red-50 p-4 rounded-xl border border-red-100 space-y-3">
+                <p class="text-xs font-bold text-red-400 uppercase">Segurança (Saldo & Pagamentos)</p>
+                <div><label class="text-xs text-gray-500">PIN de Segurança (4 dígitos)</label><input type="tel" id="edit-pin" maxlength="4" class="w-full border-b py-2 text-sm bg-transparent focus:outline-none focus:border-red-500 tracking-widest font-bold" placeholder="****"></div>
+            </div>
+
+            <button onclick="salvarPerfil()" id="btn-save-perf" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg">Salvar Alterações</button>
+            <button onclick="fazerLogout()" class="w-full text-red-500 font-bold py-4 rounded-xl text-sm">Sair do App</button>
         </div>
     </div>
+        <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[60] flex items-center justify-center p-4 fade-in"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Pedido Criado!</h2><p class="text-sm text-gray-500 mb-6">Aguardando entregador...</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
 
-    <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[60] flex items-center justify-center p-4 fade-in"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Pedido Criado!</h2><p class="text-sm text-gray-500 mb-6">Aguardando entregador...</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
+    <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in">
+        <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
+            <h2 class="text-lg font-bold text-gray-800 mb-2">Segurança</h2>
+            <p class="text-sm text-gray-500 mb-4">Digite seu PIN de 4 dígitos</p>
+            <input type="tel" id="input-confirm-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-4 outline-none focus:ring-2 focus:ring-blue-500">
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="document.getElementById('modal-pin').classList.add('hidden')" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button>
+                <button onclick="confirmarPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Confirmar</button>
+            </div>
+        </div>
+    </div>
 
     <div id="bottom-menu" class="hidden bottom-nav w-full max-w-md">
         <div class="nav-item active" onclick="navegar('app', this)"><i class="fas fa-home"></i><span>Início</span></div>
@@ -220,8 +241,9 @@
         $(document).ready(function(){ 
             $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
             $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
+            $('#edit-zap-loja').mask('(00) 00000-0000'); $('#edit-resp-zap').mask('(00) 00000-0000');
         });
-        // --- LÓGICA DE INTERFACE ---
+                // --- LÓGICA DE INTERFACE ---
         function toggleDropdown(id) { const list = document.getElementById(`list-${id}`); if(id === 'entrega') document.getElementById('list-produto').classList.remove('show'); else document.getElementById('list-entrega').classList.remove('show'); list.classList.toggle('show'); }
         function selectOption(id, value, text) { document.getElementById(`pagamento_${id}`).value = value; document.getElementById(`display-${id}`).innerText = text; document.getElementById(`list-${id}`).classList.remove('show'); }
         document.addEventListener('click', function(e) { if (!e.target.closest('.relative')) { document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show')); } });
@@ -232,7 +254,6 @@
                 if(el) el.classList.add('hidden');
             });
             document.getElementById('screen-'+id).classList.remove('hidden'); 
-            
             if(['app', 'pedidos', 'extrato', 'perfil'].includes(id)) { 
                 document.getElementById('bottom-menu').classList.remove('hidden'); 
                 document.getElementById('bottom-menu').classList.add('flex'); 
@@ -245,22 +266,116 @@
             showScreen(tela);
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             elemento.classList.add('active');
-            
-            if(tela === 'perfil' && userProfile) {
-                safeText('perf-nome', userProfile.nome_loja);
-                safeText('perf-email', userSession.user.email);
-            }
+            if(tela === 'perfil') carregarPerfil(); // Recarrega para garantir dados frescos
         }
 
         function fazerLogout() { sbClient.auth.signOut(); location.reload(); }
+
+        // --- LÓGICA DE PERFIL (CARREGAR E SALVAR) ---
+        async function carregarPerfil() {
+            const { data: { user } } = await sbClient.auth.getUser();
+            const { data } = await sbClient.from('profiles').select('*').eq('id', user.id).single();
+            if (data) {
+                userProfile = data;
+                // Header e Saldo
+                safeText('app-user-name', data.nome_loja);
+                safeText('app-user-code', data.codigo_visual || '...');
+                safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
+                
+                // Pedido (Origem)
+                safeVal('origem', data.endereco || data.nome_loja);
+
+                // Formulário de Edição
+                safeVal('edit-nome-loja', data.nome_loja);
+                safeVal('edit-zap-loja', data.whatsapp_loja || data.whatsapp || ''); // Tenta pegar whatsapp_loja, senão o antigo whatsapp
+                safeVal('edit-endereco', data.endereco);
+                safeVal('edit-resp-nome', data.responsavel);
+                safeVal('edit-resp-zap', data.whatsapp_responsavel || '');
+                safeVal('edit-pin', data.pin_carteira || '');
+            }
+        }
+
+        async function salvarPerfil() {
+            const nomeLoja = document.getElementById('edit-nome-loja').value;
+            const zapLoja = document.getElementById('edit-zap-loja').value;
+            const endereco = document.getElementById('edit-endereco').value;
+            const respNome = document.getElementById('edit-resp-nome').value;
+            const respZap = document.getElementById('edit-resp-zap').value;
+            const pin = document.getElementById('edit-pin').value;
+
+            if(!nomeLoja || !endereco) return alert("Nome da Loja e Endereço são obrigatórios.");
+            if(pin && pin.length !== 4) return alert("O PIN deve ter 4 dígitos.");
+
+            const btn = document.getElementById('btn-save-perf');
+            btn.innerText = "Salvando..."; btn.disabled = true;
+
+            const { error } = await sbClient.from('profiles').update({
+                nome_loja: nomeLoja,
+                whatsapp_loja: zapLoja,
+                endereco: endereco,
+                responsavel: respNome,
+                whatsapp_responsavel: respZap,
+                pin_carteira: pin
+            }).eq('id', userSession.user.id);
+
+            if(error) {
+                alert("Erro ao salvar: " + error.message);
+                btn.innerText = "Salvar Alterações"; btn.disabled = false;
+            } else {
+                alert("Perfil atualizado!");
+                await carregarPerfil(); // Recarrega para atualizar a variável global e o campo origem
+                btn.innerText = "Salvar Alterações"; btn.disabled = false;
+            }
+        }
+                // --- LÓGICA DE PIN E SEGURANÇA ---
         
-        function solicitarSaldo() {
-            if(!userProfile) return;
+        function verificarPinParaSaldo() {
+            if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil antes de usar esta função.");
+            pendingAction = 'saldo';
+            document.getElementById('input-confirm-pin').value = '';
+            document.getElementById('modal-pin').classList.remove('hidden');
+            document.getElementById('input-confirm-pin').focus();
+        }
+
+        function iniciarPedido() {
+            const pgEnt = document.getElementById('pagamento_entrega').value;
+            
+            // Se pagamento for Carteira/Saldo, exige PIN
+            if(pgEnt === 'Carteira') {
+                if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil para usar o Saldo em Conta.");
+                pendingAction = 'pedido';
+                document.getElementById('input-confirm-pin').value = '';
+                document.getElementById('modal-pin').classList.remove('hidden');
+                document.getElementById('input-confirm-pin').focus();
+            } else {
+                // Pagamento normal, envia direto
+                enviarParaCentral();
+            }
+        }
+
+        function confirmarPin() {
+            const pinDigitado = document.getElementById('input-confirm-pin').value;
+            if(pinDigitado !== userProfile.pin_carteira) {
+                alert("PIN Incorreto!");
+                return;
+            }
+            
+            document.getElementById('modal-pin').classList.add('hidden');
+            
+            if(pendingAction === 'saldo') {
+                solicitarSaldoZap();
+            } else if (pendingAction === 'pedido') {
+                enviarParaCentral();
+            }
+            pendingAction = null;
+        }
+
+        function solicitarSaldoZap() {
             const msg = `Olá, sou da loja *${userProfile.nome_loja}* e gostaria de adicionar saldo.`;
             window.open(`https://wa.me/${NUMERO_ADMIN}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // --- LÓGICA DE CADASTRO ---
+        // --- CADASTRO E LOGIN (INALTERADOS) ---
         async function fazerCadastro() {
             const email = document.getElementById('reg-email').value; const senha = document.getElementById('reg-senha').value; const loja = document.getElementById('reg-nome-loja').value; const zap = document.getElementById('reg-zap-loja').value; const resp = document.getElementById('reg-nome-resp').value; const cep = document.getElementById('reg-cep').value; const rua = document.getElementById('reg-rua').value; const num = document.getElementById('reg-num').value; const bairro = document.getElementById('reg-bairro').value; const cidade = document.getElementById('reg-cidade').value;
             const btn = document.getElementById('btn-cad'); const load = document.getElementById('load-cad');
@@ -269,16 +384,16 @@
             btn.disabled = true; load.classList.remove('hidden');
 
             try {
+                // Salva o whatsapp da loja como whatsapp_loja também
                 const { data, error } = await sbClient.auth.signUp({
                     email: email, password: senha,
-                    options: { data: { nome_loja: loja, whatsapp: zap, responsavel: resp, cep: cep, endereco: `${rua}, ${num}, ${bairro}`, numero: num, bairro: bairro, cidade: cidade } }
+                    options: { data: { nome_loja: loja, whatsapp: zap, whatsapp_loja: zap, responsavel: resp, cep: cep, endereco: `${rua}, ${num}, ${bairro}`, numero: num, bairro: bairro, cidade: cidade } }
                 });
                 if (error) throw error;
                 alert("Conta criada! Entrando...");
             } catch (e) { alert("Erro: " + e.message); } finally { btn.disabled = false; load.classList.add('hidden'); }
         }
 
-        // --- LÓGICA DE LOGIN ---
         async function fazerLogin() {
             const email = document.getElementById('log-email').value; const senha = document.getElementById('log-senha').value;
             const btn = document.getElementById('btn-log'); const load = document.getElementById('load-log');
@@ -289,21 +404,9 @@
             } catch (e) { alert("Login falhou."); } finally { btn.disabled = false; load.classList.add('hidden'); }
         }
 
-        async function carregarPerfil() {
-            const { data: { user } } = await sbClient.auth.getUser();
-            const { data } = await sbClient.from('profiles').select('*').eq('id', user.id).single();
-            if (data) {
-                userProfile = data;
-                safeText('app-user-name', data.nome_loja);
-                safeText('app-user-code', data.codigo_visual || '...');
-                safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
-                document.getElementById('origem').value = data.endereco || data.nome_loja;
-            }
-        }
-
         async function buscarCep(prefixo) { let cep = document.getElementById(prefixo + '-cep').value.replace(/\D/g, ''); if(cep.length !== 8) return; try { const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`); const data = await res.json(); if(!data.erro) { document.getElementById(prefixo + '-rua').value = data.logradouro; document.getElementById(prefixo + '-bairro').value = data.bairro; document.getElementById(prefixo + '-cidade').value = `${data.localidade}/${data.uf}`; document.getElementById(prefixo + '-num').focus(); } } catch(e){} }
         
-        // --- CÁLCULO DE FRETE ---
+        // --- CÁLCULO DE FRETE E ENVIO ---
         async function calcularDistancia() {
             const origem = document.getElementById('origem').value; const destino = document.getElementById('destino').value;
             if(!origem || !destino) return alert("Preencha endereços");
@@ -324,17 +427,8 @@
         
         function recalcularTotal() { 
             if(distanciaFinal == 0) return; 
-            
-            // Valor Base + Distância
             let preco = PRECO_BASE + (distanciaFinal * PRECO_POR_KM); 
-            
-            // Adiciona taxa de retorno se marcado
-            if(document.getElementById('retorno').checked) {
-                preco += (preco * TAXA_RETORNO);
-            }
-            
-            // Cliente não vê taxa da plataforma
-            
+            if(document.getElementById('retorno').checked) preco += (preco * TAXA_RETORNO);
             valorFinal = preco.toFixed(2); 
             document.getElementById('km-display').innerText = distanciaFinal.replace('.', ','); 
             document.getElementById('valor-display').innerText = valorFinal.replace('.', ','); 
@@ -342,11 +436,9 @@
 
         function mudarStatusRetorno() { const checked = document.getElementById('retorno').checked; const txt = document.getElementById('text-retorno'); const ico = document.getElementById('icon-retorno'); if(checked) { txt.innerText = "Sim, com retorno!"; txt.classList.replace('text-gray-500', 'text-blue-700'); ico.className = "fas fa-exchange-alt text-blue-600"; } else { txt.innerText = "Sem retorno!"; txt.classList.replace('text-blue-700', 'text-gray-500'); ico.className = "fas fa-arrow-right text-gray-400"; } }
 
-        // --- ENVIAR PARA O BANCO (SEM WHATSAPP) ---
         async function enviarParaCentral() {
             const pgEnt = document.getElementById('pagamento_entrega').value;
             const nomeDest = document.getElementById('nome_dest').value; const telDest = document.getElementById('tel_dest').value; const ref = document.getElementById('referencia').value;
-
             if(!nomeDest || !telDest || !ref) return alert("Preencha todos os dados.");
             
             const pinSeguranca = Math.floor(1000 + Math.random() * 9000).toString();
@@ -362,8 +454,6 @@
             }]);
 
             if(error) { alert("Erro ao enviar pedido: " + error.message); return; }
-
-            // Apenas exibe o sucesso na tela (sem abrir WhatsApp)
             document.getElementById('display-pin').innerText = pinSeguranca;
             document.getElementById('modal-success').classList.remove('hidden');
         }
