@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Drop Entregas - Mossoró</title>
+    <title>Drop Entregas - Cliente</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -32,11 +32,13 @@
         .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 80px; }
         @media (min-width: 768px) { .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; margin: auto; } body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } }
         
+        /* Dropdown */
         .custom-select-btn { width: 100%; background: white; border: 1px solid #E5E7EB; border-radius: 0.5rem; padding: 0.75rem; font-size: 0.875rem; text-align: left; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .custom-options { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #E5E7EB; border-radius: 0.5rem; margin-top: 4px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 40; overflow: hidden; display: none; }
         .custom-options.show { display: block; animation: fadeIn 0.2s; }
         .custom-option { padding: 10px; font-size: 0.875rem; cursor: pointer; border-bottom: 1px solid #F3F4F6; display: flex; align-items: center; gap: 8px; }
         
+        /* Menu Bottom */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; max-width: 28rem; margin: 0 auto; }
         @media (min-width: 768px) { .bottom-nav { border-radius: 0 0 1.5rem 1.5rem; } }
         .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.2s; }
@@ -48,16 +50,21 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
 
+    <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
+        <div class="spinner w-10 h-10 border-4 mb-4"></div>
+        <p class="text-gray-500 text-sm font-bold">Conectando...</p>
+    </div>
+
     <script>
+        // CONFIGURAÇÕES
         const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
 
         let sbClient = null;
-
         try {
             if (typeof supabase !== 'undefined') {
                 sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            } else { console.error("Biblioteca Supabase não carregou."); }
+            } else { console.error("Supabase JS não carregou."); }
         } catch (e) { console.error("Erro config:", e); }
 
         const NUMERO_ADMIN = "5584982005039"; 
@@ -73,17 +80,60 @@
         let pendingAction = null;
         let isRegistering = false; 
 
-        // --- SISTEMA DE LOGIN E SESSÃO ---
+        // --- SISTEMA DE INICIALIZAÇÃO ROBUSTO ---
+        window.onload = async function() {
+            // 1. Fail-Safe: Se demorar mais de 5s, força a tela inicial para não ficar branco
+            const safetyTimeout = setTimeout(() => {
+                const loader = document.getElementById('global-loading');
+                if (loader && loader.style.display !== 'none') {
+                    console.warn("Timeout: Forçando tela inicial.");
+                    loader.style.display = 'none';
+                    if(!userSession) showScreen('welcome');
+                }
+            }, 5000);
+
+            if(!sbClient) {
+                alert("Erro: Falha na conexão com o servidor. Recarregue.");
+                return;
+            }
+
+            try {
+                // Tenta pegar a sessão
+                const { data, error } = await sbClient.auth.getSession();
+                
+                if (error) throw error;
+
+                if (data.session) {
+                    userSession = data.session;
+                    await carregarPerfil();
+                    // Se carregarPerfil der certo, ele chama showScreen('app')
+                } else {
+                    showScreen('welcome');
+                }
+            } catch(e) {
+                console.error("Erro init:", e);
+                showScreen('welcome'); // Joga pro login se der erro
+            } finally {
+                // Limpa o timer e garante que o loader suma
+                clearTimeout(safetyTimeout);
+                const loader = document.getElementById('global-loading');
+                if(loader) loader.style.display = 'none';
+            }
+        };
+
+        // --- LISTENER DE SESSÃO ---
         if (sbClient) {
             sbClient.auth.onAuthStateChange(async (event, session) => {
-                if (isRegistering) return;
+                if (isRegistering) return; // Não interfere no cadastro
 
                 if (event === 'SIGNED_IN' && session) {
                     userSession = session;
-                    await carregarPerfil(); 
+                    await carregarPerfil();
                     
-                    const currentScreen = document.querySelector('.app-container:not(.hidden)').id;
-                    if(currentScreen === 'screen-welcome' || currentScreen === 'screen-login') {
+                    // Só redireciona se estiver na tela de login/welcome
+                    const welcome = document.getElementById('screen-welcome');
+                    const login = document.getElementById('screen-login');
+                    if(!welcome.classList.contains('hidden') || !login.classList.contains('hidden')) {
                         showScreen('app');
                     }
                 } else if (event === 'SIGNED_OUT') {
@@ -94,51 +144,10 @@
             });
         }
 
-        window.onload = async function() {
-            // TRAVA DE SEGURANÇA: Se demorar mais de 6 segundos, força a tela de login
-            setTimeout(() => {
-                const loader = document.getElementById('global-loading');
-                if(loader && loader.style.display !== 'none') {
-                    console.warn("Tempo limite excedido. Forçando abertura.");
-                    loader.style.display = 'none';
-                    if(!userSession) showScreen('welcome');
-                }
-            }, 6000);
-
-            if(!sbClient) {
-                alert("Erro crítico: Verifique sua conexão.");
-                document.getElementById('global-loading').style.display = 'none';
-                return;
-            }
-
-            try {
-                const { data: { session }, error } = await sbClient.auth.getSession();
-                if (error) throw error;
-
-                if (session) {
-                    userSession = session;
-                    await carregarPerfil();
-                    // carregarPerfil já direciona ou desloga se der erro
-                } else { 
-                    showScreen('welcome'); 
-                }
-            } catch(e) { 
-                console.error("Erro init:", e);
-                showScreen('welcome'); 
-            } finally {
-                // Garante que o spinner suma SEMPRE
-                document.getElementById('global-loading').style.display = 'none';
-            }
-        };
-
+        // --- UTILITÁRIOS ---
         function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
         function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
     </script>
-
-    <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
-        <div class="spinner w-10 h-10 border-4 mb-4"></div>
-        <p class="text-gray-500 text-sm font-bold">Conectando...</p>
-    </div>
 
     <div id="screen-welcome" class="hidden app-container p-8 text-center fade-in flex flex-col justify-center">
         <div class="mb-8"><div class="inline-block p-5 rounded-full bg-blue-50 text-blue-700 mb-4"><i class="fas fa-box-open text-5xl"></i></div><h1 class="text-3xl font-bold text-gray-800">Drop Entregas</h1><p class="text-gray-500">Cliente</p></div>
@@ -326,9 +335,11 @@
             isRegistering = true; 
 
             try {
+                // 1. Cria Auth
                 const { data, error } = await sbClient.auth.signUp({ email, password: senha });
                 if (error) throw error;
                 
+                // 2. Insere Perfil no Banco (Espera terminar)
                 if (data.user) {
                     const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cidade}`;
                     const { error: perfilErro } = await sbClient.from('profiles').insert([{
@@ -341,10 +352,12 @@
                     }]);
                     if (perfilErro) throw perfilErro;
 
-                    alert("Sucesso! Entrando...");
+                    alert("Conta criada com sucesso! Entrando...");
+                    
+                    // 3. Define Sessão e Redireciona
                     userSession = data.session;
                     await carregarPerfil();
-                    showScreen('app'); 
+                    showScreen('app'); // Redirecionamento explícito
                     isRegistering = false; 
                 }
             } catch (e) { 
@@ -369,6 +382,7 @@
             
             try {
                 const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: senha });
+                
                 if (error) {
                     if(error.message.includes("Invalid login credentials")) {
                         throw new Error("E-mail ou senha incorretos.");
@@ -378,6 +392,7 @@
                         throw new Error(error.message);
                     }
                 }
+                // Sucesso: o listener onAuthStateChange fará o resto
             } catch (e) { 
                 alert(e.message); 
             } finally { 
@@ -395,11 +410,11 @@
                 if(!userSession) return;
 
                 const { data, error } = await sbClient.from('profiles').select('*').eq('id', userSession.user.id).single();
-                
+                                // VERIFICA SE O CADASTRO EXISTE (IMPEDE USUÁRIO ZUMBI)
                 if (!data) {
                     if (!isRegistering) {
                         await sbClient.auth.signOut();
-                        alert("Acesso Negado: Cadastro não encontrado.");
+                        alert("Erro: Cadastro incompleto ou não encontrado.");
                         location.reload();
                     }
                     return;
@@ -419,7 +434,9 @@
                 safeVal('edit-resp-zap', data.whatsapp_responsavel || '');
                 safeVal('edit-pin', data.pin_carteira || '');
                 
-                if (document.getElementById('screen-welcome').classList.contains('hidden') === false) {
+                // Se já estiver na tela de login/welcome, avança
+                const currentScreen = document.querySelector('.app-container:not(.hidden)').id;
+                if(currentScreen === 'screen-welcome' || currentScreen === 'screen-login') {
                     showScreen('app');
                 }
 
@@ -437,7 +454,7 @@
             const pin = document.getElementById('edit-pin').value;
 
             if(!nomeLoja || !endereco) return alert("Nome e Endereço são obrigatórios.");
-            if(pin && pin.length !== 4) return alert("PIN deve ser 4 dígitos.");
+            if(pin && pin.length !== 4) return alert("O PIN deve ter 4 dígitos.");
 
             const btn = document.getElementById('btn-save-perf');
             btn.innerText = "Salvando..."; btn.disabled = true;
@@ -451,10 +468,17 @@
                 pin_carteira: pin
             }).eq('id', userSession.user.id);
 
-            if(error) { alert("Erro: " + error.message); } 
-            else { 
-                alert("Salvo com sucesso!");
-                await carregarPerfil();
+            if(error) {
+                alert("Erro ao salvar: " + error.message);
+            } else {
+                alert("Perfil atualizado!");
+                if(userProfile) {
+                    userProfile.nome_loja = nomeLoja;
+                    userProfile.endereco = endereco;
+                    userProfile.pin_carteira = pin;
+                }
+                safeVal('origem', endereco);
+                safeText('app-user-name', nomeLoja);
             }
             btn.innerText = "Salvar Alterações"; btn.disabled = false;
         }
@@ -540,7 +564,7 @@
                 telefone_destinatario: telDest
             }]);
 
-            if(error) { alert("Erro ao enviar: " + error.message); return; }
+            if(error) { alert("Erro: " + error.message); return; }
             document.getElementById('display-pin').innerText = pinSeguranca;
             document.getElementById('modal-success').classList.remove('hidden');
         }
@@ -549,5 +573,4 @@
         function deg2rad(deg) { return deg * (Math.PI/180); }
     </script>
 </body>
-    </html>
-    
+</html>
