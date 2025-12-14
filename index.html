@@ -60,14 +60,11 @@
 
     <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
         <div class="spinner w-10 h-10 border-4 mb-4"></div>
-        <p id="loading-msg" class="text-gray-500 text-sm font-bold">Iniciando...</p>
-        
-        <div id="repair-area" class="hidden mt-6 text-center">
-            <p class="text-xs text-gray-400 mb-2">Demorando muito?</p>
-            <button onclick="resetarSistema()" class="text-xs text-white font-bold bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl shadow-lg">
-                <i class="fas fa-trash-alt mr-2"></i> Limpar e Reiniciar
-            </button>
-        </div>
+        <p id="loading-msg" class="text-gray-500 text-sm font-bold">Verificando segurança...</p>
+        <button onclick="resetarSistema()" class="mt-8 text-xs text-white font-bold bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl shadow-lg hidden animate-bounce" id="btn-reload">
+            <i class="fas fa-trash-alt mr-2"></i> REPARAR SISTEMA
+        </button>
+        <p id="msg-delay" class="text-[10px] text-gray-400 mt-2 hidden">Se travou, clique acima.</p>
     </div>
 
     <div id="screen-welcome" class="hidden app-container p-8 text-center fade-in flex flex-col justify-center">
@@ -163,7 +160,9 @@
         <div class="space-y-4 pb-20">
             <div class="bg-white p-4 rounded-xl border space-y-3">
                 <p class="text-xs font-bold text-gray-400 uppercase">Estabelecimento</p>
-                <div><label class="text-xs text-gray-500">Nome da Loja</label><input type="text" id="edit-nome-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs text-gray-500">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs text-gray-500">Razão Social</label><input type="text" id="edit-razao" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs text-gray-500">CNPJ</label><input type="text" id="edit-cnpj" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
                 <div><label class="text-xs text-gray-500">WhatsApp Loja</label><input type="text" id="edit-zap-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
                 <div><label class="text-xs text-gray-500">Endereço de Coleta (Atualiza Pedidos)</label><input type="text" id="edit-endereco" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
             </div>
@@ -173,7 +172,7 @@
                 <div><label class="text-xs text-gray-500">WhatsApp Pessoal</label><input type="text" id="edit-resp-zap" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
             </div>
             <div class="bg-red-50 p-4 rounded-xl border border-red-100 space-y-3">
-                <p class="text-xs font-bold text-red-400 uppercase">Segurança (Saldo & Pagamentos)</p>
+                <p class="text-xs font-bold text-red-400 uppercase">Segurança</p>
                 <div><label class="text-xs text-gray-500">PIN de Segurança (4 dígitos)</label><input type="tel" id="edit-pin" maxlength="4" class="w-full border-b py-2 text-sm bg-transparent focus:outline-none focus:border-red-500 tracking-widest font-bold" placeholder="****"></div>
             </div>
             <button onclick="salvarPerfil()" id="btn-save-perf" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg">Salvar Alterações</button>
@@ -199,35 +198,22 @@
         <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl relative">
             <button onclick="document.getElementById('modal-motoboy').classList.add('hidden')" class="absolute top-2 right-3 text-gray-400 text-2xl z-10">&times;</button>
             <div class="bg-blue-600 p-6 text-center relative overflow-hidden">
-                <div class="absolute inset-0 bg-blue-500 opacity-20 transform -skew-y-6"></div>
                 <div class="relative z-10">
-                    <div class="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center mb-3 shadow-lg border-4 border-blue-400">
-                        <i class="fas fa-user-astronaut text-4xl text-blue-600"></i>
-                    </div>
+                    <div class="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center mb-3 shadow-lg border-4 border-blue-400"><i class="fas fa-user-astronaut text-4xl text-blue-600"></i></div>
                     <h3 class="text-white font-bold text-xl" id="moto-nome">Carregando...</h3>
-                    <p class="text-blue-100 text-sm">Entregador Verificado <i class="fas fa-check-circle text-xs"></i></p>
+                    <p class="text-blue-100 text-sm">Entregador Verificado</p>
                 </div>
             </div>
             <div class="p-6 space-y-4">
                 <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
                     <div class="bg-blue-100 p-2.5 rounded-full"><i class="fas fa-motorcycle text-blue-600"></i></div>
-                    <div>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold">Veículo</p>
-                        <p class="font-bold text-gray-800 text-sm" id="moto-modelo">...</p>
-                    </div>
+                    <div><p class="text-[10px] text-gray-400 uppercase font-bold">Veículo</p><p class="font-bold text-gray-800 text-sm" id="moto-modelo">...</p></div>
                 </div>
                 <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
                     <div class="bg-gray-800 p-2.5 rounded-full"><i class="fas fa-credit-card text-white"></i></div>
-                    <div>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold">Placa</p>
-                        <p class="font-bold text-gray-800 text-sm tracking-widest" id="moto-placa">...</p>
-                    </div>
+                    <div><p class="text-[10px] text-gray-400 uppercase font-bold">Placa</p><p class="font-bold text-gray-800 text-sm tracking-widest" id="moto-placa">...</p></div>
                 </div>
-                
-                <button onclick="contatarMotoboy()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-green-900/20 flex items-center justify-center gap-2 transition-all active:scale-95">
-                    <i class="fab fa-whatsapp text-lg"></i> Chamar no WhatsApp
-                </button>
-                
+                <button onclick="contatarMotoboy()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3.5 rounded-xl shadow-lg flex items-center justify-center gap-2"><i class="fab fa-whatsapp text-lg"></i> Chamar no WhatsApp</button>
                 <input type="hidden" id="moto-zap-oculto">
             </div>
         </div>
@@ -241,39 +227,18 @@
     </div>
 
     <script>
-        // === 1. UTILITÁRIOS GLOBAIS ===
         function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
         function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
         function toggleDropdown(id) { const list = document.getElementById(`list-${id}`); if(id === 'entrega') document.getElementById('list-produto').classList.remove('show'); else document.getElementById('list-entrega').classList.remove('show'); list.classList.toggle('show'); }
         function selectOption(id, value, text) { document.getElementById(`pagamento_${id}`).value = value; document.getElementById(`display-${id}`).innerText = text; document.getElementById(`list-${id}`).classList.remove('show'); }
         document.addEventListener('click', function(e) { if (!e.target.closest('.relative')) { document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show')); } });
 
-        // === 2. CONFIGURAÇÕES ===
         const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
+        let sbClient = null, userSession = null, userProfile = null, distanciaFinal = 0, valorFinal = 0, pendingAction = null, isRegistering = false; 
+        const NUMERO_ADMIN = "5584982005039"; const CIDADE_FIXA = "Mossoró, RN"; const TAXA_RETORNO = 0.20; const PRECO_BASE = 5.00; const PRECO_POR_KM = 1.00;
 
-        let sbClient = null;
-        let userSession = null; 
-        let userProfile = null; 
-        let distanciaFinal = 0; 
-        let valorFinal = 0;
-        let pendingAction = null;
-        let isRegistering = false; 
-
-        const NUMERO_ADMIN = "5584982005039"; 
-        const CIDADE_FIXA = "Mossoró, RN"; 
-        const TAXA_RETORNO = 0.20; 
-        const PRECO_BASE = 5.00; 
-        const PRECO_POR_KM = 1.00;
-
-        // === 3. INICIALIZAÇÃO ===
-        try {
-            if (typeof supabase !== 'undefined') {
-                sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            } else { 
-                console.error("Supabase JS falhou."); 
-            }
-        } catch (e) { console.error("Erro config:", e); }
+        try { if (typeof supabase !== 'undefined') { sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } } catch (e) { console.error("Erro config:", e); }
 
         window.onload = async function() {
             if(typeof $ !== 'undefined') {
@@ -281,495 +246,192 @@
                     $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
                     $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
                     $('#edit-zap-loja').mask('(00) 00000-0000'); $('#edit-resp-zap').mask('(00) 00000-0000');
+                    $('#edit-cnpj').mask('00.000.000/0000-00');
                 });
             }
-
-            // TIMEOUT DE 4 SEGUNDOS -> FORÇA TELA DE LOGIN SE TRAVAR
             setTimeout(() => {
                 const loader = document.getElementById('global-loading');
                 if(loader && loader.style.display !== 'none') {
-                    // Se estiver preso carregando e não tiver sessão, libera o Login
-                    if(!userSession) {
-                        console.warn("Demora no carregamento. Liberando tela inicial.");
-                        document.getElementById('repair-area').classList.remove('hidden'); // Mostra botão reset
-                        loader.style.display = 'none';
-                        showScreen('welcome');
-                    }
+                    document.getElementById('btn-reload').classList.remove('hidden');
+                    document.getElementById('msg-delay').classList.remove('hidden');
+                    if(!userSession) { loader.style.display = 'none'; showScreen('welcome'); }
                 }
-            }, 4000);
-
+            }, 3000);
             if(!sbClient) return;
-
             sbClient.auth.onAuthStateChange(async (event, session) => {
                 if (isRegistering) return;
-                if (event === 'SIGNED_IN' && session) {
-                    userSession = session;
-                    await carregarPerfil();
-                } else if (event === 'SIGNED_OUT') {
-                    userSession = null;
-                    userProfile = null;
-                    showScreen('welcome');
-                }
+                if (event === 'SIGNED_IN' && session) { userSession = session; await carregarPerfil(); } 
+                else if (event === 'SIGNED_OUT') { userSession = null; userProfile = null; showScreen('welcome'); }
             });
-
-            try {
-                const { data: { session }, error } = await sbClient.auth.getSession();
-                if (session) {
-                    userSession = session;
-                    await carregarPerfil();
-                } else {
-                    showScreen('welcome');
-                }
-            } catch(e) {
-                console.error("Erro fatal init:", e);
-                showScreen('welcome');
-            } finally {
-                // Garante que o loading some se tudo der certo rápido
-                if(userSession || document.querySelector('.app-container:not(.hidden)').id !== 'global-loading') {
-                    document.getElementById('global-loading').style.display = 'none';
-                }
-            }
+            try { const { data: { session } } = await sbClient.auth.getSession(); if (session) { userSession = session; await carregarPerfil(); } else { showScreen('welcome'); } } catch(e) {}
         };
 
-        // === 4. FUNÇÕES PRINCIPAIS ===
-        async function resetarSistema() {
-            localStorage.clear();
-            if(sbClient) await sbClient.auth.signOut();
-            alert("✅ Cache limpo com sucesso! O sistema será reiniciado.");
-            location.reload();
-        }
-
+        async function resetarSistema() { localStorage.clear(); if(sbClient) await sbClient.auth.signOut(); alert("✅ Cache limpo com sucesso! O sistema será reiniciado."); location.reload(); }
         async function fazerLogin() {
-            const email = document.getElementById('log-email').value; 
-            const senha = document.getElementById('log-senha').value;
-            const btn = document.getElementById('btn-log'); 
-            const load = document.getElementById('load-log');
-            
-            if(!email || !senha) return alert("Preencha e-mail e senha.");
-            if(!sbClient) return alert("Erro interno. Recarregue.");
-
-            btn.disabled = true; load.classList.remove('hidden');
-            
+            const email = document.getElementById('log-email').value, senha = document.getElementById('log-senha').value;
+            if(!email || !senha) return alert("Preencha todos os dados.");
+            document.getElementById('btn-log').disabled = true; document.getElementById('load-log').classList.remove('hidden');
             try {
-                const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: senha });
-                if (error) {
-                    if(error.message.includes("Invalid login")) throw new Error("E-mail ou senha incorretos.");
-                    throw new Error(error.message);
-                }
-                
-                if(data.user) {
-                    userSession = data.session;
-                    await carregarPerfil(); 
-                    showScreen('app'); 
-                    ativarRealtimePedidos(); 
-                }
-            } catch (e) { 
-                alert(e.message); 
-            } finally { 
-                btn.disabled = false; load.classList.add('hidden'); 
-            }
+                const { data, error } = await sbClient.auth.signInWithPassword({ email, password: senha });
+                if (error) throw error;
+                if(data.user) { userSession = data.session; await carregarPerfil(); showScreen('app'); ativarRealtimePedidos(); }
+            } catch (e) { alert("Erro: " + e.message); } 
+            finally { document.getElementById('btn-log').disabled = false; document.getElementById('load-log').classList.add('hidden'); }
         }
-
         async function fazerCadastro() {
-            const email = document.getElementById('reg-email').value; 
-            const senha = document.getElementById('reg-senha').value; 
-            const loja = document.getElementById('reg-nome-loja').value; 
-            const zap = document.getElementById('reg-zap-loja').value; 
-            const resp = document.getElementById('reg-nome-resp').value; 
-            const cep = document.getElementById('reg-cep').value; 
-            const rua = document.getElementById('reg-rua').value; 
-            const num = document.getElementById('reg-num').value; 
-            const bairro = document.getElementById('reg-bairro').value; 
-            const cidade = document.getElementById('reg-cidade').value;
-            const btn = document.getElementById('btn-cad'); 
-            const load = document.getElementById('load-cad');
-
-            if(!email || !senha || !loja || !num) return alert("Preencha todos os campos obrigatórios!");
-            if(senha.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
-
-            btn.disabled = true; load.classList.remove('hidden');
-            isRegistering = true; 
-
+            const email = document.getElementById('reg-email').value, senha = document.getElementById('reg-senha').value;
+            if(!email || !senha) return alert("Preencha todos os dados.");
+            document.getElementById('btn-cad').disabled = true; document.getElementById('load-cad').classList.remove('hidden'); isRegistering = true;
             try {
                 const { data, error } = await sbClient.auth.signUp({ email, password: senha });
                 if (error) throw error;
                 if (data.user) {
-                    const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cidade}`;
-                    const { error: perfilErro } = await sbClient.from('profiles').insert([{
-                        id: data.user.id, nome_loja: loja, whatsapp_loja: zap, responsavel: resp, endereco: enderecoCompleto, email: email
-                    }]);
-                    if (perfilErro) throw perfilErro;
-                    alert("Sucesso! Entrando...");
-                    userSession = data.session;
-                    const { data: profile } = await sbClient.from('profiles').select('*').eq('id', data.user.id).single();
-                    userProfile = profile;
-                    preencherDadosPerfil(profile);
-                    showScreen('app'); 
-                    ativarRealtimePedidos();
-                    isRegistering = false;
+                    await sbClient.from('profiles').insert([{ id: data.user.id, nome_loja: document.getElementById('reg-nome-loja').value, email: email }]);
+                    alert("Sucesso! Entrando..."); userSession = data.session; await carregarPerfil(); showScreen('app'); ativarRealtimePedidos(); isRegistering = false;
                 }
-            } catch (e) { 
-                isRegistering = false;
-                let msg = e.message;
-                if(msg.includes("User already registered")) msg = "Este e-mail já possui cadastro.";
-                alert("Erro: " + msg); 
-            } finally { 
-                btn.disabled = false; load.classList.add('hidden'); 
-            }
-        }
-                // --- NAVEGAÇÃO E PERFIL ---
-        function showScreen(id) { 
-            ['welcome', 'register', 'login', 'app', 'pedidos', 'extrato', 'perfil'].forEach(s => {
-                const el = document.getElementById('screen-'+s);
-                if(el) el.classList.add('hidden');
-            });
-            document.getElementById('screen-'+id).classList.remove('hidden'); 
-            
-            // CORREÇÃO MENU (Exibe apenas nas telas logadas)
-            const menu = document.getElementById('bottom-menu');
-            if(['app', 'pedidos', 'extrato', 'perfil'].includes(id)) { 
-                menu.classList.remove('hidden');
-                menu.style.display = 'flex';
-            } else { 
-                menu.classList.add('hidden');
-                menu.style.display = 'none';
-            } 
+            } catch (e) { isRegistering = false; alert("Erro: " + e.message); } finally { document.getElementById('btn-cad').disabled = false; document.getElementById('load-cad').classList.add('hidden'); }
         }
 
-        function navegar(tela, elemento) { 
-            showScreen(tela);
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            elemento.classList.add('active');
-            if(tela === 'perfil') carregarPerfil();
-            if(tela === 'pedidos') carregarHistoricoPedidos();
+        function showScreen(id) { 
+            ['welcome', 'register', 'login', 'app', 'pedidos', 'extrato', 'perfil'].forEach(s => document.getElementById('screen-'+s).classList.add('hidden'));
+            document.getElementById('screen-'+id).classList.remove('hidden'); 
+            const menu = document.getElementById('bottom-menu');
+            if(['app', 'pedidos', 'extrato', 'perfil'].includes(id)) { menu.classList.remove('hidden'); menu.style.display = 'flex'; } else { menu.classList.add('hidden'); menu.style.display = 'none'; } 
         }
+        function navegar(tela, elemento) { showScreen(tela); document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); elemento.classList.add('active'); if(tela==='perfil') carregarPerfil(); if(tela==='pedidos') carregarHistoricoPedidos(); }
 
         async function carregarPerfil() {
             try {
                 if (!userSession) return;
-                const { data, error } = await sbClient.from('profiles').select('*').eq('id', userSession.user.id).single();
-                if (data) {
-                    userProfile = data;
-                    preencherDadosPerfil(data);
-                    const currentScreen = document.querySelector('.app-container:not(.hidden)').id;
-                    if(['screen-welcome', 'screen-login', 'screen-register'].includes(currentScreen)) {
-                        showScreen('app');
-                        ativarRealtimePedidos(); 
-                    }
-                } else {
-                    if(!isRegistering) {
-                        await sbClient.auth.signOut();
-                        alert("Erro de cadastro. Faça login novamente.");
-                        showScreen('welcome');
-                    }
+                const { data } = await sbClient.from('profiles').select('*').eq('id', userSession.user.id).single();
+                if (data) { userProfile = data; preencherDadosPerfil(data); 
+                    if(document.querySelector('.app-container:not(.hidden)').id.includes('welcome')) { showScreen('app'); ativarRealtimePedidos(); }
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) {}
         }
-
         function preencherDadosPerfil(data) {
             safeText('app-user-name', data.nome_loja || 'Minha Loja');
-            const displayId = data.codigo_visual || userSession.user.id.slice(0, 4).toUpperCase();
-            safeText('app-user-code', displayId);
+            safeText('app-user-code', data.codigo_visual || 'ID');
             safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
             safeVal('origem', data.endereco || data.nome_loja);
-            safeVal('edit-nome-loja', data.nome_loja);
-            safeVal('edit-zap-loja', data.whatsapp_loja || data.whatsapp || ''); 
-            safeVal('edit-endereco', data.endereco || '');
-            safeVal('edit-resp-nome', data.responsavel || '');
-            safeVal('edit-resp-zap', data.whatsapp_responsavel || '');
-            safeVal('edit-pin', data.pin_carteira || '');
+            safeVal('edit-nome-loja', data.nome_loja); safeVal('edit-razao', data.razao_social || ''); safeVal('edit-cnpj', data.cnpj || '');
+            safeVal('edit-zap-loja', data.whatsapp_loja); safeVal('edit-endereco', data.endereco);
+            safeVal('edit-resp-nome', data.responsavel); safeVal('edit-resp-zap', data.whatsapp_responsavel); safeVal('edit-pin', data.pin_carteira);
         }
-
         async function salvarPerfil() {
-            const nomeLoja = document.getElementById('edit-nome-loja').value;
-            const zapLoja = document.getElementById('edit-zap-loja').value;
-            const endereco = document.getElementById('edit-endereco').value;
-            const respNome = document.getElementById('edit-resp-nome').value;
-            const respZap = document.getElementById('edit-resp-zap').value;
-            const pin = document.getElementById('edit-pin').value;
-
-            if(!nomeLoja || !endereco) return alert("Preencha campos obrigatórios.");
-            if(pin && pin.length !== 4) return alert("PIN deve ter 4 dígitos.");
-
-            const btn = document.getElementById('btn-save-perf');
-            btn.innerText = "Salvando..."; btn.disabled = true;
-
-            const { error } = await sbClient.from('profiles').update({
-                nome_loja: nomeLoja, whatsapp_loja: zapLoja, endereco: endereco,
-                responsavel: respNome, whatsapp_responsavel: respZap, pin_carteira: pin
-            }).eq('id', userSession.user.id);
-
-            if(error) alert("Erro: " + error.message);
-            else { alert("Salvo!"); await carregarPerfil(); }
+            const updates = {
+                nome_loja: document.getElementById('edit-nome-loja').value, razao_social: document.getElementById('edit-razao').value, cnpj: document.getElementById('edit-cnpj').value,
+                whatsapp_loja: document.getElementById('edit-zap-loja').value, endereco: document.getElementById('edit-endereco').value,
+                responsavel: document.getElementById('edit-resp-nome').value, whatsapp_responsavel: document.getElementById('edit-resp-zap').value, pin_carteira: document.getElementById('edit-pin').value
+            };
+            const btn = document.getElementById('btn-save-perf'); btn.innerText = "Salvando..."; btn.disabled = true;
+            const { error } = await sbClient.from('profiles').update(updates).eq('id', userSession.user.id);
+            if(error) alert("Erro: "+error.message); else { alert("Salvo!"); await carregarPerfil(); }
             btn.innerText = "Salvar Alterações"; btn.disabled = false;
         }
+        async function fazerLogout() { await sbClient.auth.signOut(); location.reload(); }
 
-        async function fazerLogout() {
-            try { await sbClient.auth.signOut(); } catch (e) { console.error(e); } 
-            finally { location.reload(); }
-        }
-
-        // --- HISTÓRICO REALTIME ---
-        function ativarRealtimePedidos() {
-            sbClient.channel('meus-pedidos')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, payload => {
-                carregarHistoricoPedidos();
-            })
-            .subscribe();
-        }
-
+        function ativarRealtimePedidos() { sbClient.channel('meus-pedidos').on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, payload => carregarHistoricoPedidos()).subscribe(); }
+        
         async function carregarHistoricoPedidos() {
             const lista = document.getElementById('lista-pedidos');
-            if(lista.children.length === 0) lista.innerHTML = '<div class="text-center text-gray-400 mt-10">Carregando...</div>';
+            if(lista.children.length === 0) lista.innerHTML = '<div class="text-center mt-10">Carregando...</div>';
+            const { data } = await sbClient.from('pedidos').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(20);
+            if(!data || data.length === 0) { lista.innerHTML = '<div class="text-center mt-10">Nenhum pedido.</div>'; return; }
+                        // Busca Entregadores
+            const eIds = data.filter(p=>p.entregador_id).map(p=>p.entregador_id);
+            let entMap = {};
+            if(eIds.length > 0) { const { data: profs } = await sbClient.from('profiles').select('id, responsavel').in('id', eIds); if(profs) profs.forEach(p => entMap[p.id] = p.responsavel); }
 
-            try {
-                const { data, error } = await sbClient
-                    .from('pedidos')
-                    .select('*')
-                    .eq('user_id', userSession.user.id)
-                    .order('created_at', { ascending: false })
-                    .limit(20);
+            lista.innerHTML = '';
+            data.forEach(p => {
+                const st = p.status || 'solicitado';
+                const stClass = st === 'solicitado' ? 'status-solicitado' : st === 'pendente' ? 'status-pendente' : st === 'em_rota' ? 'status-em_rota' : 'status-concluido';
+                const stText = st === 'solicitado' ? '📡 Solicitado' : st === 'pendente' ? '🛵 A Caminho' : st === 'em_rota' ? '🚀 Em Rota' : '✅ Finalizado';
+                const entregador = p.entregador_id ? (entMap[p.entregador_id] || 'Entregador') : null;
 
-                if(error) throw error;
-
-                if(!data || data.length === 0) {
-                    lista.innerHTML = '<div class="text-center text-gray-400 mt-10">Nenhum pedido.</div>';
-                    return;
-                }
-
-                const entregadorIds = data.filter(p => p.entregador_id).map(p => p.entregador_id);
-                let entregadoresMap = {};
-                if(entregadorIds.length > 0) {
-                    const { data: profs } = await sbClient.from('profiles').select('id, responsavel').in('id', entregadorIds);
-                    if(profs) profs.forEach(p => entregadoresMap[p.id] = p.responsavel);
-                }
-
-                lista.innerHTML = '';
+                let btnCancel = st === 'solicitado' ? `<button onclick="cancelarPedido('${p.id}')" class="text-red-500 text-xs underline ml-auto">Cancelar</button>` : '';
+                let btnMoto = (p.entregador_id && st !== 'solicitado') ? `<button onclick="verMotoboy('${p.entregador_id}')" class="w-full mt-2 bg-gray-100 p-2 rounded text-xs font-bold flex items-center justify-center gap-2"><i class="fas fa-motorcycle"></i> ${entregador}</button>` : '';
                 
-                const mapStatus = {
-                    'solicitado': { text: '📡 Solicitado', class: 'status-solicitado' },
-                    'pendente': { text: '🛵 Motoboy a Caminho', class: 'status-pendente' },
-                    'em_rota': { text: '🚀 Saiu para Entrega', class: 'status-em_rota' },
-                    'concluido': { text: '✅ Finalizado', class: 'status-finalizado' }
-                };
-
-                data.forEach(p => {
-                    const statusKey = p.status || 'solicitado';
-                    const statusConfig = mapStatus[statusKey] || mapStatus['solicitado'];
-                    const nomeEntregador = p.entregador_id ? (entregadoresMap[p.entregador_id] || "Entregador") : null;
-                    
-                    let pinHtml = `<div class="bg-blue-50 border border-blue-100 rounded-lg p-2 text-center mb-3">
-                                <p class="text-[10px] text-blue-400 font-bold uppercase tracking-wider">Código de Recebimento</p>
-                                <p class="text-xl font-mono font-bold text-blue-700 tracking-[0.3em]">${p.pin_entrega || '----'}</p>
-                            </div>`;
-                    
-                    let extrasHtml = pinHtml;
-                    if(statusKey === 'concluido') {
-                        const nota = p.avaliacao || 0;
-                        extrasHtml = `
-                            <div class="text-center mb-3">
-                                <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Avalie a Entrega</p>
-                                <div class="flex justify-center gap-1 star-rating text-lg" id="stars-${p.id}">
-                                    ${[1,2,3,4,5].map(i => `<i onclick="avaliarPedido('${p.id}', ${i})" class="fas fa-star ${i <= nota ? 'star-filled' : 'star-empty'}"></i>`).join('')}
-                                </div>
-                            </div>
-                        `;
-                    }
-
-                    let btnMoto = '';
-                    if(p.entregador_id && statusKey !== 'solicitado') {
-                        btnMoto = `
-                            <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg mb-3 border border-gray-100">
-                                <div class="flex items-center gap-2">
-                                    <div class="bg-blue-100 p-1.5 rounded-full"><i class="fas fa-motorcycle text-blue-600 text-xs"></i></div>
-                                    <span class="text-xs font-bold text-gray-700">${nomeEntregador.split(' ')[0]}</span>
-                                </div>
-                                <button onclick="verMotoboy('${p.entregador_id}')" class="text-xs text-blue-600 font-bold underline">Detalhes</button>
-                            </div>
-                        `;
-                    }
-
-                    let btnReportar = `
-                        <button onclick="reportarProblema('${p.id}')" class="text-[10px] text-red-400 font-bold hover:text-red-600 flex items-center gap-1">
-                            <i class="fas fa-exclamation-circle"></i> Reportar Problema
-                        </button>
-                    `;
-
-                    const html = `
-                        <div class="card-historico shadow-sm">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="badge-status ${statusConfig.class}">${statusConfig.text}</span>
-                                <span class="text-xs text-gray-400 font-mono">#${p.id.toString().slice(0,4)}</span>
-                            </div>
-                            <div class="text-sm font-bold text-gray-800 mb-1">${p.destino}</div>
-                            <div class="text-xs text-gray-500 mb-3">${p.nome_destinatario}</div>
-                            
-                            ${btnMoto}
-                            ${extrasHtml}
-
-                            <div class="flex justify-between items-center border-t pt-2 mt-2">
-                                <span class="text-xs font-bold text-blue-600">R$ ${p.valor_frete.toFixed(2)}</span>
-                                ${btnReportar}
-                            </div>
-                        </div>
-                    `;
-                    lista.insertAdjacentHTML('beforeend', html);
-                });
-
-            } catch (e) {
-                console.error(e);
-                lista.innerHTML = '<div class="text-center text-red-400 mt-10">Erro ao carregar.</div>';
-            }
+                lista.insertAdjacentHTML('beforeend', `
+                    <div class="card-historico shadow-sm">
+                        <div class="flex justify-between items-center mb-2"><span class="badge-status ${stClass}">${stText}</span> ${btnCancel}</div>
+                        <div class="font-bold text-gray-800 text-sm">${p.destino}</div>
+                        <div class="text-xs text-gray-500 mb-2">${p.nome_destinatario}</div>
+                        ${st !== 'concluido' ? `<div class="bg-blue-50 p-2 rounded text-center text-blue-700 font-bold font-mono tracking-widest text-lg">${p.pin_entrega}</div>` : ''}
+                        ${btnMoto}
+                    </div>
+                `);
+            });
         }
-                // --- AÇÕES DO HISTÓRICO ---
+
+        async function cancelarPedido(id) {
+            if(!confirm("Cancelar este pedido?")) return;
+            const { error } = await sbClient.from('pedidos').delete().eq('id', id).eq('status', 'solicitado');
+            if(error) alert("Não foi possível cancelar (talvez o motoboy já tenha aceito).");
+            else carregarHistoricoPedidos();
+        }
+
         async function verMotoboy(id) {
             document.getElementById('modal-motoboy').classList.remove('hidden');
-            document.getElementById('moto-nome').innerText = "Buscando...";
-            document.getElementById('moto-modelo').innerText = "...";
-            document.getElementById('moto-placa').innerText = "...";
-            document.getElementById('moto-zap-oculto').value = ""; 
-
-            try {
-                const { data, error } = await sbClient.from('profiles').select('responsavel, modelo_moto, placa_moto, whatsapp_responsavel').eq('id', id).single();
-                if(data) {
-                    document.getElementById('moto-nome').innerText = data.responsavel || "Motoboy Parceiro";
-                    document.getElementById('moto-modelo').innerText = data.modelo_moto || "Não informado";
-                    document.getElementById('moto-placa').innerText = data.placa_moto || "---";
-                    document.getElementById('moto-zap-oculto').value = data.whatsapp_responsavel || "";
-                }
-            } catch(e) {
-                document.getElementById('moto-nome').innerText = "Erro ao buscar";
+            const { data } = await sbClient.from('profiles').select('*').eq('id', id).single();
+            if(data) {
+                document.getElementById('moto-nome').innerText = data.responsavel;
+                document.getElementById('moto-modelo').innerText = data.modelo_moto || '-';
+                document.getElementById('moto-placa').innerText = data.placa_moto || '-';
+                document.getElementById('moto-zap-oculto').value = data.whatsapp_responsavel;
             }
         }
+        function contatarMotoboy() { window.open(`https://wa.me/${document.getElementById('moto-zap-oculto').value}`, '_blank'); }
 
-        function contatarMotoboy() {
-            let zap = document.getElementById('moto-zap-oculto').value;
-            if(!zap) return alert("Número não disponível.");
-            zap = zap.replace(/\D/g, '');
-            if(!zap.startsWith('55')) zap = '55' + zap;
-            window.open(`https://wa.me/${zap}`, '_blank');
-        }
-
-        async function avaliarPedido(id, nota) {
-            const container = document.getElementById(`stars-${id}`);
-            const stars = container.getElementsByTagName('i');
-            for(let i=0; i<5; i++) {
-                if(i < nota) { stars[i].classList.remove('star-empty'); stars[i].classList.add('star-filled'); }
-                else { stars[i].classList.remove('star-filled'); stars[i].classList.add('star-empty'); }
-            }
-            await sbClient.from('pedidos').update({ avaliacao: nota }).eq('id', id);
-        }
-
-        function reportarProblema(id) {
-            const msg = `Olá, estou com um problema no pedido #${id.slice(0,4)}. Poderia me ajudar?`;
-            window.open(`https://wa.me/${NUMERO_ADMIN}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        // --- MAPA E PEDIDO ---
         async function calcularDistancia() {
-            const origem = document.getElementById('origem').value; 
-            const destino = document.getElementById('destino').value;
-            if(!origem || !destino) return alert("Preencha endereços.");
-            
-            document.getElementById('btn-text').innerText = "Calculando..."; 
-            document.getElementById('loading').classList.remove('hidden'); 
-            document.getElementById('btn-calcular').classList.add('opacity-50');
-            
+            const or = document.getElementById('origem').value, des = document.getElementById('destino').value;
+            if(!or || !des) return alert("Preencha endereços.");
+            document.getElementById('loading').classList.remove('hidden');
             try {
-                const urlA = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(origem + ', ' + CIDADE_FIXA)}`;
-                const urlB = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destino + ', ' + CIDADE_FIXA)}`;
-                const [resA, resB] = await Promise.all([fetch(urlA), fetch(urlB)]);
-                const [dataA, dataB] = await Promise.all([resA.json(), resB.json()]);
-                
-                if(!dataA.length || !dataB.length) { alert("Endereço não encontrado."); resetBotao(); return; }
-                
-                const dist = getDistanceFromLatLonInKm(dataA[0].lat, dataA[0].lon, dataB[0].lat, dataB[0].lon);
-                distanciaFinal = (dist * 1.3).toFixed(1); if(distanciaFinal < 1) distanciaFinal = 1;
+                const [rA, rB] = await Promise.all([
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(or+', '+CIDADE_FIXA)}`),
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(des+', '+CIDADE_FIXA)}`)
+                ]);
+                const [dA, dB] = await Promise.all([rA.json(), rB.json()]);
+                if(!dA.length || !dB.length) throw new Error("Endereço não achado");
+                distanciaFinal = (getDist(dA[0].lat, dA[0].lon, dB[0].lat, dB[0].lon) * 1.3).toFixed(1);
                 recalcularTotal();
-                
-                document.getElementById('btn-calcular').classList.add('hidden'); 
-                document.getElementById('resultado-box').classList.remove('hidden'); 
-                document.getElementById('btn-enviar').classList.remove('hidden'); 
-                document.getElementById('resultado-box').classList.remove('animate-pulse');
-            } catch (e) { alert("Erro de conexão."); resetBotao(); }
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('btn-calcular').classList.add('hidden');
+                document.getElementById('resultado-box').classList.remove('hidden');
+                document.getElementById('btn-enviar').classList.remove('hidden');
+            } catch(e) { alert("Erro ao calcular."); document.getElementById('loading').classList.add('hidden'); }
         }
-
-        function resetBotao() { 
-            document.getElementById('btn-text').innerText = "Calcular Frete"; 
-            document.getElementById('loading').classList.add('hidden'); 
-            document.getElementById('btn-calcular').classList.remove('opacity-50'); 
-        }
-
+        function getDist(lat1,lon1,lat2,lon2) { var R=6371, dLat=d2r(lat2-lat1), dLon=d2r(lon2-lon1), a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(d2r(lat1))*Math.cos(d2r(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2); return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))); }
+        function d2r(deg) { return deg*(Math.PI/180); }
         function recalcularTotal() { 
-            if(distanciaFinal == 0) return; 
-            let preco = PRECO_BASE + (distanciaFinal * PRECO_POR_KM); 
-            if(document.getElementById('retorno').checked) preco += (preco * TAXA_RETORNO); 
-            valorFinal = preco.toFixed(2); 
-            document.getElementById('km-display').innerText = distanciaFinal.replace('.', ','); 
-            document.getElementById('valor-display').innerText = valorFinal.replace('.', ','); 
+            let p = PRECO_BASE + (distanciaFinal * PRECO_POR_KM); 
+            if(document.getElementById('retorno').checked) p += (p * TAXA_RETORNO);
+            valorFinal = p.toFixed(2);
+            document.getElementById('km-display').innerText = distanciaFinal;
+            document.getElementById('valor-display').innerText = valorFinal.replace('.',',');
+        }
+        
+        async function iniciarPedido() {
+            // Verifica saldo se for carteira
+            if(document.getElementById('pagamento_entrega').value === 'Carteira' && !userProfile.pin_carteira) return alert("Configure seu PIN no perfil.");
+            enviarParaCentral();
         }
 
         async function enviarParaCentral() {
-            const pgEnt = document.getElementById('pagamento_entrega').value;
-            const nomeDest = document.getElementById('nome_dest').value; 
-            const telDest = document.getElementById('tel_dest').value; 
-            const ref = document.getElementById('referencia').value;
-            
-            if(!nomeDest || !telDest || !ref) return alert("Preencha todos os dados.");
-            
-            const pinSeguranca = Math.floor(1000 + Math.random() * 9000).toString();
-            
             const { error } = await sbClient.from('pedidos').insert([{
-                user_id: userSession.user.id,
-                origem: document.getElementById('origem').value,
-                destino: document.getElementById('destino').value,
-                valor_frete: parseFloat(valorFinal),
-                forma_pagamento: pgEnt,
-                pin_entrega: pinSeguranca,
-                nome_destinatario: nomeDest,
-                telefone_destinatario: telDest,
+                user_id: userSession.user.id, origem: document.getElementById('origem').value, destino: document.getElementById('destino').value,
+                valor_frete: valorFinal, forma_pagamento: document.getElementById('pagamento_entrega').value,
+                pin_entrega: Math.floor(1000+Math.random()*9000).toString(),
+                nome_destinatario: document.getElementById('nome_dest').value, telefone_destinatario: document.getElementById('tel_dest').value,
                 status: 'solicitado'
             }]);
-
-            if(error) { alert("Erro ao enviar: " + error.message); return; }
-            document.getElementById('display-pin').innerText = pinSeguranca;
-            document.getElementById('modal-success').classList.remove('hidden');
+            if(error) alert("Erro: "+error.message); else { document.getElementById('modal-success').classList.remove('hidden'); }
         }
-
-       function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) { var R = 6371; var dLat = deg2rad(lat2-lat1); var dLon = deg2rad(lon2-lon1); var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R * c; }
-        function deg2rad(deg) { return deg * (Math.PI/180); }
-        async function buscarCep(prefixo) { let cep = document.getElementById(prefixo + '-cep').value.replace(/\D/g, ''); if(cep.length !== 8) return; try { const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`); const data = await res.json(); if(!data.erro) { document.getElementById(prefixo + '-rua').value = data.logradouro; document.getElementById(prefixo + '-bairro').value = data.bairro; document.getElementById(prefixo + '-cidade').value = `${data.localidade}/${data.uf}`; document.getElementById(prefixo + '-num').focus(); } } catch(e){} }
-        function mudarStatusRetorno() { const checked = document.getElementById('retorno').checked; const txt = document.getElementById('text-retorno'); const ico = document.getElementById('icon-retorno'); if(checked) { txt.innerText = "Sim, com retorno!"; txt.classList.replace('text-gray-500', 'text-blue-700'); ico.className = "fas fa-exchange-alt text-blue-600"; } else { txt.innerText = "Sem retorno!"; txt.classList.replace('text-blue-700', 'text-gray-500'); ico.className = "fas fa-arrow-right text-gray-400"; } }
-        
-        function verificarPinParaSaldo() {
-            if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil.");
-            pendingAction = 'saldo';
-            document.getElementById('input-confirm-pin').value = '';
-            document.getElementById('modal-pin').classList.remove('hidden');
-            document.getElementById('input-confirm-pin').focus();
-        }
-        function iniciarPedido() {
-            const pgEnt = document.getElementById('pagamento_entrega').value;
-            if(pgEnt === 'Carteira') {
-                if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil.");
-                pendingAction = 'pedido';
-                document.getElementById('input-confirm-pin').value = '';
-                document.getElementById('modal-pin').classList.remove('hidden');
-                document.getElementById('input-confirm-pin').focus();
-            } else { enviarParaCentral(); }
-        }
-        function confirmarPin() {
-            const pinDigitado = document.getElementById('input-confirm-pin').value;
-            if(pinDigitado !== userProfile.pin_carteira) { alert("PIN Incorreto!"); return; }
-            document.getElementById('modal-pin').classList.add('hidden');
-            if(pendingAction === 'saldo') solicitarSaldoZap();
-            else if (pendingAction === 'pedido') enviarParaCentral();
-            pendingAction = null;
-        }
-        function solicitarSaldoZap() {
-            const msg = `Olá, sou da loja *${userProfile.nome_loja}* e gostaria de adicionar saldo.`;
-            window.open(`https://wa.me/${NUMERO_ADMIN}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
+        function verificarPinParaSaldo() { document.getElementById('modal-pin').classList.remove('hidden'); pendingAction='saldo'; }
+        function confirmarPin() { if(document.getElementById('input-confirm-pin').value === userProfile.pin_carteira) { document.getElementById('modal-pin').classList.add('hidden'); if(pendingAction==='saldo') solicitarSaldoZap(); } else alert("PIN Incorreto"); }
+        function solicitarSaldoZap() { window.open(`https://wa.me/${NUMERO_ADMIN}?text=Quero%20saldo`, '_blank'); }
     </script>
 </body>
 </html>
