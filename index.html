@@ -45,21 +45,15 @@
         .spinner { border: 3px solid rgba(0,0,0,0.1); border-left-color: #1E40AF; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Estilo Card Pedido */
         .card-historico { background: white; border-radius: 12px; border: 1px solid #E5E7EB; padding: 16px; margin-bottom: 12px; position: relative; transition: all 0.3s ease; }
         .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
-        /* Cores dos Status */
         .status-solicitado { background: #E5E7EB; color: #374151; border: 1px solid #D1D5DB; }
         .status-pendente { background: #FEF3C7; color: #D97706; border: 1px solid #FCD34D; }
         .status-em_rota { background: #DBEAFE; color: #1E40AF; border: 1px solid #93C5FD; }
         .status-concluido { background: #D1FAE5; color: #059669; border: 1px solid #6EE7B7; }
-
-        /* Estrelas */
-        .star-rating i { cursor: pointer; transition: 0.2s; }
-        .star-rating i:hover { transform: scale(1.2); }
-        .star-filled { color: #F59E0B; } /* Amarelo Ouro */
-        .star-empty { color: #D1D5DB; }
+        .star-rating i { cursor: pointer; transition: 0.2s; } .star-rating i:hover { transform: scale(1.2); }
+        .star-filled { color: #F59E0B; } .star-empty { color: #D1D5DB; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
@@ -67,7 +61,10 @@
     <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
         <div class="spinner w-10 h-10 border-4 mb-4"></div>
         <p id="loading-msg" class="text-gray-500 text-sm font-bold">Verificando segurança...</p>
-        <button onclick="location.reload()" class="mt-4 text-xs text-blue-500 underline bg-gray-100 p-2 rounded hidden" id="btn-reload">Conexão lenta? Recarregar</button>
+        
+        <button onclick="resetarSistema()" class="mt-6 text-xs text-red-500 font-bold bg-red-50 px-4 py-2 rounded-lg border border-red-100 hidden" id="btn-reload">
+            <i class="fas fa-sync-alt mr-1"></i> Reiniciar Sistema (Correção)
+        </button>
     </div>
 
     <div id="screen-welcome" class="hidden app-container p-8 text-center fade-in flex flex-col justify-center">
@@ -183,7 +180,7 @@
 
     <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[60] flex items-center justify-center p-4 fade-in"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Pedido Criado!</h2><p class="text-sm text-gray-500 mb-6">Aguardando entregador...</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
 
-    <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in">
+   <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in">
         <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
             <h2 class="text-lg font-bold text-gray-800 mb-2">Segurança</h2>
             <p class="text-sm text-gray-500 mb-4">Digite seu PIN de 4 dígitos</p>
@@ -277,7 +274,7 @@
                     $('#edit-zap-loja').mask('(00) 00000-0000'); $('#edit-resp-zap').mask('(00) 00000-0000');
                 });
             }
-                        // SEGURANÇA: Timeout
+                       // SEGURANÇA: Timeout
             setTimeout(() => {
                 const loader = document.getElementById('global-loading');
                 if(loader && loader.style.display !== 'none') {
@@ -321,6 +318,13 @@
                 document.getElementById('global-loading').style.display = 'none';
             }
         };
+
+        // --- FUNÇÕES DE SISTEMA (RESET) ---
+        async function resetarSistema() {
+            localStorage.clear();
+            if(sbClient) await sbClient.auth.signOut();
+            location.reload();
+        }
 
         // --- FUNÇÕES DE LOGIN/CADASTRO ---
         async function fazerLogin() {
@@ -500,8 +504,7 @@
             try { await sbClient.auth.signOut(); } catch (e) { console.error(e); } 
             finally { location.reload(); }
         }
-
-        // --- HISTÓRICO REALTIME ---
+                // --- HISTÓRICO REALTIME ---
         function ativarRealtimePedidos() {
             sbClient.channel('meus-pedidos')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, payload => {
@@ -778,3 +781,4 @@
     </script>
 </body>
 </html>
+    
