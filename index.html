@@ -37,7 +37,7 @@
         .custom-options.show { display: block; animation: fadeIn 0.2s; }
         .custom-option { padding: 10px; font-size: 0.875rem; cursor: pointer; border-bottom: 1px solid #F3F4F6; display: flex; align-items: center; gap: 8px; }
         
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; max-width: 28rem; margin: 0 auto; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; justify-content: space-around; padding: 12px 0; max-width: 28rem; margin: 0 auto; }
         @media (min-width: 768px) { .bottom-nav { border-radius: 0 0 1.5rem 1.5rem; } }
         .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.2s; }
         .nav-item.active { color: #1E40AF; font-weight: bold; transform: translateY(-2px); }
@@ -60,12 +60,14 @@
 
     <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
         <div class="spinner w-10 h-10 border-4 mb-4"></div>
-        <p id="loading-msg" class="text-gray-500 text-sm font-bold">Verificando segurança...</p>
+        <p id="loading-msg" class="text-gray-500 text-sm font-bold">Iniciando...</p>
         
-        <button onclick="resetarSistema()" class="mt-8 text-xs text-white font-bold bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl shadow-lg hidden animate-bounce" id="btn-reload">
-            <i class="fas fa-trash-alt mr-2"></i> REPARAR SISTEMA (LIMPAR CACHE)
-        </button>
-        <p id="msg-delay" class="text-[10px] text-gray-400 mt-2 hidden">Se travou, clique acima.</p>
+        <div id="repair-area" class="hidden mt-6 text-center">
+            <p class="text-xs text-gray-400 mb-2">Demorando muito?</p>
+            <button onclick="resetarSistema()" class="text-xs text-white font-bold bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl shadow-lg">
+                <i class="fas fa-trash-alt mr-2"></i> Limpar e Reiniciar
+            </button>
+        </div>
     </div>
 
     <div id="screen-welcome" class="hidden app-container p-8 text-center fade-in flex flex-col justify-center">
@@ -185,11 +187,6 @@
         <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
             <h2 class="text-lg font-bold text-gray-800 mb-2">Segurança</h2>
             <p class="text-sm text-gray-500 mb-4">Digite seu PIN de 4 dígitos</p>
-            <input type="tel" id="input-confirm-pin" maxlength="4" 
-       <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in">
-        <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
-            <h2 class="text-lg font-bold text-gray-800 mb-2">Segurança</h2>
-            <p class="text-sm text-gray-500 mb-4">Digite seu PIN de 4 dígitos</p>
             <input type="tel" id="input-confirm-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-4 outline-none focus:ring-2 focus:ring-blue-500">
             <div class="grid grid-cols-2 gap-3">
                 <button onclick="document.getElementById('modal-pin').classList.add('hidden')" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button>
@@ -236,7 +233,7 @@
         </div>
     </div>
 
-    <div id="bottom-menu" class="hidden bottom-nav w-full max-w-md">
+    <div id="bottom-menu" class="hidden flex bottom-nav w-full z-[200]">
         <div class="nav-item active" onclick="navegar('app', this)"><i class="fas fa-home"></i><span>Início</span></div>
         <div class="nav-item" onclick="navegar('pedidos', this)"><i class="fas fa-list"></i><span>Pedidos</span></div>
         <div class="nav-item" onclick="navegar('extrato', this)"><i class="fas fa-file-invoice-dollar"></i><span>Extrato</span></div>
@@ -244,10 +241,9 @@
     </div>
 
     <script>
-        // === 1. UTILITÁRIOS GLOBAIS (DEFINIDOS NO TOPO) ===
+        // === 1. UTILITÁRIOS GLOBAIS ===
         function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
         function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
-        
         function toggleDropdown(id) { const list = document.getElementById(`list-${id}`); if(id === 'entrega') document.getElementById('list-produto').classList.remove('show'); else document.getElementById('list-entrega').classList.remove('show'); list.classList.toggle('show'); }
         function selectOption(id, value, text) { document.getElementById(`pagamento_${id}`).value = value; document.getElementById(`display-${id}`).innerText = text; document.getElementById(`list-${id}`).classList.remove('show'); }
         document.addEventListener('click', function(e) { if (!e.target.closest('.relative')) { document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show')); } });
@@ -280,7 +276,6 @@
         } catch (e) { console.error("Erro config:", e); }
 
         window.onload = async function() {
-            // Setup JQuery Masks
             if(typeof $ !== 'undefined') {
                 $(document).ready(function(){ 
                     $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
@@ -289,26 +284,24 @@
                 });
             }
 
-            // Timeout de Segurança
+            // TIMEOUT DE 4 SEGUNDOS -> FORÇA TELA DE LOGIN SE TRAVAR
             setTimeout(() => {
                 const loader = document.getElementById('global-loading');
                 if(loader && loader.style.display !== 'none') {
-                    document.getElementById('btn-reload').classList.remove('hidden');
-                    document.getElementById('msg-delay').classList.remove('hidden');
-                    // Se não tiver sessão, assume deslogado
-                    if(!userSession) { 
-                        loader.style.display = 'none'; 
-                        showScreen('welcome'); 
+                    // Se estiver preso carregando e não tiver sessão, libera o Login
+                    if(!userSession) {
+                        console.warn("Demora no carregamento. Liberando tela inicial.");
+                        document.getElementById('repair-area').classList.remove('hidden'); // Mostra botão reset
+                        loader.style.display = 'none';
+                        showScreen('welcome');
                     }
                 }
-            }, 3000);
+            }, 4000);
 
             if(!sbClient) return;
 
-            // Listener de Sessão
             sbClient.auth.onAuthStateChange(async (event, session) => {
                 if (isRegistering) return;
-
                 if (event === 'SIGNED_IN' && session) {
                     userSession = session;
                     await carregarPerfil();
@@ -318,7 +311,7 @@
                     showScreen('welcome');
                 }
             });
-                        // Checagem Inicial
+
             try {
                 const { data: { session }, error } = await sbClient.auth.getSession();
                 if (session) {
@@ -331,20 +324,18 @@
                 console.error("Erro fatal init:", e);
                 showScreen('welcome');
             } finally {
-                document.getElementById('global-loading').style.display = 'none';
+                // Garante que o loading some se tudo der certo rápido
+                if(userSession || document.querySelector('.app-container:not(.hidden)').id !== 'global-loading') {
+                    document.getElementById('global-loading').style.display = 'none';
+                }
             }
         };
 
         // === 4. FUNÇÕES PRINCIPAIS ===
         async function resetarSistema() {
-            // 1. Limpa tudo
             localStorage.clear();
             if(sbClient) await sbClient.auth.signOut();
-
-            // 2. Avisa o usuário
             alert("✅ Cache limpo com sucesso! O sistema será reiniciado.");
-
-            // 3. Recarrega
             location.reload();
         }
 
@@ -366,14 +357,12 @@
                     throw new Error(error.message);
                 }
                 
-                // LOGIN SUCESSO - EXECUÇÃO IMEDIATA
                 if(data.user) {
                     userSession = data.session;
-                    await carregarPerfil(); // Carrega dados
-                    showScreen('app'); // Troca tela
-                    ativarRealtimePedidos(); // Liga monitoramento
+                    await carregarPerfil(); 
+                    showScreen('app'); 
+                    ativarRealtimePedidos(); 
                 }
-
             } catch (e) { 
                 alert(e.message); 
             } finally { 
@@ -387,13 +376,11 @@
             const loja = document.getElementById('reg-nome-loja').value; 
             const zap = document.getElementById('reg-zap-loja').value; 
             const resp = document.getElementById('reg-nome-resp').value; 
-            
             const cep = document.getElementById('reg-cep').value; 
             const rua = document.getElementById('reg-rua').value; 
             const num = document.getElementById('reg-num').value; 
             const bairro = document.getElementById('reg-bairro').value; 
             const cidade = document.getElementById('reg-cidade').value;
-            
             const btn = document.getElementById('btn-cad'); 
             const load = document.getElementById('load-cad');
 
@@ -406,26 +393,17 @@
             try {
                 const { data, error } = await sbClient.auth.signUp({ email, password: senha });
                 if (error) throw error;
-                
                 if (data.user) {
                     const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cidade}`;
                     const { error: perfilErro } = await sbClient.from('profiles').insert([{
-                        id: data.user.id,
-                        nome_loja: loja,
-                        whatsapp_loja: zap,
-                        responsavel: resp,
-                        endereco: enderecoCompleto,
-                        email: email
+                        id: data.user.id, nome_loja: loja, whatsapp_loja: zap, responsavel: resp, endereco: enderecoCompleto, email: email
                     }]);
                     if (perfilErro) throw perfilErro;
-
                     alert("Sucesso! Entrando...");
                     userSession = data.session;
-                    
                     const { data: profile } = await sbClient.from('profiles').select('*').eq('id', data.user.id).single();
                     userProfile = profile;
                     preencherDadosPerfil(profile);
-                    
                     showScreen('app'); 
                     ativarRealtimePedidos();
                     isRegistering = false;
@@ -439,8 +417,7 @@
                 btn.disabled = false; load.classList.add('hidden'); 
             }
         }
-
-        // --- NAVEGAÇÃO E PERFIL ---
+                // --- NAVEGAÇÃO E PERFIL ---
         function showScreen(id) { 
             ['welcome', 'register', 'login', 'app', 'pedidos', 'extrato', 'perfil'].forEach(s => {
                 const el = document.getElementById('screen-'+s);
@@ -448,11 +425,14 @@
             });
             document.getElementById('screen-'+id).classList.remove('hidden'); 
             
+            // CORREÇÃO MENU (Exibe apenas nas telas logadas)
+            const menu = document.getElementById('bottom-menu');
             if(['app', 'pedidos', 'extrato', 'perfil'].includes(id)) { 
-                document.getElementById('bottom-menu').classList.remove('hidden'); 
-                document.getElementById('bottom-menu').classList.add('flex'); 
+                menu.classList.remove('hidden');
+                menu.style.display = 'flex';
             } else { 
-                document.getElementById('bottom-menu').classList.add('hidden'); 
+                menu.classList.add('hidden');
+                menu.style.display = 'none';
             } 
         }
 
@@ -460,7 +440,6 @@
             showScreen(tela);
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             elemento.classList.add('active');
-            
             if(tela === 'perfil') carregarPerfil();
             if(tela === 'pedidos') carregarHistoricoPedidos();
         }
@@ -468,14 +447,10 @@
         async function carregarPerfil() {
             try {
                 if (!userSession) return;
-                
                 const { data, error } = await sbClient.from('profiles').select('*').eq('id', userSession.user.id).single();
-                
                 if (data) {
                     userProfile = data;
                     preencherDadosPerfil(data);
-                    
-                    // Se estiver em tela de login, entra no app
                     const currentScreen = document.querySelector('.app-container:not(.hidden)').id;
                     if(['screen-welcome', 'screen-login', 'screen-register'].includes(currentScreen)) {
                         showScreen('app');
@@ -488,9 +463,7 @@
                         showScreen('welcome');
                     }
                 }
-            } catch (e) { 
-                console.error(e); 
-            }
+            } catch (e) { console.error(e); }
         }
 
         function preencherDadosPerfil(data) {
@@ -499,7 +472,6 @@
             safeText('app-user-code', displayId);
             safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
             safeVal('origem', data.endereco || data.nome_loja);
-
             safeVal('edit-nome-loja', data.nome_loja);
             safeVal('edit-zap-loja', data.whatsapp_loja || data.whatsapp || ''); 
             safeVal('edit-endereco', data.endereco || '');
@@ -549,8 +521,8 @@
         async function carregarHistoricoPedidos() {
             const lista = document.getElementById('lista-pedidos');
             if(lista.children.length === 0) lista.innerHTML = '<div class="text-center text-gray-400 mt-10">Carregando...</div>';
-                       try {
-                // Busca IDs dos entregadores
+
+            try {
                 const { data, error } = await sbClient
                     .from('pedidos')
                     .select('*')
@@ -565,7 +537,6 @@
                     return;
                 }
 
-                // Busca nomes dos entregadores (Otimização)
                 const entregadorIds = data.filter(p => p.entregador_id).map(p => p.entregador_id);
                 let entregadoresMap = {};
                 if(entregadorIds.length > 0) {
@@ -587,13 +558,11 @@
                     const statusConfig = mapStatus[statusKey] || mapStatus['solicitado'];
                     const nomeEntregador = p.entregador_id ? (entregadoresMap[p.entregador_id] || "Entregador") : null;
                     
-                    // HTML do PIN
                     let pinHtml = `<div class="bg-blue-50 border border-blue-100 rounded-lg p-2 text-center mb-3">
                                 <p class="text-[10px] text-blue-400 font-bold uppercase tracking-wider">Código de Recebimento</p>
                                 <p class="text-xl font-mono font-bold text-blue-700 tracking-[0.3em]">${p.pin_entrega || '----'}</p>
                             </div>`;
                     
-                    // Se finalizado, mostra Avaliação em vez de PIN
                     let extrasHtml = pinHtml;
                     if(statusKey === 'concluido') {
                         const nota = p.avaliacao || 0;
@@ -607,7 +576,6 @@
                         `;
                     }
 
-                    // Botão Ver Condutor
                     let btnMoto = '';
                     if(p.entregador_id && statusKey !== 'solicitado') {
                         btnMoto = `
@@ -621,7 +589,6 @@
                         `;
                     }
 
-                    // Botão Reportar
                     let btnReportar = `
                         <button onclick="reportarProblema('${p.id}')" class="text-[10px] text-red-400 font-bold hover:text-red-600 flex items-center gap-1">
                             <i class="fas fa-exclamation-circle"></i> Reportar Problema
@@ -654,15 +621,13 @@
                 lista.innerHTML = '<div class="text-center text-red-400 mt-10">Erro ao carregar.</div>';
             }
         }
-
-        // --- AÇÕES DO HISTÓRICO ---
-        
+                // --- AÇÕES DO HISTÓRICO ---
         async function verMotoboy(id) {
             document.getElementById('modal-motoboy').classList.remove('hidden');
             document.getElementById('moto-nome').innerText = "Buscando...";
             document.getElementById('moto-modelo').innerText = "...";
             document.getElementById('moto-placa').innerText = "...";
-            document.getElementById('moto-zap-oculto').value = ""; // Limpa anterior
+            document.getElementById('moto-zap-oculto').value = ""; 
 
             try {
                 const { data, error } = await sbClient.from('profiles').select('responsavel, modelo_moto, placa_moto, whatsapp_responsavel').eq('id', id).single();
@@ -686,15 +651,12 @@
         }
 
         async function avaliarPedido(id, nota) {
-            // Atualiza visualmente na hora (Optimistic UI)
             const container = document.getElementById(`stars-${id}`);
             const stars = container.getElementsByTagName('i');
             for(let i=0; i<5; i++) {
                 if(i < nota) { stars[i].classList.remove('star-empty'); stars[i].classList.add('star-filled'); }
                 else { stars[i].classList.remove('star-filled'); stars[i].classList.add('star-empty'); }
             }
-
-            // Salva no banco
             await sbClient.from('pedidos').update({ avaliacao: nota }).eq('id', id);
         }
 
@@ -778,8 +740,6 @@
         function deg2rad(deg) { return deg * (Math.PI/180); }
         async function buscarCep(prefixo) { let cep = document.getElementById(prefixo + '-cep').value.replace(/\D/g, ''); if(cep.length !== 8) return; try { const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`); const data = await res.json(); if(!data.erro) { document.getElementById(prefixo + '-rua').value = data.logradouro; document.getElementById(prefixo + '-bairro').value = data.bairro; document.getElementById(prefixo + '-cidade').value = `${data.localidade}/${data.uf}`; document.getElementById(prefixo + '-num').focus(); } } catch(e){} }
         function mudarStatusRetorno() { const checked = document.getElementById('retorno').checked; const txt = document.getElementById('text-retorno'); const ico = document.getElementById('icon-retorno'); if(checked) { txt.innerText = "Sim, com retorno!"; txt.classList.replace('text-gray-500', 'text-blue-700'); ico.className = "fas fa-exchange-alt text-blue-600"; } else { txt.innerText = "Sem retorno!"; txt.classList.replace('text-blue-700', 'text-gray-500'); ico.className = "fas fa-arrow-right text-gray-400"; } }
-        function toggleDropdown(id) { const list = document.getElementById(`list-${id}`); if(id === 'entrega') document.getElementById('list-produto').classList.remove('show'); else document.getElementById('list-entrega').classList.remove('show'); list.classList.toggle('show'); }
-        function selectOption(id, value, text) { document.getElementById(`pagamento_${id}`).value = value; document.getElementById(`display-${id}`).innerText = text; document.getElementById(`list-${id}`).classList.remove('show'); }
         
         function verificarPinParaSaldo() {
             if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil.");
