@@ -232,7 +232,7 @@
         let isRegistering = false;
 
         function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
-        function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val || ''; } // Garante que não fique undefined
+        function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val || ''; } 
         
         function toggleDropdown(id) { 
             const list = document.getElementById(`list-${id}`); 
@@ -257,7 +257,6 @@
             const { data: { session } } = await sbClient.auth.getSession();
             if (session) {
                 userSession = session;
-                // Carrega perfil inicial, redirecionando para App se sucesso
                 await carregarPerfil(true); 
             } else {
                 document.getElementById('global-loading').style.display = 'none';
@@ -270,7 +269,6 @@
             });
         });
 
-        // Modificado: Aceita parametro para saber se deve redirecionar
         async function carregarPerfil(isLogin = false) {
             try {
                 if (!userSession) return;
@@ -279,8 +277,6 @@
                 if (data) { 
                     userProfile = data; 
                     preencherDadosPerfil(data); 
-                    // CORREÇÃO: Só redireciona para o APP se for LOGIN. 
-                    // Se for clique no botão perfil, não faz nada (mantém na tela atual)
                     if(isLogin) {
                         showScreen('app'); 
                         ativarRealtimePedidos();
@@ -297,8 +293,6 @@
             const userIdShort = userSession.user.id.slice(0, 4).toUpperCase();
             safeText('app-user-code', data.codigo_visual || userIdShort);
             safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
-            
-            // CORREÇÃO: Garante que todos os campos do form "Perfil" sejam preenchidos
             safeVal('origem', data.endereco || data.nome_loja);
             safeVal('edit-nome-loja', data.nome_loja); 
             safeVal('edit-razao', data.razao_social); 
@@ -323,28 +317,45 @@
         }
 
         async function enviarParaCentral() {
+            const btn = document.getElementById('btn-enviar');
             try {
+                // CORREÇÃO: Forçar conversão de string para float para evitar erro de tipo no banco
+                let valorFreteFloat = parseFloat(valorFinal);
+                if (isNaN(valorFreteFloat)) valorFreteFloat = 0;
+
                 const novoPedido = {
                     user_id: userSession.user.id,
                     origem: document.getElementById('origem').value,
                     destino: document.getElementById('destino').value,
-                    valor_frete: parseFloat(valorFinal), 
+                    valor_frete: valorFreteFloat, 
                     forma_pagamento: document.getElementById('pagamento_entrega').value,
                     pin_entrega: Math.floor(1000 + Math.random() * 9000).toString(),
                     nome_destinatario: document.getElementById('nome_dest').value || 'Não informado',
                     telefone_destinatario: document.getElementById('tel_dest').value || '',
                     status: 'solicitado'
                 };
+                
+                console.log("Tentando enviar:", novoPedido); // Debug no console
+
                 const { error } = await sbClient.from('pedidos').insert([novoPedido]);
-                if(error) throw error;
+                
+                if(error) {
+                    console.error("Erro Supabase:", error);
+                    throw error;
+                }
+
                 document.getElementById('display-pin').innerText = novoPedido.pin_entrega;
                 document.getElementById('modal-success').style.display = 'flex';
                 document.getElementById('modal-success').classList.remove('hidden');
+
             } catch(e) {
-                alert("Erro ao criar pedido: " + e.message);
-                const btn = document.getElementById('btn-enviar');
+                // ALERTA DETALHADO: Mostra o erro real se falhar
+                alert("Erro ao criar pedido: " + (e.message || JSON.stringify(e)));
+                console.error(e);
+            } finally {
+                // DESTRAVAR O BOTÃO: Garante que o botão volta ao normal mesmo se der erro
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-check text-2xl"></i> Tentar Novamente';
+                btn.innerHTML = '<i class="fas fa-check text-2xl"></i> Confirmar Pedido';
             }
         }
 
@@ -362,7 +373,6 @@
             showScreen(tela); 
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); 
             elemento.classList.add('active'); 
-            // CORREÇÃO: Chama carregarPerfil sem parametro (isLogin=false), então não redireciona
             if(tela==='perfil') carregarPerfil(); 
             if(tela==='pedidos') carregarHistoricoPedidos(); 
         }
@@ -416,7 +426,6 @@
                 let stText = st === 'solicitado' ? '📡 Procurando...' : st === 'pendente' ? '🛵 A Caminho' : st === 'em_rota' ? '🚀 Em Rota' : st === 'cancelado' ? '❌ Cancelado' : '✅ Finalizado';
                 const entregador = p.entregador_id ? (entMap[p.entregador_id] || 'Entregador') : null;
 
-                // CORREÇÃO: Botão cancelar melhorado
                 let btnCancel = st === 'solicitado' ? `<button onclick="cancelarPedido('${p.id}')" class="text-red-500 text-xs underline ml-auto font-bold">Cancelar</button>` : '';
                 let btnMoto = (p.entregador_id && (st === 'pendente' || st === 'em_rota')) ? `<button onclick="verMotoboy('${p.entregador_id}')" class="w-full mt-2 bg-gray-100 p-2 rounded text-xs font-bold flex items-center justify-center gap-2"><i class="fas fa-motorcycle"></i> ${entregador}</button>` : '';
                 
@@ -432,21 +441,18 @@
             });
         }
 
-        // CORREÇÃO: Lógica de cancelamento via UPDATE em vez de DELETE
         async function cancelarPedido(id) {
             if(!confirm("Deseja realmente cancelar este pedido?")) return;
-            // Tenta atualizar o status para cancelado
             const { error } = await sbClient
                 .from('pedidos')
                 .update({ status: 'cancelado' })
                 .eq('id', id)
-                .eq('user_id', userSession.user.id); // Segurança extra
-
+                .eq('user_id', userSession.user.id);
             if(error) {
                 console.error(error);
                 alert("Erro ao cancelar. Talvez um motoboy já tenha aceito.");
             } else {
-                carregarHistoricoPedidos(); // Atualiza a lista na hora
+                carregarHistoricoPedidos();
             }
         }
 
@@ -510,7 +516,6 @@
         function confirmarPin() { if(document.getElementById('input-confirm-pin').value === userProfile.pin_carteira) { document.getElementById('modal-pin').style.display='none'; if(pendingAction==='saldo') solicitarSaldoZap(); } else alert("PIN Incorreto"); }
         function solicitarSaldoZap() { window.open(`https://wa.me/${NUMERO_ADMIN}?text=Olá, gostaria de adicionar saldo. ID: ${userProfile.codigo_visual}`, '_blank'); }
         
-        // CORREÇÃO: Texto de retorno simplificado
         function mudarStatusRetorno() {
             const isChecked = document.getElementById('retorno').checked;
             document.getElementById('text-retorno').innerText = isChecked ? "Com Retorno" : "Sem Retorno";
