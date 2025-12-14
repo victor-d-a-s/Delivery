@@ -44,6 +44,13 @@
         .nav-item i { font-size: 22px; margin-bottom: 4px; }
         .spinner { border: 3px solid rgba(0,0,0,0.1); border-left-color: #1E40AF; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Estilo Card Pedido */
+        .card-historico { background: white; border-radius: 12px; border: 1px solid #E5E7EB; padding: 16px; margin-bottom: 12px; position: relative; }
+        .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        .status-pendente { background: #FEF3C7; color: #D97706; }
+        .status-em_rota { background: #DBEAFE; color: #1E40AF; }
+        .status-concluido { background: #D1FAE5; color: #059669; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
@@ -55,7 +62,6 @@
     </div>
 
     <script>
-        // CONFIGURAÇÕES GERAIS
         const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
 
@@ -66,7 +72,6 @@
             } else { 
                 console.error("Supabase JS falhou."); 
                 document.getElementById('loading-msg').innerText = "Erro ao carregar sistema.";
-                document.getElementById('loading-msg').classList.add('text-red-500');
             }
         } catch (e) { console.error("Erro config:", e); }
 
@@ -83,57 +88,43 @@
         let pendingAction = null;
         let isRegistering = false; 
 
-        // --- INICIALIZAÇÃO SEGURA (SEM TELA BRANCA) ---
+        // --- INICIALIZAÇÃO ---
         window.onload = async function() {
-            // Timer de segurança: Se travar por 5s, força a tela inicial
             setTimeout(() => {
                 const loader = document.getElementById('global-loading');
                 if(loader && loader.style.display !== 'none') {
                     document.getElementById('btn-reload').classList.remove('hidden');
-                    // Se não tiver sessão carregada, libera o welcome para não ficar branco
-                    if(!userSession) {
-                        loader.style.display = 'none';
-                        showScreen('welcome');
-                    }
+                    if(!userSession) { loader.style.display = 'none'; showScreen('welcome'); }
                 }
             }, 5000);
 
             if(!sbClient) return;
 
             try {
-                // 1. Tenta pegar sessão
                 const { data: { session }, error } = await sbClient.auth.getSession();
-                
                 if (session) {
                     userSession = session;
-                    // 2. Tenta pegar perfil
-                    const { data: profile, error: profileError } = await sbClient
-                        .from('profiles')
-                        .select('*')
-                        .eq('id', session.user.id)
-                        .single();
-
+                    const { data: profile } = await sbClient.from('profiles').select('*').eq('id', session.user.id).single();
                     if (profile) {
                         userProfile = profile;
                         preencherDadosPerfil(profile);
-                        showScreen('app'); // Sucesso: Vai pro App
+                        showScreen('app');
                     } else {
-                        // Tem login mas não tem perfil (Erro Zumbi): Força Logout
                         await sbClient.auth.signOut();
                         showScreen('welcome'); 
                     }
                 } else {
-                    showScreen('welcome'); // Sem sessão: Vai pro Welcome
+                    showScreen('welcome');
                 }
             } catch(e) {
                 console.error("Erro fatal init:", e);
-                showScreen('welcome'); // Erro geral: Vai pro Welcome
+                showScreen('welcome');
             } finally {
                 document.getElementById('global-loading').style.display = 'none';
             }
         };
 
-        // --- FUNÇÕES DE DADOS ---
+        // --- DADOS ---
         function preencherDadosPerfil(data) {
             safeText('app-user-name', data.nome_loja || 'Minha Loja');
             const displayId = data.codigo_visual || userSession.user.id.slice(0, 4).toUpperCase();
@@ -149,7 +140,6 @@
             safeVal('edit-pin', data.pin_carteira || '');
         }
 
-        // --- UTILITÁRIOS ---
         function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
         function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
     </script>
@@ -226,10 +216,11 @@
         </div>
     </div>
 
-    <div id="screen-pedidos" class="hidden app-container p-6 fade-in text-center flex flex-col items-center justify-center">
-        <i class="fas fa-list text-6xl text-gray-200 mb-4"></i>
-        <h2 class="text-xl font-bold text-gray-700">Meus Pedidos</h2>
-        <p class="text-gray-500 mt-2">Histórico será exibido aqui.</p>
+    <div id="screen-pedidos" class="hidden app-container p-6 fade-in flex flex-col h-screen">
+        <h2 class="text-xl font-bold text-gray-700 mb-4 text-center">Meus Pedidos</h2>
+        <div id="lista-pedidos" class="flex-1 overflow-y-auto pb-20 space-y-3">
+            <div class="text-center text-gray-400 mt-10">Carregando histórico...</div>
+        </div>
     </div>
 
     <div id="screen-extrato" class="hidden app-container p-6 fade-in text-center flex flex-col items-center justify-center">
@@ -281,8 +272,7 @@
         <div class="nav-item" onclick="navegar('extrato', this)"><i class="fas fa-file-invoice-dollar"></i><span>Extrato</span></div>
         <div class="nav-item" onclick="navegar('perfil', this)"><i class="fas fa-user"></i><span>Perfil</span></div>
     </div>
-
-    <script>
+        <script>
         $(document).ready(function(){ 
             $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
             $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
@@ -311,14 +301,104 @@
             showScreen(tela);
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             elemento.classList.add('active');
+            
+            // CORREÇÃO: Não redireciona mais ao clicar em perfil, apenas carrega dados
             if(tela === 'perfil') carregarPerfil();
+            
+            // IMPLEMENTAÇÃO: Carrega pedidos ao entrar na aba
+            if(tela === 'pedidos') carregarHistoricoPedidos();
         }
 
         async function fazerLogout() {
             try { await sbClient.auth.signOut(); } catch (error) { console.error(error); } 
             finally { location.reload(); }
         }
-               // --- GATEKEEPER ---
+
+        async function fazerCadastro() {
+            const email = document.getElementById('reg-email').value; 
+            const senha = document.getElementById('reg-senha').value; 
+            const loja = document.getElementById('reg-nome-loja').value; 
+            const zap = document.getElementById('reg-zap-loja').value; 
+            const resp = document.getElementById('reg-nome-resp').value; 
+            const cep = document.getElementById('reg-cep').value; 
+            const rua = document.getElementById('reg-rua').value; 
+            const num = document.getElementById('reg-num').value; 
+            const bairro = document.getElementById('reg-bairro').value; 
+            const cidade = document.getElementById('reg-cidade').value;
+            
+            const btn = document.getElementById('btn-cad'); 
+            const load = document.getElementById('load-cad');
+
+            if(!email || !senha || !loja || !num) return alert("Preencha todos os campos!");
+            if(senha.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
+
+            btn.disabled = true; load.classList.remove('hidden');
+            isRegistering = true; 
+
+            try {
+                const { data, error } = await sbClient.auth.signUp({ email, password: senha });
+                if (error) throw error;
+                
+                if (data.user) {
+                    const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cidade}`;
+                    const { error: perfilErro } = await sbClient.from('profiles').insert([{
+                        id: data.user.id,
+                        nome_loja: loja,
+                        whatsapp_loja: zap,
+                        responsavel: resp,
+                        endereco: enderecoCompleto,
+                        email: email
+                    }]);
+                    if (perfilErro) throw perfilErro;
+
+                    alert("Sucesso! Entrando...");
+                    userSession = data.session;
+                    
+                    const { data: profile } = await sbClient.from('profiles').select('*').eq('id', data.user.id).single();
+                    userProfile = profile;
+                    preencherDadosPerfil(profile);
+                    
+                    showScreen('app'); 
+                    isRegistering = false;
+                }
+            } catch (e) { 
+                isRegistering = false;
+                let msg = e.message;
+                if(msg.includes("User already registered")) msg = "Este e-mail já possui cadastro.";
+                alert("Erro: " + msg); 
+            } finally { 
+                btn.disabled = false; load.classList.add('hidden'); 
+            }
+        }
+
+        async function fazerLogin() {
+            const email = document.getElementById('log-email').value; 
+            const senha = document.getElementById('log-senha').value;
+            const btn = document.getElementById('btn-log'); 
+            const load = document.getElementById('load-log');
+            
+            if(!email || !senha) return alert("Preencha e-mail e senha.");
+
+            btn.disabled = true; load.classList.remove('hidden');
+            
+            try {
+                const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: senha });
+                if (error) {
+                    if(error.message.includes("Invalid login credentials")) {
+                        throw new Error("E-mail ou senha incorretos.");
+                    } else if(error.message.includes("Email not confirmed")) {
+                        throw new Error("E-mail não confirmado.");
+                    } else {
+                        throw new Error(error.message);
+                    }
+                }
+            } catch (e) { 
+                alert(e.message); 
+            } finally { 
+                btn.disabled = false; load.classList.add('hidden'); 
+            }
+        }
+
         async function carregarPerfil() {
             try {
                 if (!userSession) {
@@ -341,12 +421,15 @@
 
                 userProfile = data;
                 preencherDadosPerfil(data);
-                showScreen('app'); // Sucesso garantido aqui
+                
+                // CORREÇÃO: Só força o 'app' se estiver nas telas de entrada
+                const currentScreen = document.querySelector('.app-container:not(.hidden)').id;
+                if(currentScreen === 'screen-welcome' || currentScreen === 'screen-login') {
+                    showScreen('app');
+                }
 
             } catch (e) {
                 console.error("Erro perfil:", e);
-                // Se der erro grave no perfil, desloga
-                if(!isRegistering) fazerLogout();
             }
         }
 
@@ -382,139 +465,54 @@
                     userProfile.endereco = endereco;
                     userProfile.pin_carteira = pin;
                 }
-                safeVal('origem', endereco);
-                safeText('app-user-name', nomeLoja);
+                preencherDadosPerfil(userProfile);
             }
             btn.innerText = "Salvar Alterações"; btn.disabled = false;
         }
-
-        // --- LÓGICA DE PIN E SEGURANÇA ---
-        function verificarPinParaSaldo() {
-            if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil antes de usar esta função.");
-            pendingAction = 'saldo';
-            document.getElementById('input-confirm-pin').value = '';
-            document.getElementById('modal-pin').classList.remove('hidden');
-            document.getElementById('input-confirm-pin').focus();
-        }
-
-        function iniciarPedido() {
-            const pgEnt = document.getElementById('pagamento_entrega').value;
-            if(pgEnt === 'Carteira') {
-                if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil para usar o Saldo em Conta.");
-                pendingAction = 'pedido';
-                document.getElementById('input-confirm-pin').value = '';
-                document.getElementById('modal-pin').classList.remove('hidden');
-                document.getElementById('input-confirm-pin').focus();
-            } else {
-                enviarParaCentral();
-            }
-        }
-
-        function confirmarPin() {
-            const pinDigitado = document.getElementById('input-confirm-pin').value;
-            if(pinDigitado !== userProfile.pin_carteira) {
-                alert("PIN Incorreto!");
-                return;
-            }
-            document.getElementById('modal-pin').classList.add('hidden');
-            if(pendingAction === 'saldo') {
-                solicitarSaldoZap();
-            } else if (pendingAction === 'pedido') {
-                enviarParaCentral();
-            }
-            pendingAction = null;
-        }
-
-        function solicitarSaldoZap() {
-            const msg = `Olá, sou da loja *${userProfile.nome_loja}* e gostaria de adicionar saldo.`;
-            window.open(`https://wa.me/${NUMERO_ADMIN}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        // --- CADASTRO ---
-        async function fazerCadastro() {
-            const email = document.getElementById('reg-email').value; 
-            const senha = document.getElementById('reg-senha').value; 
-            const loja = document.getElementById('reg-nome-loja').value; 
-            const zap = document.getElementById('reg-zap-loja').value; 
-            const resp = document.getElementById('reg-nome-resp').value; 
-            const cep = document.getElementById('reg-cep').value; 
-            const rua = document.getElementById('reg-rua').value; 
-            const num = document.getElementById('reg-num').value; 
-            const bairro = document.getElementById('reg-bairro').value; 
-            const cidade = document.getElementById('reg-cidade').value;
-            
-            const btn = document.getElementById('btn-cad'); 
-            const load = document.getElementById('load-cad');
-
-            if(!email || !senha || !loja || !num) return alert("Preencha todos os campos obrigatórios!");
-            if(senha.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
-
-            btn.disabled = true; load.classList.remove('hidden');
-            isRegistering = true; 
+                    // --- HISTÓRICO DE PEDIDOS (NOVA FUNÇÃO) ---
+        async function carregarHistoricoPedidos() {
+            const lista = document.getElementById('lista-pedidos');
+            lista.innerHTML = '<div class="text-center text-gray-400 mt-10"><div class="spinner w-6 h-6 border-gray-400 mx-auto mb-2"></div>Carregando...</div>';
 
             try {
-                const { data, error } = await sbClient.auth.signUp({ email: email, password: senha });
-                if (error) throw error;
-                
-                if (data.user) {
-                    const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cidade}`;
-                    const { error: perfilErro } = await sbClient.from('profiles').insert([{
-                        id: data.user.id,
-                        nome_loja: loja,
-                        whatsapp_loja: zap,
-                        responsavel: resp,
-                        endereco: enderecoCompleto,
-                        email: email
-                    }]);
-                    if (perfilErro) throw perfilErro;
+                const { data, error } = await sbClient
+                    .from('pedidos')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(20);
 
-                    alert("Conta criada com sucesso! Entrando...");
-                    userSession = data.session;
-                    
-                    // CARREGA E REDIRECIONA MANUALMENTE (SEM DEPENDER DO LISTENER)
-                    const { data: profile } = await sbClient.from('profiles').select('*').eq('id', data.user.id).single();
-                    userProfile = profile;
-                    preencherDadosPerfil(profile);
-                    
-                    showScreen('app'); 
-                    isRegistering = false;
+                if(error) throw error;
+
+                if(!data || data.length === 0) {
+                    lista.innerHTML = '<div class="text-center text-gray-400 mt-10"><i class="fas fa-box-open text-4xl mb-2"></i><p>Nenhum pedido realizado.</p></div>';
+                    return;
                 }
-            } catch (e) { 
-                isRegistering = false;
-                let msg = e.message;
-                if(msg.includes("User already registered")) msg = "Este e-mail já possui cadastro.";
-                alert("Erro: " + msg); 
-            } finally { 
-                btn.disabled = false; load.classList.add('hidden'); 
-            }
-        }
 
-        // --- LOGIN ---
-        async function fazerLogin() {
-            const email = document.getElementById('log-email').value; 
-            const senha = document.getElementById('log-senha').value;
-            const btn = document.getElementById('btn-log'); 
-            const load = document.getElementById('load-log');
-            
-            if(!email || !senha) return alert("Preencha e-mail e senha.");
+                lista.innerHTML = '';
+                data.forEach(p => {
+                    const statusClass = `status-${p.status || 'pendente'}`;
+                    const statusLabel = (p.status || 'pendente').replace('_', ' ').toUpperCase();
+                    
+                    const html = `
+                        <div class="card-historico">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="badge-status ${statusClass}">${statusLabel}</span>
+                                <span class="text-xs text-gray-400 font-mono">#${p.id.toString().slice(0,4)}</span>
+                            </div>
+                            <div class="text-sm font-bold text-gray-800 mb-1">${p.destino}</div>
+                            <div class="text-xs text-gray-500 mb-3">${p.nome_destinatario}</div>
+                            <div class="flex justify-between items-center border-t pt-2 mt-2">
+                                <span class="text-xs font-bold text-blue-600">R$ ${p.valor_frete.toFixed(2)}</span>
+                                <span class="text-[10px] text-gray-400">${new Date(p.created_at).toLocaleDateString('pt-BR')}</span>
+                            </div>
+                        </div>
+                    `;
+                    lista.insertAdjacentHTML('beforeend', html);
+                });
 
-            btn.disabled = true; load.classList.remove('hidden');
-            
-            try {
-                const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: senha });
-                
-                if (error) {
-                    if(error.message.includes("Invalid login credentials")) {
-                        throw new Error("E-mail ou senha incorretos.");
-                    } else {
-                        throw new Error(error.message);
-                    }
-                }
-                // Sucesso: onAuthStateChange fará o resto
-            } catch (e) { 
-                alert(e.message); 
-            } finally { 
-                btn.disabled = false; load.classList.add('hidden'); 
+            } catch (e) {
+                console.error(e);
+                lista.innerHTML = '<div class="text-center text-red-400 mt-10">Erro ao carregar histórico.</div>';
             }
         }
 
@@ -549,6 +547,39 @@
 
         function mudarStatusRetorno() { const checked = document.getElementById('retorno').checked; const txt = document.getElementById('text-retorno'); const ico = document.getElementById('icon-retorno'); if(checked) { txt.innerText = "Sim, com retorno!"; txt.classList.replace('text-gray-500', 'text-blue-700'); ico.className = "fas fa-exchange-alt text-blue-600"; } else { txt.innerText = "Sem retorno!"; txt.classList.replace('text-blue-700', 'text-gray-500'); ico.className = "fas fa-arrow-right text-gray-400"; } }
 
+        function verificarPinParaSaldo() {
+            if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil.");
+            pendingAction = 'saldo';
+            document.getElementById('input-confirm-pin').value = '';
+            document.getElementById('modal-pin').classList.remove('hidden');
+            document.getElementById('input-confirm-pin').focus();
+        }
+
+        function iniciarPedido() {
+            const pgEnt = document.getElementById('pagamento_entrega').value;
+            if(pgEnt === 'Carteira') {
+                if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil.");
+                pendingAction = 'pedido';
+                document.getElementById('input-confirm-pin').value = '';
+                document.getElementById('modal-pin').classList.remove('hidden');
+                document.getElementById('input-confirm-pin').focus();
+            } else { enviarParaCentral(); }
+        }
+
+        function confirmarPin() {
+            const pinDigitado = document.getElementById('input-confirm-pin').value;
+            if(pinDigitado !== userProfile.pin_carteira) { alert("PIN Incorreto!"); return; }
+            document.getElementById('modal-pin').classList.add('hidden');
+            if(pendingAction === 'saldo') solicitarSaldoZap();
+            else if (pendingAction === 'pedido') enviarParaCentral();
+            pendingAction = null;
+        }
+
+        function solicitarSaldoZap() {
+            const msg = `Olá, sou da loja *${userProfile.nome_loja}* e gostaria de adicionar saldo.`;
+            window.open(`https://wa.me/${NUMERO_ADMIN}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
         async function enviarParaCentral() {
             const pgEnt = document.getElementById('pagamento_entrega').value;
             const nomeDest = document.getElementById('nome_dest').value; const telDest = document.getElementById('tel_dest').value; const ref = document.getElementById('referencia').value;
@@ -566,7 +597,7 @@
                 telefone_destinatario: telDest
             }]);
 
-            if(error) { alert("Erro ao enviar pedido: " + error.message); return; }
+            if(error) { alert("Erro ao enviar: " + error.message); return; }
             document.getElementById('display-pin').innerText = pinSeguranca;
             document.getElementById('modal-success').classList.remove('hidden');
         }
