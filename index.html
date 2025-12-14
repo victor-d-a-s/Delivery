@@ -62,6 +62,7 @@
     </div>
 
     <script>
+        // CONFIGURAÇÕES GERAIS
         const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
 
@@ -88,7 +89,7 @@
         let pendingAction = null;
         let isRegistering = false; 
 
-        // --- INICIALIZAÇÃO ---
+        // --- INICIALIZAÇÃO SEGURA ---
         window.onload = async function() {
             setTimeout(() => {
                 const loader = document.getElementById('global-loading');
@@ -272,7 +273,8 @@
         <div class="nav-item" onclick="navegar('extrato', this)"><i class="fas fa-file-invoice-dollar"></i><span>Extrato</span></div>
         <div class="nav-item" onclick="navegar('perfil', this)"><i class="fas fa-user"></i><span>Perfil</span></div>
     </div>
-        <script>
+
+    <script>
         $(document).ready(function(){ 
             $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
             $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
@@ -301,104 +303,15 @@
             showScreen(tela);
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             elemento.classList.add('active');
-            
-            // CORREÇÃO: Não redireciona mais ao clicar em perfil, apenas carrega dados
             if(tela === 'perfil') carregarPerfil();
-            
-            // IMPLEMENTAÇÃO: Carrega pedidos ao entrar na aba
-            if(tela === 'pedidos') carregarHistoricoPedidos();
+            if(tela === 'pedidos') carregarHistoricoPedidos(); // Carrega histórico ao entrar
         }
 
         async function fazerLogout() {
             try { await sbClient.auth.signOut(); } catch (error) { console.error(error); } 
             finally { location.reload(); }
         }
-
-        async function fazerCadastro() {
-            const email = document.getElementById('reg-email').value; 
-            const senha = document.getElementById('reg-senha').value; 
-            const loja = document.getElementById('reg-nome-loja').value; 
-            const zap = document.getElementById('reg-zap-loja').value; 
-            const resp = document.getElementById('reg-nome-resp').value; 
-            const cep = document.getElementById('reg-cep').value; 
-            const rua = document.getElementById('reg-rua').value; 
-            const num = document.getElementById('reg-num').value; 
-            const bairro = document.getElementById('reg-bairro').value; 
-            const cidade = document.getElementById('reg-cidade').value;
-            
-            const btn = document.getElementById('btn-cad'); 
-            const load = document.getElementById('load-cad');
-
-            if(!email || !senha || !loja || !num) return alert("Preencha todos os campos!");
-            if(senha.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
-
-            btn.disabled = true; load.classList.remove('hidden');
-            isRegistering = true; 
-
-            try {
-                const { data, error } = await sbClient.auth.signUp({ email, password: senha });
-                if (error) throw error;
-                
-                if (data.user) {
-                    const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cidade}`;
-                    const { error: perfilErro } = await sbClient.from('profiles').insert([{
-                        id: data.user.id,
-                        nome_loja: loja,
-                        whatsapp_loja: zap,
-                        responsavel: resp,
-                        endereco: enderecoCompleto,
-                        email: email
-                    }]);
-                    if (perfilErro) throw perfilErro;
-
-                    alert("Sucesso! Entrando...");
-                    userSession = data.session;
-                    
-                    const { data: profile } = await sbClient.from('profiles').select('*').eq('id', data.user.id).single();
-                    userProfile = profile;
-                    preencherDadosPerfil(profile);
-                    
-                    showScreen('app'); 
-                    isRegistering = false;
-                }
-            } catch (e) { 
-                isRegistering = false;
-                let msg = e.message;
-                if(msg.includes("User already registered")) msg = "Este e-mail já possui cadastro.";
-                alert("Erro: " + msg); 
-            } finally { 
-                btn.disabled = false; load.classList.add('hidden'); 
-            }
-        }
-
-        async function fazerLogin() {
-            const email = document.getElementById('log-email').value; 
-            const senha = document.getElementById('log-senha').value;
-            const btn = document.getElementById('btn-log'); 
-            const load = document.getElementById('load-log');
-            
-            if(!email || !senha) return alert("Preencha e-mail e senha.");
-
-            btn.disabled = true; load.classList.remove('hidden');
-            
-            try {
-                const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: senha });
-                if (error) {
-                    if(error.message.includes("Invalid login credentials")) {
-                        throw new Error("E-mail ou senha incorretos.");
-                    } else if(error.message.includes("Email not confirmed")) {
-                        throw new Error("E-mail não confirmado.");
-                    } else {
-                        throw new Error(error.message);
-                    }
-                }
-            } catch (e) { 
-                alert(e.message); 
-            } finally { 
-                btn.disabled = false; load.classList.add('hidden'); 
-            }
-        }
-
+                // --- GATEKEEPER ---
         async function carregarPerfil() {
             try {
                 if (!userSession) {
@@ -422,7 +335,6 @@
                 userProfile = data;
                 preencherDadosPerfil(data);
                 
-                // CORREÇÃO: Só força o 'app' se estiver nas telas de entrada
                 const currentScreen = document.querySelector('.app-container:not(.hidden)').id;
                 if(currentScreen === 'screen-welcome' || currentScreen === 'screen-login') {
                     showScreen('app');
@@ -469,7 +381,8 @@
             }
             btn.innerText = "Salvar Alterações"; btn.disabled = false;
         }
-                    // --- HISTÓRICO DE PEDIDOS (NOVA FUNÇÃO) ---
+
+        // --- HISTÓRICO DE PEDIDOS (COM PIN) ---
         async function carregarHistoricoPedidos() {
             const lista = document.getElementById('lista-pedidos');
             lista.innerHTML = '<div class="text-center text-gray-400 mt-10"><div class="spinner w-6 h-6 border-gray-400 mx-auto mb-2"></div>Carregando...</div>';
@@ -501,6 +414,12 @@
                             </div>
                             <div class="text-sm font-bold text-gray-800 mb-1">${p.destino}</div>
                             <div class="text-xs text-gray-500 mb-3">${p.nome_destinatario}</div>
+                            
+                            <div class="bg-blue-50 border border-blue-100 rounded-lg p-2 text-center mb-3">
+                                <p class="text-[10px] text-blue-400 font-bold uppercase tracking-wider">Código de Recebimento</p>
+                                <p class="text-xl font-mono font-bold text-blue-700 tracking-[0.3em]">${p.pin_entrega || '----'}</p>
+                            </div>
+
                             <div class="flex justify-between items-center border-t pt-2 mt-2">
                                 <span class="text-xs font-bold text-blue-600">R$ ${p.valor_frete.toFixed(2)}</span>
                                 <span class="text-[10px] text-gray-400">${new Date(p.created_at).toLocaleDateString('pt-BR')}</span>
@@ -516,37 +435,7 @@
             }
         }
 
-        async function buscarCep(prefixo) { let cep = document.getElementById(prefixo + '-cep').value.replace(/\D/g, ''); if(cep.length !== 8) return; try { const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`); const data = await res.json(); if(!data.erro) { document.getElementById(prefixo + '-rua').value = data.logradouro; document.getElementById(prefixo + '-bairro').value = data.bairro; document.getElementById(prefixo + '-cidade').value = `${data.localidade}/${data.uf}`; document.getElementById(prefixo + '-num').focus(); } } catch(e){} }
-        
-        async function calcularDistancia() {
-            const origem = document.getElementById('origem').value; const destino = document.getElementById('destino').value;
-            if(!origem || !destino) return alert("Preencha endereços.");
-            document.getElementById('btn-text').innerText = "Calculando..."; document.getElementById('loading').classList.remove('hidden'); document.getElementById('btn-calcular').classList.add('opacity-50');
-            try {
-                const urlA = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(origem + ', ' + CIDADE_FIXA)}`;
-                const urlB = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destino + ', ' + CIDADE_FIXA)}`;
-                const [resA, resB] = await Promise.all([fetch(urlA), fetch(urlB)]);
-                const [dataA, dataB] = await Promise.all([resA.json(), resB.json()]);
-                if(!dataA.length || !dataB.length) { alert("Endereço não encontrado."); resetBotao(); return; }
-                const dist = getDistanceFromLatLonInKm(dataA[0].lat, dataA[0].lon, dataB[0].lat, dataB[0].lon);
-                distanciaFinal = (dist * 1.3).toFixed(1); if(distanciaFinal < 1) distanciaFinal = 1;
-                recalcularTotal();
-                document.getElementById('btn-calcular').classList.add('hidden'); document.getElementById('resultado-box').classList.remove('hidden'); document.getElementById('btn-enviar').classList.remove('hidden'); document.getElementById('resultado-box').classList.remove('animate-pulse');
-            } catch (e) { alert("Erro de conexão."); resetBotao(); }
-        }
-        function resetBotao() { document.getElementById('btn-text').innerText = "Calcular Frete"; document.getElementById('loading').classList.add('hidden'); document.getElementById('btn-calcular').classList.remove('opacity-50'); }
-        
-        function recalcularTotal() { 
-            if(distanciaFinal == 0) return; 
-            let preco = PRECO_BASE + (distanciaFinal * PRECO_POR_KM); 
-            if(document.getElementById('retorno').checked) preco += (preco * TAXA_RETORNO);
-            valorFinal = preco.toFixed(2); 
-            document.getElementById('km-display').innerText = distanciaFinal.replace('.', ','); 
-            document.getElementById('valor-display').innerText = valorFinal.replace('.', ','); 
-        }
-
-        function mudarStatusRetorno() { const checked = document.getElementById('retorno').checked; const txt = document.getElementById('text-retorno'); const ico = document.getElementById('icon-retorno'); if(checked) { txt.innerText = "Sim, com retorno!"; txt.classList.replace('text-gray-500', 'text-blue-700'); ico.className = "fas fa-exchange-alt text-blue-600"; } else { txt.innerText = "Sem retorno!"; txt.classList.replace('text-blue-700', 'text-gray-500'); ico.className = "fas fa-arrow-right text-gray-400"; } }
-
+        // --- LÓGICA DE PIN E SEGURANÇA ---
         function verificarPinParaSaldo() {
             if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil.");
             pendingAction = 'saldo';
@@ -602,8 +491,58 @@
             document.getElementById('modal-success').classList.remove('hidden');
         }
 
+        // --- MAPA ---
         function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) { var R = 6371; var dLat = deg2rad(lat2-lat1); var dLon = deg2rad(lon2-lon1); var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R * c; }
         function deg2rad(deg) { return deg * (Math.PI/180); }
+        async function buscarCep(prefixo) { let cep = document.getElementById(prefixo + '-cep').value.replace(/\D/g, ''); if(cep.length !== 8) return; try { const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`); const data = await res.json(); if(!data.erro) { document.getElementById(prefixo + '-rua').value = data.logradouro; document.getElementById(prefixo + '-bairro').value = data.bairro; document.getElementById(prefixo + '-cidade').value = `${data.localidade}/${data.uf}`; document.getElementById(prefixo + '-num').focus(); } } catch(e){} }
+        async function calcularDistancia() {
+            const origem = document.getElementById('origem').value; const destino = document.getElementById('destino').value;
+            if(!origem || !destino) return alert("Preencha endereços.");
+            document.getElementById('btn-text').innerText = "Calculando..."; document.getElementById('loading').classList.remove('hidden'); document.getElementById('btn-calcular').classList.add('opacity-50');
+            try {
+                const urlA = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(origem + ', ' + CIDADE_FIXA)}`;
+                const urlB = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destino + ', ' + CIDADE_FIXA)}`;
+                const [resA, resB] = await Promise.all([fetch(urlA), fetch(urlB)]);
+                const [dataA, dataB] = await Promise.all([resA.json(), resB.json()]);
+                if(!dataA.length || !dataB.length) { alert("Endereço não encontrado."); resetBotao(); return; }
+                const dist = getDistanceFromLatLonInKm(dataA[0].lat, dataA[0].lon, dataB[0].lat, dataB[0].lon);
+                distanciaFinal = (dist * 1.3).toFixed(1); if(distanciaFinal < 1) distanciaFinal = 1;
+                recalcularTotal();
+                document.getElementById('btn-calcular').classList.add('hidden'); document.getElementById('resultado-box').classList.remove('hidden'); document.getElementById('btn-enviar').classList.remove('hidden'); document.getElementById('resultado-box').classList.remove('animate-pulse');
+            } catch (e) { alert("Erro de conexão."); resetBotao(); }
+        }
+        function resetBotao() { document.getElementById('btn-text').innerText = "Calcular Frete"; document.getElementById('loading').classList.add('hidden'); document.getElementById('btn-calcular').classList.remove('opacity-50'); }
+        function recalcularTotal() { if(distanciaFinal == 0) return; let preco = PRECO_BASE + (distanciaFinal * PRECO_POR_KM); if(document.getElementById('retorno').checked) preco += (preco * TAXA_RETORNO); valorFinal = preco.toFixed(2); document.getElementById('km-display').innerText = distanciaFinal.replace('.', ','); document.getElementById('valor-display').innerText = valorFinal.replace('.', ','); }
+        function mudarStatusRetorno() { const checked = document.getElementById('retorno').checked; const txt = document.getElementById('text-retorno'); const ico = document.getElementById('icon-retorno'); if(checked) { txt.innerText = "Sim, com retorno!"; txt.classList.replace('text-gray-500', 'text-blue-700'); ico.className = "fas fa-exchange-alt text-blue-600"; } else { txt.innerText = "Sem retorno!"; txt.classList.replace('text-blue-700', 'text-gray-500'); ico.className = "fas fa-arrow-right text-gray-400"; } }
+        
+        // --- CADASTRO/LOGIN ---
+        async function fazerCadastro() {
+            const email = document.getElementById('reg-email').value; const senha = document.getElementById('reg-senha').value; const loja = document.getElementById('reg-nome-loja').value; const zap = document.getElementById('reg-zap-loja').value; const resp = document.getElementById('reg-nome-resp').value; const cep = document.getElementById('reg-cep').value; const rua = document.getElementById('reg-rua').value; const num = document.getElementById('reg-num').value; const bairro = document.getElementById('reg-bairro').value; const cidade = document.getElementById('reg-cidade').value;
+            const btn = document.getElementById('btn-cad'); const load = document.getElementById('load-cad');
+            if(!email || !senha || !loja || !num) return alert("Preencha todos os campos!");
+            if(senha.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
+            btn.disabled = true; load.classList.remove('hidden'); isRegistering = true; 
+            try {
+                const { data, error } = await sbClient.auth.signUp({ email, password: senha });
+                if (error) throw error;
+                if (data.user) {
+                    const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cidade}`;
+                    const { error: perfilErro } = await sbClient.from('profiles').insert([{ id: data.user.id, nome_loja: loja, whatsapp_loja: zap, responsavel: resp, endereco: enderecoCompleto, email: email }]);
+                    if (perfilErro) throw perfilErro;
+                    alert("Sucesso! Entrando..."); userSession = data.session;
+                    const { data: profile } = await sbClient.from('profiles').select('*').eq('id', data.user.id).single();
+                    userProfile = profile; preencherDadosPerfil(profile); showScreen('app'); isRegistering = false;
+                }
+            } catch (e) { isRegistering = false; let msg = e.message; if(msg.includes("User already registered")) msg = "Este e-mail já possui cadastro."; alert("Erro: " + msg); } finally { btn.disabled = false; load.classList.add('hidden'); }
+        }
+        async function fazerLogin() {
+            const email = document.getElementById('log-email').value; const senha = document.getElementById('log-senha').value; const btn = document.getElementById('btn-log'); const load = document.getElementById('load-log');
+            if(!email || !senha) return alert("Preencha e-mail e senha."); btn.disabled = true; load.classList.remove('hidden');
+            try {
+                const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: senha });
+                if (error) { if(error.message.includes("Invalid login credentials")) { throw new Error("E-mail ou senha incorretos."); } else if(error.message.includes("Email not confirmed")) { throw new Error("E-mail não confirmado."); } else { throw new Error(error.message); } }
+            } catch (e) { alert(e.message); } finally { btn.disabled = false; load.classList.add('hidden'); }
+        }
     </script>
 </body>
 </html>
