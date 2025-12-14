@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Drop Entregas - Cliente</title>
+    <title>Drop Entregas</title>
+    
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://ofpnnijkhgsjarixoyhg.supabase.co">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; padding-bottom: 100px; }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
         .btn-primary { background-color: #1E40AF; color: white; transition: 0.2s; }
-        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:active { transform: scale(0.96); }
         .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; }
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
         
@@ -60,11 +63,10 @@
 
     <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
         <div class="spinner w-10 h-10 border-4 mb-4"></div>
-        <p id="loading-msg" class="text-gray-500 text-sm font-bold">Verificando segurança...</p>
-        <button onclick="resetarSistema()" class="mt-8 text-xs text-white font-bold bg-red-500 hover:bg-red-600 px-6 py-3 rounded-xl shadow-lg hidden animate-bounce" id="btn-reload">
-            <i class="fas fa-trash-alt mr-2"></i> REPARAR SISTEMA
+        <p id="loading-msg" class="text-gray-500 text-sm font-bold">Iniciando...</p>
+        <button onclick="resetarSistema()" class="mt-8 text-xs text-white font-bold bg-red-500 px-6 py-3 rounded-xl shadow-lg hidden" id="btn-reload">
+            <i class="fas fa-trash-alt mr-2"></i> Limpar e Recarregar
         </button>
-        <p id="msg-delay" class="text-[10px] text-gray-400 mt-2 hidden">Se travou, clique acima.</p>
     </div>
 
     <div id="screen-welcome" class="hidden app-container p-8 text-center fade-in flex flex-col justify-center">
@@ -182,7 +184,7 @@
 
     <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[60] flex items-center justify-center p-4 fade-in"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Pedido Criado!</h2><p class="text-sm text-gray-500 mb-6">Aguardando entregador...</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
 
-    <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in">
+   <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in">
         <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
             <h2 class="text-lg font-bold text-gray-800 mb-2">Segurança</h2>
             <p class="text-sm text-gray-500 mb-4">Digite seu PIN de 4 dígitos</p>
@@ -226,7 +228,12 @@
         <div class="nav-item" onclick="navegar('perfil', this)"><i class="fas fa-user"></i><span>Perfil</span></div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
     <script>
+        // === 3. LÓGICA DO APP (Executa após download) ===
         function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
         function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
         function toggleDropdown(id) { const list = document.getElementById(`list-${id}`); if(id === 'entrega') document.getElementById('list-produto').classList.remove('show'); else document.getElementById('list-entrega').classList.remove('show'); list.classList.toggle('show'); }
@@ -238,35 +245,60 @@
         let sbClient = null, userSession = null, userProfile = null, distanciaFinal = 0, valorFinal = 0, pendingAction = null, isRegistering = false; 
         const NUMERO_ADMIN = "5584982005039"; const CIDADE_FIXA = "Mossoró, RN"; const TAXA_RETORNO = 0.20; const PRECO_BASE = 5.00; const PRECO_POR_KM = 1.00;
 
-        try { if (typeof supabase !== 'undefined') { sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } } catch (e) { console.error("Erro config:", e); }
-
         window.onload = async function() {
+            // Inicializa Supabase
+            if (typeof supabase !== 'undefined') sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            
+            // Máscaras (se jQuery carregou)
             if(typeof $ !== 'undefined') {
-                $(document).ready(function(){ 
-                    $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
-                    $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
-                    $('#edit-zap-loja').mask('(00) 00000-0000'); $('#edit-resp-zap').mask('(00) 00000-0000');
-                    $('#edit-cnpj').mask('00.000.000/0000-00');
-                });
+                $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
+                $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
+                $('#edit-zap-loja').mask('(00) 00000-0000'); $('#edit-resp-zap').mask('(00) 00000-0000');
+                $('#edit-cnpj').mask('00.000.000/0000-00');
             }
+
+            // Destrava de segurança
             setTimeout(() => {
                 const loader = document.getElementById('global-loading');
                 if(loader && loader.style.display !== 'none') {
-                    document.getElementById('btn-reload').classList.remove('hidden');
-                    document.getElementById('msg-delay').classList.remove('hidden');
-                    if(!userSession) { loader.style.display = 'none'; showScreen('welcome'); }
+                    if(!userSession) { 
+                        loader.style.display = 'none'; 
+                        showScreen('welcome'); 
+                        console.warn("Loading demorado - liberando tela.");
+                    } else {
+                        document.getElementById('btn-reload').classList.remove('hidden');
+                    }
                 }
-            }, 3000);
+            }, 2500); // 2.5s timeout (mais rápido)
+
             if(!sbClient) return;
+
+            // Auth Listener
             sbClient.auth.onAuthStateChange(async (event, session) => {
                 if (isRegistering) return;
-                if (event === 'SIGNED_IN' && session) { userSession = session; await carregarPerfil(); } 
-                else if (event === 'SIGNED_OUT') { userSession = null; userProfile = null; showScreen('welcome'); }
+                if (event === 'SIGNED_IN' && session) { 
+                    userSession = session; 
+                    await carregarPerfil(); 
+                } 
+                else if (event === 'SIGNED_OUT') { 
+                    userSession = null; userProfile = null; showScreen('welcome'); 
+                }
             });
-            try { const { data: { session } } = await sbClient.auth.getSession(); if (session) { userSession = session; await carregarPerfil(); } else { showScreen('welcome'); } } catch(e) {}
+
+            // Check Session
+            try { 
+                const { data: { session } } = await sbClient.auth.getSession(); 
+                if (session) { 
+                    userSession = session; 
+                    await carregarPerfil(); 
+                } else { 
+                    showScreen('welcome'); 
+                } 
+            } catch(e) {}
         };
 
         async function resetarSistema() { localStorage.clear(); if(sbClient) await sbClient.auth.signOut(); alert("✅ Cache limpo com sucesso! O sistema será reiniciado."); location.reload(); }
+        
         async function fazerLogin() {
             const email = document.getElementById('log-email').value, senha = document.getElementById('log-senha').value;
             if(!email || !senha) return alert("Preencha todos os dados.");
@@ -278,6 +310,7 @@
             } catch (e) { alert("Erro: " + e.message); } 
             finally { document.getElementById('btn-log').disabled = false; document.getElementById('load-log').classList.add('hidden'); }
         }
+
         async function fazerCadastro() {
             const email = document.getElementById('reg-email').value, senha = document.getElementById('reg-senha').value;
             if(!email || !senha) return alert("Preencha todos os dados.");
@@ -305,10 +338,17 @@
                 if (!userSession) return;
                 const { data } = await sbClient.from('profiles').select('*').eq('id', userSession.user.id).single();
                 if (data) { userProfile = data; preencherDadosPerfil(data); 
-                    if(document.querySelector('.app-container:not(.hidden)').id.includes('welcome')) { showScreen('app'); ativarRealtimePedidos(); }
+                    // Se estiver em tela de login, avança
+                    if(document.querySelector('.app-container:not(.hidden)').id.includes('welcome') || 
+                       document.querySelector('.app-container:not(.hidden)').id.includes('login')) { 
+                        showScreen('app'); ativarRealtimePedidos(); 
+                    }
+                    // Remove loading se ainda estiver visível
+                    document.getElementById('global-loading').style.display = 'none';
                 }
             } catch (e) {}
         }
+
         function preencherDadosPerfil(data) {
             safeText('app-user-name', data.nome_loja || 'Minha Loja');
             safeText('app-user-code', data.codigo_visual || 'ID');
@@ -318,6 +358,7 @@
             safeVal('edit-zap-loja', data.whatsapp_loja); safeVal('edit-endereco', data.endereco);
             safeVal('edit-resp-nome', data.responsavel); safeVal('edit-resp-zap', data.whatsapp_responsavel); safeVal('edit-pin', data.pin_carteira);
         }
+
         async function salvarPerfil() {
             const updates = {
                 nome_loja: document.getElementById('edit-nome-loja').value, razao_social: document.getElementById('edit-razao').value, cnpj: document.getElementById('edit-cnpj').value,
@@ -329,7 +370,6 @@
             if(error) alert("Erro: "+error.message); else { alert("Salvo!"); await carregarPerfil(); }
             btn.innerText = "Salvar Alterações"; btn.disabled = false;
         }
-        async function fazerLogout() { await sbClient.auth.signOut(); location.reload(); }
 
         function ativarRealtimePedidos() { sbClient.channel('meus-pedidos').on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, payload => carregarHistoricoPedidos()).subscribe(); }
         
@@ -338,7 +378,7 @@
             if(lista.children.length === 0) lista.innerHTML = '<div class="text-center mt-10">Carregando...</div>';
             const { data } = await sbClient.from('pedidos').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(20);
             if(!data || data.length === 0) { lista.innerHTML = '<div class="text-center mt-10">Nenhum pedido.</div>'; return; }
-                        // Busca Entregadores
+            
             const eIds = data.filter(p=>p.entregador_id).map(p=>p.entregador_id);
             let entMap = {};
             if(eIds.length > 0) { const { data: profs } = await sbClient.from('profiles').select('id, responsavel').in('id', eIds); if(profs) profs.forEach(p => entMap[p.id] = p.responsavel); }
