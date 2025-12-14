@@ -47,10 +47,6 @@
 
         /* Estilo Card Pedido */
         .card-historico { background: white; border-radius: 12px; border: 1px solid #E5E7EB; padding: 16px; margin-bottom: 12px; position: relative; }
-        .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        .status-pendente { background: #FEF3C7; color: #D97706; }
-        .status-em_rota { background: #DBEAFE; color: #1E40AF; }
-        .status-concluido { background: #D1FAE5; color: #059669; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
@@ -230,6 +226,19 @@
         <p class="text-gray-500 mt-2">Movimentações financeiras.</p>
     </div>
 
+    <div id="screen-pedidos" class="hidden app-container p-6 fade-in flex flex-col h-screen">
+        <h2 class="text-xl font-bold text-gray-700 mb-4 text-center">Meus Pedidos</h2>
+        <div id="lista-pedidos" class="flex-1 overflow-y-auto pb-20 space-y-3">
+            <div class="text-center text-gray-400 mt-10">Carregando histórico...</div>
+        </div>
+    </div>
+
+    <div id="screen-extrato" class="hidden app-container p-6 fade-in text-center flex flex-col items-center justify-center">
+        <i class="fas fa-file-invoice-dollar text-6xl text-gray-200 mb-4"></i>
+        <h2 class="text-xl font-bold text-gray-700">Extrato</h2>
+        <p class="text-gray-500 mt-2">Movimentações financeiras.</p>
+    </div>
+
     <div id="screen-perfil" class="hidden app-container p-6 fade-in">
         <h2 class="text-xl font-bold mb-4">Editar Perfil</h2>
         <div class="space-y-4 pb-20">
@@ -272,9 +281,8 @@
         <div class="nav-item" onclick="navegar('pedidos', this)"><i class="fas fa-list"></i><span>Pedidos</span></div>
         <div class="nav-item" onclick="navegar('extrato', this)"><i class="fas fa-file-invoice-dollar"></i><span>Extrato</span></div>
         <div class="nav-item" onclick="navegar('perfil', this)"><i class="fas fa-user"></i><span>Perfil</span></div>
-    </div>
-
-    <script>
+                </div>
+            <script>
         $(document).ready(function(){ 
             $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
             $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
@@ -304,14 +312,99 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             elemento.classList.add('active');
             if(tela === 'perfil') carregarPerfil();
-            if(tela === 'pedidos') carregarHistoricoPedidos(); // Carrega histórico ao entrar
+            if(tela === 'pedidos') carregarHistoricoPedidos();
         }
 
         async function fazerLogout() {
             try { await sbClient.auth.signOut(); } catch (error) { console.error(error); } 
             finally { location.reload(); }
         }
-                // --- GATEKEEPER ---
+
+        async function fazerCadastro() {
+            const email = document.getElementById('reg-email').value; 
+            const senha = document.getElementById('reg-senha').value; 
+            const loja = document.getElementById('reg-nome-loja').value; 
+            const zap = document.getElementById('reg-zap-loja').value; 
+            const resp = document.getElementById('reg-nome-resp').value; 
+            const cep = document.getElementById('reg-cep').value; 
+            const rua = document.getElementById('reg-rua').value; 
+            const num = document.getElementById('reg-num').value; 
+            const bairro = document.getElementById('reg-bairro').value; 
+            const cidade = document.getElementById('reg-cidade').value;
+            
+            const btn = document.getElementById('btn-cad'); 
+            const load = document.getElementById('load-cad');
+
+            if(!email || !senha || !loja || !num) return alert("Preencha todos os campos obrigatórios!");
+            if(senha.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
+
+            btn.disabled = true; load.classList.remove('hidden');
+            isRegistering = true; 
+
+            try {
+                const { data, error } = await sbClient.auth.signUp({ email, password: senha });
+                if (error) throw error;
+                
+                if (data.user) {
+                    const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cidade}`;
+                    const { error: perfilErro } = await sbClient.from('profiles').insert([{
+                        id: data.user.id,
+                        nome_loja: loja,
+                        whatsapp_loja: zap,
+                        responsavel: resp,
+                        endereco: enderecoCompleto,
+                        email: email
+                    }]);
+                    if (perfilErro) throw perfilErro;
+
+                    alert("Sucesso! Entrando...");
+                    userSession = data.session;
+                    
+                    const { data: profile } = await sbClient.from('profiles').select('*').eq('id', data.user.id).single();
+                    userProfile = profile;
+                    preencherDadosPerfil(profile);
+                    
+                    showScreen('app'); 
+                    isRegistering = false;
+                }
+            } catch (e) { 
+                isRegistering = false;
+                let msg = e.message;
+                if(msg.includes("User already registered")) msg = "Este e-mail já possui cadastro.";
+                alert("Erro: " + msg); 
+            } finally { 
+                btn.disabled = false; load.classList.add('hidden'); 
+            }
+        }
+
+        async function fazerLogin() {
+            const email = document.getElementById('log-email').value; 
+            const senha = document.getElementById('log-senha').value;
+            const btn = document.getElementById('btn-log'); 
+            const load = document.getElementById('load-log');
+            
+            if(!email || !senha) return alert("Preencha e-mail e senha.");
+
+            btn.disabled = true; load.classList.remove('hidden');
+            
+            try {
+                const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: senha });
+                if (error) {
+                    if(error.message.includes("Invalid login credentials")) {
+                        throw new Error("E-mail ou senha incorretos.");
+                    } else if(error.message.includes("Email not confirmed")) {
+                        throw new Error("E-mail não confirmado.");
+                    } else {
+                        throw new Error(error.message);
+                    }
+                }
+            } catch (e) { 
+                alert(e.message); 
+            } finally { 
+                btn.disabled = false; load.classList.add('hidden'); 
+            }
+        }
+
         async function carregarPerfil() {
             try {
                 if (!userSession) {
@@ -382,7 +475,7 @@
             btn.innerText = "Salvar Alterações"; btn.disabled = false;
         }
 
-        // --- HISTÓRICO DE PEDIDOS (COM PIN) ---
+        // --- HISTÓRICO DE PEDIDOS COM STATUS E PIN ---
         async function carregarHistoricoPedidos() {
             const lista = document.getElementById('lista-pedidos');
             lista.innerHTML = '<div class="text-center text-gray-400 mt-10"><div class="spinner w-6 h-6 border-gray-400 mx-auto mb-2"></div>Carregando...</div>';
@@ -402,14 +495,22 @@
                 }
 
                 lista.innerHTML = '';
+                
+                // Mapeamento de Status
+                const mapStatus = {
+                    'pendente': { text: '🕒 Pendente', class: 'bg-yellow-100 text-yellow-800' },
+                    'em_rota': { text: '🚀 Em Andamento', class: 'bg-blue-100 text-blue-800' },
+                    'concluido': { text: '✅ Finalizado', class: 'bg-green-100 text-green-800' }
+                };
+
                 data.forEach(p => {
-                    const statusClass = `status-${p.status || 'pendente'}`;
-                    const statusLabel = (p.status || 'pendente').replace('_', ' ').toUpperCase();
+                    const statusKey = p.status || 'pendente';
+                    const statusConfig = mapStatus[statusKey] || mapStatus['pendente'];
                     
                     const html = `
                         <div class="card-historico">
                             <div class="flex justify-between items-start mb-2">
-                                <span class="badge-status ${statusClass}">${statusLabel}</span>
+                                <span class="badge-status ${statusConfig.class}">${statusConfig.text}</span>
                                 <span class="text-xs text-gray-400 font-mono">#${p.id.toString().slice(0,4)}</span>
                             </div>
                             <div class="text-sm font-bold text-gray-800 mb-1">${p.destino}</div>
@@ -434,8 +535,7 @@
                 lista.innerHTML = '<div class="text-center text-red-400 mt-10">Erro ao carregar histórico.</div>';
             }
         }
-
-        // --- LÓGICA DE PIN E SEGURANÇA ---
+                      // --- LÓGICA DE PIN E SEGURANÇA ---
         function verificarPinParaSaldo() {
             if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil.");
             pendingAction = 'saldo';
@@ -491,7 +591,6 @@
             document.getElementById('modal-success').classList.remove('hidden');
         }
 
-        // --- MAPA ---
         function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) { var R = 6371; var dLat = deg2rad(lat2-lat1); var dLon = deg2rad(lon2-lon1); var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R * c; }
         function deg2rad(deg) { return deg * (Math.PI/180); }
         async function buscarCep(prefixo) { let cep = document.getElementById(prefixo + '-cep').value.replace(/\D/g, ''); if(cep.length !== 8) return; try { const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`); const data = await res.json(); if(!data.erro) { document.getElementById(prefixo + '-rua').value = data.logradouro; document.getElementById(prefixo + '-bairro').value = data.bairro; document.getElementById(prefixo + '-cidade').value = `${data.localidade}/${data.uf}`; document.getElementById(prefixo + '-num').focus(); } } catch(e){} }
@@ -514,35 +613,6 @@
         function resetBotao() { document.getElementById('btn-text').innerText = "Calcular Frete"; document.getElementById('loading').classList.add('hidden'); document.getElementById('btn-calcular').classList.remove('opacity-50'); }
         function recalcularTotal() { if(distanciaFinal == 0) return; let preco = PRECO_BASE + (distanciaFinal * PRECO_POR_KM); if(document.getElementById('retorno').checked) preco += (preco * TAXA_RETORNO); valorFinal = preco.toFixed(2); document.getElementById('km-display').innerText = distanciaFinal.replace('.', ','); document.getElementById('valor-display').innerText = valorFinal.replace('.', ','); }
         function mudarStatusRetorno() { const checked = document.getElementById('retorno').checked; const txt = document.getElementById('text-retorno'); const ico = document.getElementById('icon-retorno'); if(checked) { txt.innerText = "Sim, com retorno!"; txt.classList.replace('text-gray-500', 'text-blue-700'); ico.className = "fas fa-exchange-alt text-blue-600"; } else { txt.innerText = "Sem retorno!"; txt.classList.replace('text-blue-700', 'text-gray-500'); ico.className = "fas fa-arrow-right text-gray-400"; } }
-        
-        // --- CADASTRO/LOGIN ---
-        async function fazerCadastro() {
-            const email = document.getElementById('reg-email').value; const senha = document.getElementById('reg-senha').value; const loja = document.getElementById('reg-nome-loja').value; const zap = document.getElementById('reg-zap-loja').value; const resp = document.getElementById('reg-nome-resp').value; const cep = document.getElementById('reg-cep').value; const rua = document.getElementById('reg-rua').value; const num = document.getElementById('reg-num').value; const bairro = document.getElementById('reg-bairro').value; const cidade = document.getElementById('reg-cidade').value;
-            const btn = document.getElementById('btn-cad'); const load = document.getElementById('load-cad');
-            if(!email || !senha || !loja || !num) return alert("Preencha todos os campos!");
-            if(senha.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
-            btn.disabled = true; load.classList.remove('hidden'); isRegistering = true; 
-            try {
-                const { data, error } = await sbClient.auth.signUp({ email, password: senha });
-                if (error) throw error;
-                if (data.user) {
-                    const enderecoCompleto = `${rua}, ${num}, ${bairro} - ${cidade}`;
-                    const { error: perfilErro } = await sbClient.from('profiles').insert([{ id: data.user.id, nome_loja: loja, whatsapp_loja: zap, responsavel: resp, endereco: enderecoCompleto, email: email }]);
-                    if (perfilErro) throw perfilErro;
-                    alert("Sucesso! Entrando..."); userSession = data.session;
-                    const { data: profile } = await sbClient.from('profiles').select('*').eq('id', data.user.id).single();
-                    userProfile = profile; preencherDadosPerfil(profile); showScreen('app'); isRegistering = false;
-                }
-            } catch (e) { isRegistering = false; let msg = e.message; if(msg.includes("User already registered")) msg = "Este e-mail já possui cadastro."; alert("Erro: " + msg); } finally { btn.disabled = false; load.classList.add('hidden'); }
-        }
-        async function fazerLogin() {
-            const email = document.getElementById('log-email').value; const senha = document.getElementById('log-senha').value; const btn = document.getElementById('btn-log'); const load = document.getElementById('load-log');
-            if(!email || !senha) return alert("Preencha e-mail e senha."); btn.disabled = true; load.classList.remove('hidden');
-            try {
-                const { data, error } = await sbClient.auth.signInWithPassword({ email: email, password: senha });
-                if (error) { if(error.message.includes("Invalid login credentials")) { throw new Error("E-mail ou senha incorretos."); } else if(error.message.includes("Email not confirmed")) { throw new Error("E-mail não confirmado."); } else { throw new Error(error.message); } }
-            } catch (e) { alert(e.message); } finally { btn.disabled = false; load.classList.add('hidden'); }
-        }
     </script>
 </body>
 </html>
