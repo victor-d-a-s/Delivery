@@ -178,7 +178,8 @@
     </div>
 
     <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[60] flex items-center justify-center p-4 fade-in"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Pedido Criado!</h2><p class="text-sm text-gray-500 mb-6">Aguardando entregador...</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
-    <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in">
+
+   <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in">
         <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
             <h2 class="text-lg font-bold text-gray-800 mb-2">Segurança</h2>
             <p class="text-sm text-gray-500 mb-4">Digite seu PIN de 4 dígitos</p>
@@ -236,7 +237,15 @@
     </div>
 
     <script>
-        // CONFIGURAÇÕES GERAIS
+        // === 1. UTILITÁRIOS GLOBAIS (DEFINIDOS NO TOPO) ===
+        function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
+        function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
+        
+        function toggleDropdown(id) { const list = document.getElementById(`list-${id}`); if(id === 'entrega') document.getElementById('list-produto').classList.remove('show'); else document.getElementById('list-entrega').classList.remove('show'); list.classList.toggle('show'); }
+        function selectOption(id, value, text) { document.getElementById(`pagamento_${id}`).value = value; document.getElementById(`display-${id}`).innerText = text; document.getElementById(`list-${id}`).classList.remove('show'); }
+        document.addEventListener('click', function(e) { if (!e.target.closest('.relative')) { document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show')); } });
+
+        // === 2. CONFIGURAÇÕES ===
         const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
 
@@ -254,17 +263,17 @@
         const PRECO_BASE = 5.00; 
         const PRECO_POR_KM = 1.00;
 
-        // INICIALIZAÇÃO IMEDIATA
+        // === 3. INICIALIZAÇÃO ===
         try {
             if (typeof supabase !== 'undefined') {
                 sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             } else { 
-                console.error("Supabase JS falhou. Verifique CDN."); 
+                console.error("Supabase JS falhou."); 
             }
         } catch (e) { console.error("Erro config:", e); }
 
         window.onload = async function() {
-            // JQUERY MASK
+            // Setup JQuery Masks
             if(typeof $ !== 'undefined') {
                 $(document).ready(function(){ 
                     $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
@@ -273,7 +282,7 @@
                 });
             }
 
-            // SEGURANÇA: Timeout
+            // Timeout de Segurança
             setTimeout(() => {
                 const loader = document.getElementById('global-loading');
                 if(loader && loader.style.display !== 'none') {
@@ -287,7 +296,7 @@
 
             if(!sbClient) return;
 
-            // LISTENER SESSÃO
+            // Listener de Sessão
             sbClient.auth.onAuthStateChange(async (event, session) => {
                 if (isRegistering) return;
 
@@ -300,7 +309,8 @@
                     showScreen('welcome');
                 }
             });
-                        // CHECAGEM INICIAL
+
+            // Checagem Inicial
             try {
                 const { data: { session }, error } = await sbClient.auth.getSession();
                 if (session) {
@@ -316,15 +326,13 @@
                 document.getElementById('global-loading').style.display = 'none';
             }
         };
-
-        // --- FUNÇÕES DE SISTEMA (RESET) ---
+               // === 4. FUNÇÕES PRINCIPAIS ===
         async function resetarSistema() {
             localStorage.clear();
             if(sbClient) await sbClient.auth.signOut();
             location.reload();
         }
 
-        // --- FUNÇÕES DE LOGIN/CADASTRO ---
         async function fazerLogin() {
             const email = document.getElementById('log-email').value; 
             const senha = document.getElementById('log-senha').value;
@@ -343,12 +351,12 @@
                     throw new Error(error.message);
                 }
                 
-                // LOGIN SUCESSO: Carrega e vai direto pro App
+                // LOGIN SUCESSO - EXECUÇÃO IMEDIATA
                 if(data.user) {
                     userSession = data.session;
-                    await carregarPerfil();
-                    showScreen('app');
-                    ativarRealtimePedidos(); // Inicia monitoramento
+                    await carregarPerfil(); // Carrega dados
+                    showScreen('app'); // Troca tela
+                    ativarRealtimePedidos(); // Liga monitoramento
                 }
 
             } catch (e) { 
@@ -415,9 +423,8 @@
             } finally { 
                 btn.disabled = false; load.classList.add('hidden'); 
             }
-        }
-
-        // --- NAVEGAÇÃO E PERFIL ---
+                }
+                // --- NAVEGAÇÃO E PERFIL ---
         function showScreen(id) { 
             ['welcome', 'register', 'login', 'app', 'pedidos', 'extrato', 'perfil'].forEach(s => {
                 const el = document.getElementById('screen-'+s);
@@ -452,6 +459,7 @@
                     userProfile = data;
                     preencherDadosPerfil(data);
                     
+                    // Se estiver em tela de login, entra no app
                     const currentScreen = document.querySelector('.app-container:not(.hidden)').id;
                     if(['screen-welcome', 'screen-login', 'screen-register'].includes(currentScreen)) {
                         showScreen('app');
@@ -511,8 +519,9 @@
         async function fazerLogout() {
             try { await sbClient.auth.signOut(); } catch (e) { console.error(e); } 
             finally { location.reload(); }
-                    }
-                // --- HISTÓRICO REALTIME ---
+        }
+
+        // --- HISTÓRICO REALTIME ---
         function ativarRealtimePedidos() {
             sbClient.channel('meus-pedidos')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, payload => {
@@ -581,9 +590,8 @@
                                 </div>
                             </div>
                         `;
-                    }
-
-                    // Botão Ver Condutor
+        }
+                                // Botão Ver Condutor
                     let btnMoto = '';
                     if(p.entregador_id && statusKey !== 'solicitado') {
                         btnMoto = `
@@ -638,7 +646,7 @@
             document.getElementById('moto-nome').innerText = "Buscando...";
             document.getElementById('moto-modelo').innerText = "...";
             document.getElementById('moto-placa').innerText = "...";
-            document.getElementById('moto-zap-oculto').value = ""; // Limpa anterior
+            document.getElementById('moto-zap-oculto').value = ""; 
 
             try {
                 const { data, error } = await sbClient.from('profiles').select('responsavel, modelo_moto, placa_moto, whatsapp_responsavel').eq('id', id).single();
@@ -662,15 +670,12 @@
         }
 
         async function avaliarPedido(id, nota) {
-            // Atualiza visualmente na hora (Optimistic UI)
             const container = document.getElementById(`stars-${id}`);
             const stars = container.getElementsByTagName('i');
             for(let i=0; i<5; i++) {
                 if(i < nota) { stars[i].classList.remove('star-empty'); stars[i].classList.add('star-filled'); }
                 else { stars[i].classList.remove('star-filled'); stars[i].classList.add('star-empty'); }
             }
-
-            // Salva no banco
             await sbClient.from('pedidos').update({ avaliacao: nota }).eq('id', id);
         }
 
@@ -754,8 +759,6 @@
         function deg2rad(deg) { return deg * (Math.PI/180); }
         async function buscarCep(prefixo) { let cep = document.getElementById(prefixo + '-cep').value.replace(/\D/g, ''); if(cep.length !== 8) return; try { const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`); const data = await res.json(); if(!data.erro) { document.getElementById(prefixo + '-rua').value = data.logradouro; document.getElementById(prefixo + '-bairro').value = data.bairro; document.getElementById(prefixo + '-cidade').value = `${data.localidade}/${data.uf}`; document.getElementById(prefixo + '-num').focus(); } } catch(e){} }
         function mudarStatusRetorno() { const checked = document.getElementById('retorno').checked; const txt = document.getElementById('text-retorno'); const ico = document.getElementById('icon-retorno'); if(checked) { txt.innerText = "Sim, com retorno!"; txt.classList.replace('text-gray-500', 'text-blue-700'); ico.className = "fas fa-exchange-alt text-blue-600"; } else { txt.innerText = "Sem retorno!"; txt.classList.replace('text-blue-700', 'text-gray-500'); ico.className = "fas fa-arrow-right text-gray-400"; } }
-        function toggleDropdown(id) { const list = document.getElementById(`list-${id}`); if(id === 'entrega') document.getElementById('list-produto').classList.remove('show'); else document.getElementById('list-entrega').classList.remove('show'); list.classList.toggle('show'); }
-        function selectOption(id, value, text) { document.getElementById(`pagamento_${id}`).value = value; document.getElementById(`display-${id}`).innerText = text; document.getElementById(`list-${id}`).classList.remove('show'); }
         
         function verificarPinParaSaldo() {
             if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil.");
@@ -788,4 +791,4 @@
         }
     </script>
 </body>
-</html>
+</html>        
