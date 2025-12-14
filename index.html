@@ -45,22 +45,29 @@
         .spinner { border: 3px solid rgba(0,0,0,0.1); border-left-color: #1E40AF; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* Estilo Card Pedido */
         .card-historico { background: white; border-radius: 12px; border: 1px solid #E5E7EB; padding: 16px; margin-bottom: 12px; position: relative; transition: all 0.3s ease; }
         .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
         /* Cores dos Status */
         .status-solicitado { background: #E5E7EB; color: #374151; border: 1px solid #D1D5DB; }
-        .status-pendente { background: #FEF3C7; color: #D97706; border: 1px solid #FCD34D; } /* Motoboy aceitou, indo buscar */
-        .status-em_rota { background: #DBEAFE; color: #1E40AF; border: 1px solid #93C5FD; } /* Coletado, indo entregar */
-        .status-finalizado { background: #D1FAE5; color: #059669; border: 1px solid #6EE7B7; }
+        .status-pendente { background: #FEF3C7; color: #D97706; border: 1px solid #FCD34D; }
+        .status-em_rota { background: #DBEAFE; color: #1E40AF; border: 1px solid #93C5FD; }
+        .status-concluido { background: #D1FAE5; color: #059669; border: 1px solid #6EE7B7; }
+
+        /* Estrelas */
+        .star-rating i { cursor: pointer; transition: 0.2s; }
+        .star-rating i:hover { transform: scale(1.2); }
+        .star-filled { color: #F59E0B; } /* Amarelo Ouro */
+        .star-empty { color: #D1D5DB; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
 
     <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
         <div class="spinner w-10 h-10 border-4 mb-4"></div>
-        <p id="loading-msg" class="text-gray-500 text-sm font-bold">Conectando...</p>
-        <button onclick="location.reload()" class="mt-4 text-xs text-blue-500 underline hidden" id="btn-reload">Toque para recarregar</button>
+        <p id="loading-msg" class="text-gray-500 text-sm font-bold">Verificando segurança...</p>
+        <button onclick="location.reload()" class="mt-4 text-xs text-blue-500 underline bg-gray-100 p-2 rounded hidden" id="btn-reload">Conexão lenta? Recarregar</button>
     </div>
 
     <div id="screen-welcome" class="hidden app-container p-8 text-center fade-in flex flex-col justify-center">
@@ -188,6 +195,44 @@
         </div>
     </div>
 
+    <div id="modal-motoboy" class="hidden fixed inset-0 bg-black/80 z-[90] flex items-center justify-center p-6 fade-in">
+        <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl relative">
+            <button onclick="document.getElementById('modal-motoboy').classList.add('hidden')" class="absolute top-2 right-3 text-gray-400 text-2xl z-10">&times;</button>
+            <div class="bg-blue-600 p-6 text-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-blue-500 opacity-20 transform -skew-y-6"></div>
+                <div class="relative z-10">
+                    <div class="w-20 h-20 bg-white rounded-full mx-auto flex items-center justify-center mb-3 shadow-lg border-4 border-blue-400">
+                        <i class="fas fa-user-astronaut text-4xl text-blue-600"></i>
+                    </div>
+                    <h3 class="text-white font-bold text-xl" id="moto-nome">Carregando...</h3>
+                    <p class="text-blue-100 text-sm">Entregador Verificado <i class="fas fa-check-circle text-xs"></i></p>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                    <div class="bg-blue-100 p-2.5 rounded-full"><i class="fas fa-motorcycle text-blue-600"></i></div>
+                    <div>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold">Veículo</p>
+                        <p class="font-bold text-gray-800 text-sm" id="moto-modelo">...</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                    <div class="bg-gray-800 p-2.5 rounded-full"><i class="fas fa-credit-card text-white"></i></div>
+                    <div>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold">Placa</p>
+                        <p class="font-bold text-gray-800 text-sm tracking-widest" id="moto-placa">...</p>
+                    </div>
+                </div>
+                
+                <button onclick="contatarMotoboy()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-green-900/20 flex items-center justify-center gap-2 transition-all active:scale-95">
+                    <i class="fab fa-whatsapp text-lg"></i> Chamar no WhatsApp
+                </button>
+                
+                <input type="hidden" id="moto-zap-oculto">
+            </div>
+        </div>
+    </div>
+
     <div id="bottom-menu" class="hidden bottom-nav w-full max-w-md">
         <div class="nav-item active" onclick="navegar('app', this)"><i class="fas fa-home"></i><span>Início</span></div>
         <div class="nav-item" onclick="navegar('pedidos', this)"><i class="fas fa-list"></i><span>Pedidos</span></div>
@@ -214,28 +259,25 @@
         const PRECO_BASE = 5.00; 
         const PRECO_POR_KM = 1.00;
 
-        // --- INICIALIZAÇÃO SEGURA ---
-        window.onload = async function() {
-            $(document).ready(function(){ 
-                $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
-                $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
-                $('#edit-zap-loja').mask('(00) 00000-0000'); $('#edit-resp-zap').mask('(00) 00000-0000');
-            });
-
-            // Configura Supabase
-            try {
-                if (typeof supabase !== 'undefined') {
-                    sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                } else { 
-                    throw new Error("Biblioteca Supabase não carregada.");
-                }
-            } catch (e) { 
-                console.error(e);
-                alert("Erro ao iniciar sistema. Recarregue a página.");
-                return;
+        // INICIALIZAÇÃO IMEDIATA
+        try {
+            if (typeof supabase !== 'undefined') {
+                sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            } else { 
+                console.error("Supabase JS falhou. Verifique CDN."); 
             }
+        } catch (e) { console.error("Erro config:", e); }
 
-            // Timeout de segurança (Fail-Safe)
+        window.onload = async function() {
+            // JQUERY MASK
+            if(typeof $ !== 'undefined') {
+                $(document).ready(function(){ 
+                    $('#reg-zap-loja').mask('(00) 00000-0000'); $('#reg-zap-resp').mask('(00) 00000-0000'); 
+                    $('#reg-cep').mask('00000-000'); $('#tel_dest').mask('(00) 00000-0000');
+                    $('#edit-zap-loja').mask('(00) 00000-0000'); $('#edit-resp-zap').mask('(00) 00000-0000');
+                });
+            }
+                        // SEGURANÇA: Timeout
             setTimeout(() => {
                 const loader = document.getElementById('global-loading');
                 if(loader && loader.style.display !== 'none') {
@@ -245,21 +287,17 @@
                         showScreen('welcome'); 
                     }
                 }
-            }, 6000);
+            }, 5000);
 
-            // Listener de Sessão
+            if(!sbClient) return;
+
+            // LISTENER SESSÃO
             sbClient.auth.onAuthStateChange(async (event, session) => {
-                if (isRegistering) return; // Não atrapalha o cadastro
+                if (isRegistering) return;
 
                 if (event === 'SIGNED_IN' && session) {
                     userSession = session;
                     await carregarPerfil();
-                    
-                    // Se estiver em telas de login, vai pro app
-                    const currentScreen = document.querySelector('.app-container:not(.hidden)').id;
-                    if(currentScreen === 'screen-welcome' || currentScreen === 'screen-login' || currentScreen === 'screen-register') {
-                        showScreen('app');
-                    }
                 } else if (event === 'SIGNED_OUT') {
                     userSession = null;
                     userProfile = null;
@@ -267,25 +305,12 @@
                 }
             });
 
-            // Checagem Inicial
+            // CHECAGEM INICIAL
             try {
                 const { data: { session }, error } = await sbClient.auth.getSession();
                 if (session) {
                     userSession = session;
-                    const { data: profile } = await sbClient.from('profiles').select('*').eq('id', session.user.id).single();
-                    if (profile) {
-                        userProfile = profile;
-                        preencherDadosPerfil(profile);
-                        showScreen('app');
-                        
-                        // INICIA REALTIME DOS PEDIDOS
-                        ativarRealtimePedidos();
-
-                    } else {
-                        // Usuário sem perfil (Zumbi) -> Logout
-                        await sbClient.auth.signOut();
-                        showScreen('welcome'); 
-                    }
+                    await carregarPerfil();
                 } else {
                     showScreen('welcome');
                 }
@@ -315,7 +340,6 @@
                     if(error.message.includes("Invalid login")) throw new Error("E-mail ou senha incorretos.");
                     throw new Error(error.message);
                 }
-                // O listener cuida do redirecionamento
             } catch (e) { 
                 alert(e.message); 
             } finally { 
@@ -409,12 +433,28 @@
         async function carregarPerfil() {
             try {
                 if (!userSession) return;
+                
                 const { data, error } = await sbClient.from('profiles').select('*').eq('id', userSession.user.id).single();
+                
                 if (data) {
                     userProfile = data;
                     preencherDadosPerfil(data);
+                    
+                    const currentScreen = document.querySelector('.app-container:not(.hidden)').id;
+                    if(['screen-welcome', 'screen-login', 'screen-register'].includes(currentScreen)) {
+                        showScreen('app');
+                        ativarRealtimePedidos(); 
+                    }
+                } else {
+                    if(!isRegistering) {
+                        await sbClient.auth.signOut();
+                        alert("Erro de cadastro. Faça login novamente.");
+                        showScreen('welcome');
+                    }
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error(e); 
+            }
         }
 
         function preencherDadosPerfil(data) {
@@ -461,16 +501,10 @@
             finally { location.reload(); }
         }
 
-        // --- HISTÓRICO DE PEDIDOS EM TEMPO REAL ---
-        
+        // --- HISTÓRICO REALTIME ---
         function ativarRealtimePedidos() {
-            // Escuta mudanças na tabela PEDIDOS
             sbClient.channel('meus-pedidos')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, payload => {
-                // Se a mudança for relevante para este usuário, atualiza a lista
-                // Nota: O filtro exato 'user_id' no realtime do Supabase as vezes requer config extra,
-                // então simplificamos recarregando a lista se houver qualquer update na tabela.
-                // Como é um MVP, o impacto é baixo.
                 carregarHistoricoPedidos();
             })
             .subscribe();
@@ -478,14 +512,14 @@
 
         async function carregarHistoricoPedidos() {
             const lista = document.getElementById('lista-pedidos');
-            // Só mostra loading se estiver vazio
             if(lista.children.length === 0) lista.innerHTML = '<div class="text-center text-gray-400 mt-10">Carregando...</div>';
 
             try {
+                // Busca IDs dos entregadores
                 const { data, error } = await sbClient
                     .from('pedidos')
                     .select('*')
-                    .eq('user_id', userSession.user.id) // Garante que só pega os meus
+                    .eq('user_id', userSession.user.id)
                     .order('created_at', { ascending: false })
                     .limit(20);
 
@@ -496,19 +530,69 @@
                     return;
                 }
 
+                // Busca nomes dos entregadores (Otimização)
+                const entregadorIds = data.filter(p => p.entregador_id).map(p => p.entregador_id);
+                let entregadoresMap = {};
+                if(entregadorIds.length > 0) {
+                    const { data: profs } = await sbClient.from('profiles').select('id, responsavel').in('id', entregadorIds);
+                    if(profs) profs.forEach(p => entregadoresMap[p.id] = p.responsavel);
+                }
+
                 lista.innerHTML = '';
-                               // Mapeamento de Status Atualizado
+                
                 const mapStatus = {
                     'solicitado': { text: '📡 Solicitado', class: 'status-solicitado' },
-                    'pendente': { text: '🛵 Motoboy a Caminho', class: 'status-pendente' }, // Indo buscar
-                    'em_rota': { text: '🚀 Saiu para Entrega', class: 'status-em_rota' }, // Pegou o pacote
+                    'pendente': { text: '🛵 Motoboy a Caminho', class: 'status-pendente' },
+                    'em_rota': { text: '🚀 Saiu para Entrega', class: 'status-em_rota' },
                     'concluido': { text: '✅ Finalizado', class: 'status-finalizado' }
                 };
 
                 data.forEach(p => {
                     const statusKey = p.status || 'solicitado';
                     const statusConfig = mapStatus[statusKey] || mapStatus['solicitado'];
+                    const nomeEntregador = p.entregador_id ? (entregadoresMap[p.entregador_id] || "Entregador") : null;
                     
+                    // HTML do PIN
+                    let pinHtml = `<div class="bg-blue-50 border border-blue-100 rounded-lg p-2 text-center mb-3">
+                                <p class="text-[10px] text-blue-400 font-bold uppercase tracking-wider">Código de Recebimento</p>
+                                <p class="text-xl font-mono font-bold text-blue-700 tracking-[0.3em]">${p.pin_entrega || '----'}</p>
+                            </div>`;
+                    
+                    // Se finalizado, mostra Avaliação em vez de PIN
+                    let extrasHtml = pinHtml;
+                    if(statusKey === 'concluido') {
+                        const nota = p.avaliacao || 0;
+                        extrasHtml = `
+                            <div class="text-center mb-3">
+                                <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">Avalie a Entrega</p>
+                                <div class="flex justify-center gap-1 star-rating text-lg" id="stars-${p.id}">
+                                    ${[1,2,3,4,5].map(i => `<i onclick="avaliarPedido('${p.id}', ${i})" class="fas fa-star ${i <= nota ? 'star-filled' : 'star-empty'}"></i>`).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // Botão Ver Condutor
+                    let btnMoto = '';
+                    if(p.entregador_id && statusKey !== 'solicitado') {
+                        btnMoto = `
+                            <div class="flex items-center justify-between bg-gray-50 p-2 rounded-lg mb-3 border border-gray-100">
+                                <div class="flex items-center gap-2">
+                                    <div class="bg-blue-100 p-1.5 rounded-full"><i class="fas fa-motorcycle text-blue-600 text-xs"></i></div>
+                                    <span class="text-xs font-bold text-gray-700">${nomeEntregador.split(' ')[0]}</span>
+                                </div>
+                                <button onclick="verMotoboy('${p.entregador_id}')" class="text-xs text-blue-600 font-bold underline">Detalhes</button>
+                            </div>
+                        `;
+                    }
+
+                    // Botão Reportar
+                    let btnReportar = `
+                        <button onclick="reportarProblema('${p.id}')" class="text-[10px] text-red-400 font-bold hover:text-red-600 flex items-center gap-1">
+                            <i class="fas fa-exclamation-circle"></i> Reportar Problema
+                        </button>
+                    `;
+
                     const html = `
                         <div class="card-historico shadow-sm">
                             <div class="flex justify-between items-start mb-2">
@@ -518,14 +602,12 @@
                             <div class="text-sm font-bold text-gray-800 mb-1">${p.destino}</div>
                             <div class="text-xs text-gray-500 mb-3">${p.nome_destinatario}</div>
                             
-                            <div class="bg-blue-50 border border-blue-100 rounded-lg p-2 text-center mb-3">
-                                <p class="text-[10px] text-blue-400 font-bold uppercase tracking-wider">Código de Recebimento</p>
-                                <p class="text-xl font-mono font-bold text-blue-700 tracking-[0.3em]">${p.pin_entrega || '----'}</p>
-                            </div>
+                            ${btnMoto}
+                            ${extrasHtml}
 
                             <div class="flex justify-between items-center border-t pt-2 mt-2">
                                 <span class="text-xs font-bold text-blue-600">R$ ${p.valor_frete.toFixed(2)}</span>
-                                <span class="text-[10px] text-gray-400">${new Date(p.created_at).toLocaleDateString('pt-BR')}</span>
+                                ${btnReportar}
                             </div>
                         </div>
                     `;
@@ -536,6 +618,54 @@
                 console.error(e);
                 lista.innerHTML = '<div class="text-center text-red-400 mt-10">Erro ao carregar.</div>';
             }
+        }
+
+        // --- AÇÕES DO HISTÓRICO ---
+        
+        async function verMotoboy(id) {
+            document.getElementById('modal-motoboy').classList.remove('hidden');
+            document.getElementById('moto-nome').innerText = "Buscando...";
+            document.getElementById('moto-modelo').innerText = "...";
+            document.getElementById('moto-placa').innerText = "...";
+            document.getElementById('moto-zap-oculto').value = ""; // Limpa anterior
+
+            try {
+                const { data, error } = await sbClient.from('profiles').select('responsavel, modelo_moto, placa_moto, whatsapp_responsavel').eq('id', id).single();
+                if(data) {
+                    document.getElementById('moto-nome').innerText = data.responsavel || "Motoboy Parceiro";
+                    document.getElementById('moto-modelo').innerText = data.modelo_moto || "Não informado";
+                    document.getElementById('moto-placa').innerText = data.placa_moto || "---";
+                    document.getElementById('moto-zap-oculto').value = data.whatsapp_responsavel || "";
+                }
+            } catch(e) {
+                document.getElementById('moto-nome').innerText = "Erro ao buscar";
+            }
+        }
+
+        function contatarMotoboy() {
+            let zap = document.getElementById('moto-zap-oculto').value;
+            if(!zap) return alert("Número não disponível.");
+            zap = zap.replace(/\D/g, '');
+            if(!zap.startsWith('55')) zap = '55' + zap;
+            window.open(`https://wa.me/${zap}`, '_blank');
+        }
+
+        async function avaliarPedido(id, nota) {
+            // Atualiza visualmente na hora (Optimistic UI)
+            const container = document.getElementById(`stars-${id}`);
+            const stars = container.getElementsByTagName('i');
+            for(let i=0; i<5; i++) {
+                if(i < nota) { stars[i].classList.remove('star-empty'); stars[i].classList.add('star-filled'); }
+                else { stars[i].classList.remove('star-filled'); stars[i].classList.add('star-empty'); }
+            }
+
+            // Salva no banco
+            await sbClient.from('pedidos').update({ avaliacao: nota }).eq('id', id);
+        }
+
+        function reportarProblema(id) {
+            const msg = `Olá, estou com um problema no pedido #${id.slice(0,4)}. Poderia me ajudar?`;
+            window.open(`https://wa.me/${NUMERO_ADMIN}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
         // --- MAPA E PEDIDO ---
@@ -592,7 +722,6 @@
             
             const pinSeguranca = Math.floor(1000 + Math.random() * 9000).toString();
             
-            // NOVO: STATUS INICIAL 'solicitado'
             const { error } = await sbClient.from('pedidos').insert([{
                 user_id: userSession.user.id,
                 origem: document.getElementById('origem').value,
@@ -602,7 +731,7 @@
                 pin_entrega: pinSeguranca,
                 nome_destinatario: nomeDest,
                 telefone_destinatario: telDest,
-                status: 'solicitado' 
+                status: 'solicitado'
             }]);
 
             if(error) { alert("Erro ao enviar: " + error.message); return; }
@@ -617,7 +746,6 @@
         function toggleDropdown(id) { const list = document.getElementById(`list-${id}`); if(id === 'entrega') document.getElementById('list-produto').classList.remove('show'); else document.getElementById('list-entrega').classList.remove('show'); list.classList.toggle('show'); }
         function selectOption(id, value, text) { document.getElementById(`pagamento_${id}`).value = value; document.getElementById(`display-${id}`).innerText = text; document.getElementById(`list-${id}`).classList.remove('show'); }
         
-        // Funções de PIN
         function verificarPinParaSaldo() {
             if(!userProfile.pin_carteira) return alert("Configure seu PIN na aba Perfil.");
             pendingAction = 'saldo';
