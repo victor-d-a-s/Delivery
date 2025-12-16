@@ -185,7 +185,7 @@
         </div>
     </div>
 
-   <div id="modal-detalhes" class="hidden fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 fade-in" style="display:none">
+    <div id="modal-detalhes" class="hidden fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 fade-in" style="display:none">
         <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="document.getElementById('modal-detalhes').style.display='none'" class="absolute top-2 right-3 text-gray-400 text-2xl z-10">&times;</button>
             
@@ -335,49 +335,55 @@
             safeVal('edit-pin', data.pin_carteira);
         }
 
-        // --- FUNÇÃO DO BOTÃO REESCRITA ---
+        // --- CORREÇÃO DO BOTÃO "SOLICITAR ENTREGADOR" ---
         async function iniciarPedido() {
-            // Feedback imediato
+            // 1. Feedback Visual Imediato
             const btn = document.getElementById('btn-enviar');
-            btn.disabled = true; 
             btn.innerText = "Processando...";
+            btn.disabled = true;
 
+            console.log("Iniciando criação de pedido...");
+
+            // 2. Validações com Alerta
             if(!userSession) { 
-                alert("Sessão expirada. Faça login novamente.");
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-check text-2xl"></i> Confirmar Pedido';
+                alert("Erro: Você precisa estar logado para pedir.");
+                resetarBotao();
                 return;
             }
-            if(!valorFinal || parseFloat(valorFinal) <= 0) {
-                alert("Calcule o frete primeiro.");
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-check text-2xl"></i> Confirmar Pedido';
+            
+            // Garantir que valorFinal seja float
+            let valorFreteFloat = parseFloat(valorFinal);
+            if(!valorFinal || isNaN(valorFreteFloat) || valorFreteFloat <= 0) {
+                alert("Erro: O valor do frete é inválido. Por favor, calcule a rota novamente.");
+                resetarBotao();
                 return;
             }
             
             const origem = document.getElementById('origem').value;
             const destino = document.getElementById('destino').value;
+
             if(!origem || !destino) {
-                alert("Preencha os endereços.");
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-check text-2xl"></i> Confirmar Pedido';
+                alert("Erro: Preencha os endereços de retirada e entrega.");
+                resetarBotao();
                 return;
             }
 
-            await enviarParaCentral();
+            await enviarParaCentral(valorFreteFloat);
         }
 
-        async function enviarParaCentral() {
+        function resetarBotao() {
             const btn = document.getElementById('btn-enviar');
-            try {
-                let valorFreteFloat = parseFloat(valorFinal);
-                if (isNaN(valorFreteFloat)) valorFreteFloat = 0;
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check text-2xl"></i> Confirmar Pedido';
+        }
 
+        async function enviarParaCentral(valorFloat) {
+            try {
                 const novoPedido = {
                     user_id: userSession.user.id,
                     origem: document.getElementById('origem').value,
                     destino: document.getElementById('destino').value,
-                    valor_frete: valorFreteFloat, 
+                    valor_frete: valorFloat, 
                     forma_pagamento: document.getElementById('pagamento_entrega').value,
                     pin_entrega: Math.floor(1000 + Math.random() * 9000).toString(),
                     nome_destinatario: document.getElementById('nome_dest').value || 'Não informado',
@@ -385,9 +391,12 @@
                     status: 'solicitado'
                 };
                 
+                console.log("Enviando payload:", novoPedido);
+
                 const { error } = await sbClient.from('pedidos').insert([novoPedido]);
                 if(error) { throw error; }
 
+                // Sucesso
                 document.getElementById('display-pin').innerText = novoPedido.pin_entrega;
                 document.getElementById('modal-success').style.display = 'flex';
                 document.getElementById('modal-success').classList.remove('hidden');
@@ -396,8 +405,7 @@
                 alert("Erro ao criar pedido: " + (e.message || JSON.stringify(e)));
                 console.error(e);
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-check text-2xl"></i> Confirmar Pedido';
+                resetarBotao();
             }
         }
 
@@ -416,7 +424,11 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); 
             elemento.classList.add('active'); 
             if(tela==='perfil') carregarPerfil(); 
-            if(tela==='pedidos') carregarHistoricoPedidos(); 
+            // CORREÇÃO PEDIDOS: Renderiza cache primeiro para ser instantâneo
+            if(tela==='pedidos') {
+                renderizarLista(pedidosCache); 
+                carregarHistoricoPedidos(); 
+            }
         }
 
         async function fazerLogin() {
@@ -451,18 +463,14 @@
             }).subscribe(); 
         }
         
-        async function carregarHistoricoPedidos() {
+        // Função auxiliar para renderizar a lista (usada para o cache instantâneo)
+        async function renderizarLista(data) {
             const lista = document.getElementById('lista-pedidos');
-            if(lista.children.length === 0) lista.innerHTML = '<div class="text-center mt-10">Carregando...</div>';
-            
-            const { data } = await sbClient.from('pedidos').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(20);
-            
             if(!data || data.length === 0) { lista.innerHTML = '<div class="text-center mt-10">Nenhum pedido recente.</div>'; return; }
             
-            pedidosCache = data; 
-
             const eIds = data.filter(p=>p.entregador_id).map(p=>p.entregador_id);
             let entMap = {};
+            // Busca nomes apenas se necessário (cache pode não ter nomes, mas ok para exibição rápida inicial)
             if(eIds.length > 0) { const { data: profs } = await sbClient.from('profiles').select('id, responsavel').in('id', eIds); if(profs) profs.forEach(p => entMap[p.id] = p.responsavel); }
 
             lista.innerHTML = '';
@@ -471,8 +479,7 @@
                 let stClass = '';
                 let stText = '';
                 
-                // --- STATUS ATUALIZADOS ---
-                if(st === 'solicitado') { stClass = 'status-solicitado'; stText = '📡 Solicitado (Aguardando Entregador)'; } // Exibição explícita
+                if(st === 'solicitado') { stClass = 'status-solicitado'; stText = '📡 Solicitado (Aguardando Entregador)'; }
                 else if(st === 'pendente') { stClass = 'status-pendente'; stText = '🛵 Aceito (Indo à Loja)'; }
                 else if(st === 'em_rota') { stClass = 'status-em_rota'; stText = '🚀 Em Rota (Saiu para Entrega)'; }
                 else if(st === 'concluido') { stClass = 'status-concluido'; stText = '✅ Entregue'; }
@@ -497,6 +504,19 @@
             });
         }
 
+        async function carregarHistoricoPedidos() {
+            // Se já tem cache, não apaga a tela para não piscar (renderiza por cima depois)
+            const lista = document.getElementById('lista-pedidos');
+            if(lista.children.length === 0 && pedidosCache.length === 0) lista.innerHTML = '<div class="text-center mt-10">Carregando...</div>';
+            
+            const { data } = await sbClient.from('pedidos').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(20);
+            
+            if(data) {
+                pedidosCache = data; // Atualiza cache
+                renderizarLista(data);
+            }
+        }
+
         async function verDetalhes(id) {
             let pedido = pedidosCache.find(p => p.id === id);
             if(!pedido) {
@@ -512,7 +532,6 @@
 
             const st = pedido.status;
             let stText = 'Desconhecido';
-            // --- STATUS ATUALIZADOS DETALHES ---
             if(st === 'solicitado') stText = 'Pedido Solicitado - Aguardando Motoboy';
             else if(st === 'pendente') stText = 'Motoboy aceitou - Indo à coleta';
             else if(st === 'em_rota') stText = 'Produto retirado - Saiu para entrega';
@@ -520,7 +539,7 @@
             else if(st === 'cancelado') stText = 'Pedido Cancelado';
             document.getElementById('det-status').innerText = stText;
 
-           const boxMoto = document.getElementById('box-motoboy');
+            const boxMoto = document.getElementById('box-motoboy');
             if(pedido.entregador_id) {
                 const { data: moto } = await sbClient.from('profiles').select('*').eq('id', pedido.entregador_id).single();
                 if(moto) {
