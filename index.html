@@ -29,7 +29,7 @@
         input:checked + .slider { background-color: #1E40AF; }
         input:checked + .slider:before { transform: translateX(20px); }
         
-        .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 80px; display: none; }
+        .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 80px; display: none; overflow-y: auto; } /* Importante: overflow para scroll interno */
         @media (min-width: 768px) { .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; margin: auto; } body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } }
         
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; justify-content: space-around; padding: 12px 0; max-width: 28rem; margin: 0 auto; display: none; }
@@ -337,21 +337,18 @@
 
         // --- CORREÇÃO DO BOTÃO "SOLICITAR ENTREGADOR" ---
         async function iniciarPedido() {
-            // 1. Feedback Visual Imediato
             const btn = document.getElementById('btn-enviar');
             btn.innerText = "Processando...";
             btn.disabled = true;
 
             console.log("Iniciando criação de pedido...");
 
-            // 2. Validações com Alerta
             if(!userSession) { 
                 alert("Erro: Você precisa estar logado para pedir.");
                 resetarBotao();
                 return;
             }
             
-            // Garantir que valorFinal seja float
             let valorFreteFloat = parseFloat(valorFinal);
             if(!valorFinal || isNaN(valorFreteFloat) || valorFreteFloat <= 0) {
                 alert("Erro: O valor do frete é inválido. Por favor, calcule a rota novamente.");
@@ -396,7 +393,6 @@
                 const { error } = await sbClient.from('pedidos').insert([novoPedido]);
                 if(error) { throw error; }
 
-                // Sucesso
                 document.getElementById('display-pin').innerText = novoPedido.pin_entrega;
                 document.getElementById('modal-success').style.display = 'flex';
                 document.getElementById('modal-success').classList.remove('hidden');
@@ -412,8 +408,16 @@
         function showScreen(id) { 
             const screens = ['welcome', 'register', 'login', 'app', 'pedidos', 'extrato', 'perfil'];
             screens.forEach(s => { const el = document.getElementById('screen-'+s); if(el) { el.classList.add('hidden'); el.style.display = 'none'; } });
+            
             const target = document.getElementById('screen-'+id);
-            if(target) { target.classList.remove('hidden'); target.style.display = (id === 'welcome' || id === 'login' || id === 'extrato') ? 'flex' : 'block'; }
+            if(target) { 
+                target.classList.remove('hidden'); 
+                target.style.display = (id === 'welcome' || id === 'login' || id === 'extrato') ? 'flex' : 'block';
+                // Rolagem para o topo
+                target.scrollTop = 0; 
+                window.scrollTo(0,0);
+            }
+            
             const menu = document.getElementById('bottom-menu');
             if(['app', 'pedidos', 'extrato', 'perfil'].includes(id)) { menu.classList.remove('hidden'); menu.style.display = 'flex'; } 
             else { menu.classList.add('hidden'); menu.style.display = 'none'; } 
@@ -424,7 +428,7 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); 
             elemento.classList.add('active'); 
             if(tela==='perfil') carregarPerfil(); 
-            // CORREÇÃO PEDIDOS: Renderiza cache primeiro para ser instantâneo
+            // CORREÇÃO PEDIDOS: Renderiza cache primeiro
             if(tela==='pedidos') {
                 renderizarLista(pedidosCache); 
                 carregarHistoricoPedidos(); 
@@ -463,14 +467,12 @@
             }).subscribe(); 
         }
         
-        // Função auxiliar para renderizar a lista (usada para o cache instantâneo)
         async function renderizarLista(data) {
             const lista = document.getElementById('lista-pedidos');
             if(!data || data.length === 0) { lista.innerHTML = '<div class="text-center mt-10">Nenhum pedido recente.</div>'; return; }
             
             const eIds = data.filter(p=>p.entregador_id).map(p=>p.entregador_id);
             let entMap = {};
-            // Busca nomes apenas se necessário (cache pode não ter nomes, mas ok para exibição rápida inicial)
             if(eIds.length > 0) { const { data: profs } = await sbClient.from('profiles').select('id, responsavel').in('id', eIds); if(profs) profs.forEach(p => entMap[p.id] = p.responsavel); }
 
             lista.innerHTML = '';
@@ -479,11 +481,11 @@
                 let stClass = '';
                 let stText = '';
                 
-                if(st === 'solicitado') { stClass = 'status-solicitado'; stText = '📡 Solicitado (Aguardando Entregador)'; }
-                else if(st === 'pendente') { stClass = 'status-pendente'; stText = '🛵 Aceito (Indo à Loja)'; }
-                else if(st === 'em_rota') { stClass = 'status-em_rota'; stText = '🚀 Em Rota (Saiu para Entrega)'; }
-                else if(st === 'concluido') { stClass = 'status-concluido'; stText = '✅ Entregue'; }
-                else if(st === 'cancelado') { stClass = 'status-cancelado'; stText = '❌ Cancelado'; }
+                if(st === 'solicitado') { stClass = 'status-solicitado'; stText = 'Solicitado'; }
+                else if(st === 'pendente') { stClass = 'status-pendente'; stText = 'Pendente'; }
+                else if(st === 'em_rota') { stClass = 'status-em_rota'; stText = 'Em rota'; }
+                else if(st === 'concluido') { stClass = 'status-concluido'; stText = 'Finalizado'; }
+                else if(st === 'cancelado') { stClass = 'status-cancelado'; stText = 'Cancelado'; }
 
                 const entregadorNome = p.entregador_id ? (entMap[p.entregador_id] || 'Motoboy') : '---';
                 const valorF = parseFloat(p.valor_frete).toFixed(2).replace('.', ',');
@@ -505,14 +507,13 @@
         }
 
         async function carregarHistoricoPedidos() {
-            // Se já tem cache, não apaga a tela para não piscar (renderiza por cima depois)
             const lista = document.getElementById('lista-pedidos');
             if(lista.children.length === 0 && pedidosCache.length === 0) lista.innerHTML = '<div class="text-center mt-10">Carregando...</div>';
             
             const { data } = await sbClient.from('pedidos').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(20);
             
             if(data) {
-                pedidosCache = data; // Atualiza cache
+                pedidosCache = data;
                 renderizarLista(data);
             }
         }
@@ -532,14 +533,14 @@
 
             const st = pedido.status;
             let stText = 'Desconhecido';
-            if(st === 'solicitado') stText = 'Pedido Solicitado - Aguardando Motoboy';
-            else if(st === 'pendente') stText = 'Motoboy aceitou - Indo à coleta';
-            else if(st === 'em_rota') stText = 'Produto retirado - Saiu para entrega';
-            else if(st === 'concluido') stText = 'Entrega Finalizada com Sucesso';
-            else if(st === 'cancelado') stText = 'Pedido Cancelado';
+            if(st === 'solicitado') stText = 'Solicitado - Aguardando Entregador';
+            else if(st === 'pendente') stText = 'Pendente - Motoboy a caminho';
+            else if(st === 'em_rota') stText = 'Em rota - Saiu para entrega';
+            else if(st === 'concluido') stText = 'Finalizado';
+            else if(st === 'cancelado') stText = 'Cancelado';
             document.getElementById('det-status').innerText = stText;
 
-            const boxMoto = document.getElementById('box-motoboy');
+           const boxMoto = document.getElementById('box-motoboy');
             if(pedido.entregador_id) {
                 const { data: moto } = await sbClient.from('profiles').select('*').eq('id', pedido.entregador_id).single();
                 if(moto) {
