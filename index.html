@@ -55,6 +55,10 @@
         .custom-option { padding: 10px; cursor: pointer; font-size: 12px; }
         .custom-option:hover { background-color: #f3f4f6; }
         .custom-select-btn { width: 100%; text-align: left; padding: 8px; background: white; border: 1px solid; border-radius: 8px; font-size: 12px; display: flex; justify-content: space-between; items-center; }
+        
+        .transacao-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+        .transacao-valor.credito { color: #059669; }
+        .transacao-valor.debito { color: #DC2626; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
@@ -143,7 +147,9 @@
     <div id="screen-extrato" class="app-container p-6 fade-in text-center flex flex-col items-center justify-center">
         <i class="fas fa-file-invoice-dollar text-6xl text-gray-200 mb-4"></i>
         <h2 class="text-xl font-bold text-gray-700">Extrato</h2>
-        <p class="text-gray-500 mt-2">Em breve: Relatório financeiro.</p>
+        <div id="lista-extrato" class="flex-1 overflow-y-auto pb-20 space-y-2 w-full px-4">
+            <div class="text-center text-gray-400 mt-10">Carregando transações...</div>
+        </div>
     </div>
 
     <div id="screen-perfil" class="app-container p-6 fade-in">
@@ -174,20 +180,42 @@
 
     <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[60] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Pedido Criado!</h2><p class="text-sm text-gray-500 mb-6">Aguardando entregador...</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
 
+    <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in" style="display:none">
+        <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
+            <h2 class="text-lg font-bold text-gray-800 mb-2">Segurança</h2>
+            <p class="text-sm text-gray-500 mb-4">Digite seu PIN de 4 dígitos</p>
+            <input type="tel" id="input-confirm-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-4 outline-none focus:ring-2 focus:ring-blue-500">
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="document.getElementById('modal-pin').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button>
+                <button onclick="confirmarPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <div id="modal-detalhes" class="hidden fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 fade-in" style="display:none">
         <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="document.getElementById('modal-detalhes').style.display='none'" class="absolute top-2 right-3 text-gray-400 text-2xl z-10">&times;</button>
             
             <div class="bg-blue-600 p-6 text-white">
                 <h3 class="font-bold text-xl mb-1">Detalhes da Entrega</h3>
-                <p id="det-status" class="text-xs bg-white/20 inline-block px-2 py-1 rounded">Carregando...</p>
+                <div class="flex items-center gap-2 mt-1">
+                    <p id="det-id-visual" class="text-sm bg-blue-700 px-2 py-0.5 rounded font-mono">#00000</p>
+                    <p id="det-status" class="text-xs bg-white/20 px-2 py-1 rounded">Carregando...</p>
+                </div>
             </div>
             
             <div class="p-6 space-y-4">
                 <div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
-                    <div><p class="text-xs text-gray-500 uppercase font-bold">Valor</p><p id="det-valor" class="text-2xl font-bold text-green-700">R$ --,--</p></div>
-                    <div class="text-right"><p class="text-xs text-gray-500 uppercase font-bold">PIN Entrega</p><p id="det-pin" class="text-xl font-mono font-bold text-blue-600">----</p></div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-bold">Valor da Entrega</p>
+                        <p id="det-valor" class="text-2xl font-bold text-green-700">R$ --,--</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-gray-500 uppercase font-bold">PIN Entrega</p>
+                        <p id="det-pin" class="text-xl font-mono font-bold text-blue-600">----</p>
+                    </div>
                 </div>
+
                 <div class="space-y-3 border-b pb-4">
                     <div class="flex gap-3">
                         <div class="flex flex-col items-center"><i class="fas fa-circle text-blue-600 text-[10px] mt-1"></i><div class="h-full w-0.5 bg-gray-200 my-1"></div><i class="fas fa-map-marker-alt text-red-500"></i></div>
@@ -197,16 +225,23 @@
                         </div>
                     </div>
                 </div>
+
                 <div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl border border-blue-100">
                     <p class="text-xs text-blue-500 font-bold uppercase mb-3 flex items-center gap-2"><i class="fas fa-motorcycle"></i> Dados do Entregador</p>
                     <div class="flex items-center gap-4 mb-3">
                         <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-blue-600 text-xl"><i class="fas fa-user"></i></div>
-                        <div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs text-gray-500 font-mono bg-gray-200 px-1 rounded inline-block">PLACA</p></div>
+                        <div>
+                            <p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p>
+                            <p id="det-moto-placa" class="text-xs text-gray-500 font-mono bg-gray-200 px-1 rounded inline-block">PLACA</p>
+                        </div>
                     </div>
                     <p id="det-moto-modelo" class="text-xs text-gray-600 mb-3 ml-16 -mt-2">Modelo Moto</p>
                     <button id="btn-zap-moto" onclick="" class="w-full bg-green-500 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-green-600"><i class="fab fa-whatsapp"></i> Chamar no WhatsApp</button>
                 </div>
-                <div id="box-cancelar" class="hidden pt-2"><button id="btn-cancelar-detalhe" onclick="" class="w-full text-red-500 font-bold text-sm border border-red-200 py-3 rounded-xl hover:bg-red-50">Cancelar Pedido</button></div>
+
+                <div id="box-cancelar" class="hidden pt-2">
+                    <button id="btn-cancelar-detalhe" onclick="" class="w-full text-red-500 font-bold text-sm border border-red-200 py-3 rounded-xl hover:bg-red-50">Cancelar Pedido</button>
+                </div>
             </div>
         </div>
     </div>
@@ -262,6 +297,7 @@
         const TAXA_RETORNO = 0.20; 
         const PRECO_BASE = 5.00; 
         const PRECO_POR_KM = 1.00;
+        const INACTIVITY_TIME = 30 * 60 * 1000; // 30 minutos
 
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let userSession = null;
@@ -271,6 +307,8 @@
         let pendingAction = null;
         let isRegistering = false;
         let pedidosCache = [];
+        let realTimeSubscription = null;
+        let inactivityTimer;
 
         function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
         function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val || ''; } 
@@ -310,6 +348,25 @@
             });
         });
 
+        // --- SISTEMA DE INATIVIDADE ---
+        function setupInactivityListener() {
+            const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+            events.forEach(event => {
+                document.addEventListener(event, resetInactivityTimer, true);
+            });
+            resetInactivityTimer();
+        }
+
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            if(userSession) {
+                inactivityTimer = setTimeout(async () => {
+                    alert("Sessão expirada por inatividade. Faça login novamente.");
+                    await fazerLogout();
+                }, INACTIVITY_TIME);
+            }
+        }
+
         async function carregarPerfil(isLogin = false) {
             try {
                 if (!userSession) return;
@@ -318,6 +375,7 @@
                 if (data) { 
                     userProfile = data; 
                     preencherDadosPerfil(data); 
+                    setupInactivityListener(); // Ativa monitoramento
                     if(isLogin) {
                         showScreen('app'); 
                         ativarRealtimePedidos();
@@ -344,55 +402,51 @@
             safeVal('edit-resp-zap', data.whatsapp_responsavel); 
         }
 
-        // --- VALIDAÇÃO CNPJ REAL ---
         function validarCNPJ(cnpj) {
             cnpj = cnpj.replace(/[^\d]+/g,'');
             if(cnpj == '') return false;
             if (cnpj.length != 14) return false;
             if (cnpj == "00000000000000" || cnpj == "11111111111111" || cnpj == "22222222222222" || cnpj == "33333333333333" || cnpj == "44444444444444" || cnpj == "55555555555555" || cnpj == "66666666666666" || cnpj == "77777777777777" || cnpj == "88888888888888" || cnpj == "99999999999999") return false;
-            
-            let tamanho = cnpj.length - 2
-            let numeros = cnpj.substring(0,tamanho);
-            let digitos = cnpj.substring(tamanho);
-            let soma = 0;
-            let pos = tamanho - 7;
-            for (let i = tamanho; i >= 1; i--) {
-                soma += numeros.charAt(tamanho - i) * pos--;
-                if (pos < 2) pos = 9;
-            }
-            let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
-            if (resultado != digitos.charAt(0)) return false;
-            
-            tamanho = tamanho + 1;
-            numeros = cnpj.substring(0,tamanho);
-            soma = 0;
-            pos = tamanho - 7;
-            for (let i = tamanho; i >= 1; i--) {
-                soma += numeros.charAt(tamanho - i) * pos--;
-                if (pos < 2) pos = 9;
-            }
-            resultado = soma % 11 < 2 ? 0 : 11 - soma % 11;
-            if (resultado != digitos.charAt(1)) return false;
-            
-            return true;
+            let tamanho = cnpj.length - 2; let numeros = cnpj.substring(0,tamanho); let digitos = cnpj.substring(tamanho); let soma = 0; let pos = tamanho - 7;
+            for (let i = tamanho; i >= 1; i--) { soma += numeros.charAt(tamanho - i) * pos--; if (pos < 2) pos = 9; }
+            let resultado = soma % 11 < 2 ? 0 : 11 - soma % 11; if (resultado != digitos.charAt(0)) return false;
+            tamanho = tamanho + 1; numeros = cnpj.substring(0,tamanho); soma = 0; pos = tamanho - 7;
+            for (let i = tamanho; i >= 1; i--) { soma += numeros.charAt(tamanho - i) * pos--; if (pos < 2) pos = 9; }
+            resultado = soma % 11 < 2 ? 0 : 11 - soma % 11; if (resultado != digitos.charAt(1)) return false; return true;
         }
 
-        // --- SOLICITAÇÃO ---
+        // --- SOLICITAÇÃO COM VALIDAÇÃO ---
         async function iniciarPedido() {
             const btn = document.getElementById('btn-enviar');
             btn.innerText = "Processando...";
             btn.disabled = true;
 
-            if(!userSession) { alert("Erro: Faça login."); resetarBotao(); return; }
+            if(!userSession) { alert("Erro: Você precisa estar logado."); resetarBotao(); return; }
             
             let valorFreteFloat = parseFloat(valorFinal);
             if(!valorFinal || isNaN(valorFreteFloat) || valorFreteFloat <= 0) {
-                alert("Erro: Recalcule a rota."); resetarBotao(); return;
+                alert("Erro: O valor do frete é inválido. Por favor, calcule a rota novamente.");
+                resetarBotao();
+                return;
             }
             
             const origem = document.getElementById('origem').value;
             const destino = document.getElementById('destino').value;
-            if(!origem || !destino) { alert("Preencha os endereços."); resetarBotao(); return; }
+            const nomeDest = document.getElementById('nome_dest').value;
+            const telDest = document.getElementById('tel_dest').value;
+            const ref = document.getElementById('referencia').value;
+
+            if(!origem || !destino) {
+                alert("Erro: Preencha os endereços de retirada e entrega.");
+                resetarBotao();
+                return;
+            }
+
+            if (!nomeDest || !telDest || !ref) {
+                alert("Erro: Preencha os dados do cliente (Nome, Zap e Referência) antes de solicitar.");
+                resetarBotao();
+                return;
+            }
 
             await enviarParaCentral(valorFreteFloat);
         }
@@ -405,16 +459,41 @@
 
         async function enviarParaCentral(valorFloat) {
             try {
+                // VERIFICAÇÃO FINANCEIRA (Se pagar com Carteira)
+                const formaPagamento = document.getElementById('pagamento_entrega').value;
+                if(formaPagamento === 'Carteira') {
+                    if(userProfile.saldo < valorFloat) {
+                        throw new Error(`Saldo insuficiente (Saldo: R$ ${userProfile.saldo.toFixed(2)})`);
+                    }
+                    
+                    const novoSaldo = userProfile.saldo - valorFloat;
+                    const { error: errUp } = await sbClient.from('profiles').update({ saldo: novoSaldo }).eq('id', userSession.user.id);
+                    if(errUp) throw errUp;
+                    
+                    await sbClient.from('transacoes').insert([{
+                        user_id: userSession.user.id,
+                        tipo: 'debito',
+                        valor: valorFloat,
+                        descricao: 'Pagamento Entrega'
+                    }]);
+                    
+                    userProfile.saldo = novoSaldo;
+                    document.getElementById('display-saldo').innerText = "R$ " + novoSaldo.toFixed(2);
+                }
+
+                const idVisual = '#' + Math.floor(10000 + Math.random() * 90000);
+
                 const novoPedido = {
                     user_id: userSession.user.id,
                     origem: document.getElementById('origem').value,
                     destino: document.getElementById('destino').value,
                     valor_frete: valorFloat, 
-                    forma_pagamento: document.getElementById('pagamento_entrega').value,
+                    forma_pagamento: formaPagamento,
                     pin_entrega: Math.floor(1000 + Math.random() * 9000).toString(),
-                    nome_destinatario: document.getElementById('nome_dest').value || 'Não informado',
-                    telefone_destinatario: document.getElementById('tel_dest').value || '',
-                    status: 'solicitado' // Status inicial padrão
+                    nome_destinatario: document.getElementById('nome_dest').value,
+                    telefone_destinatario: document.getElementById('tel_dest').value,
+                    status: 'solicitado',
+                    codigo_visual: idVisual
                 };
                 
                 const { error } = await sbClient.from('pedidos').insert([novoPedido]);
@@ -424,10 +503,15 @@
                 document.getElementById('modal-success').style.display = 'flex';
                 document.getElementById('modal-success').classList.remove('hidden');
 
-            } catch(e) { alert("Erro: " + e.message); } finally { resetarBotao(); }
+            } catch(e) {
+                alert("Erro ao criar pedido: " + (e.message || JSON.stringify(e)));
+                console.error(e);
+            } finally {
+                resetarBotao();
+            }
         }
 
-        async function calcularDistancia() {
+       async function calcularDistancia() {
             const or = document.getElementById('origem').value, des = document.getElementById('destino').value;
             if(!or || !des) return alert("Preencha o endereço de entrega.");
             
@@ -444,10 +528,17 @@
                 distanciaFinal = (getDist(dA[0].lat, dA[0].lon, dB[0].lat, dB[0].lon) * 1.3).toFixed(1);
                 if(distanciaFinal < 1) distanciaFinal = 1;
                 recalcularTotal();
-                document.getElementById('loading').style.display = 'none'; document.getElementById('btn-calcular').style.display = 'none';
-                document.getElementById('resultado-box').style.display = 'flex'; document.getElementById('resultado-box').classList.remove('hidden');
-                document.getElementById('btn-enviar').style.display = 'flex'; document.getElementById('btn-enviar').classList.remove('hidden');
-            } catch(e) { alert("Erro: " + e.message); document.getElementById('loading').style.display = 'none'; document.getElementById('btn-text').innerText = "Calcular Frete"; }
+                document.getElementById('loading').style.display = 'none'; 
+                document.getElementById('btn-calcular').style.display = 'none';
+                document.getElementById('resultado-box').style.display = 'flex'; 
+                document.getElementById('resultado-box').classList.remove('hidden');
+                document.getElementById('btn-enviar').style.display = 'flex'; 
+                document.getElementById('btn-enviar').classList.remove('hidden');
+            } catch(e) { 
+                alert("Erro: " + e.message); 
+                document.getElementById('loading').style.display = 'none'; 
+                document.getElementById('btn-text').innerText = "Calcular Frete"; 
+            }
         }
 
         function showScreen(id) { 
@@ -458,7 +549,8 @@
             if(target) { 
                 target.classList.remove('hidden'); 
                 target.style.display = (id === 'welcome' || id === 'login' || id === 'extrato') ? 'flex' : 'block';
-                target.scrollTop = 0; window.scrollTo(0,0);
+                target.scrollTop = 0; 
+                window.scrollTo(0,0);
             }
             const menu = document.getElementById('bottom-menu');
             if(['app', 'pedidos', 'extrato', 'perfil'].includes(id)) { menu.classList.remove('hidden'); menu.style.display = 'flex'; } 
@@ -471,6 +563,7 @@
             elemento.classList.add('active'); 
             if(tela==='perfil') carregarPerfil(); 
             if(tela==='pedidos') { renderizarLista(pedidosCache); carregarHistoricoPedidos(); }
+            if(tela==='extrato') carregarExtrato();
         }
 
         async function fazerLogin() {
@@ -513,29 +606,30 @@
             lista.innerHTML = '';
             data.forEach(p => {
                 const st = p.status || 'solicitado';
-                let stClass = '';
-                let stText = '';
+                let stClass = '', stText = '';
                 
-                // Mapeamento EXATO dos status
                 if(st === 'solicitado') { stClass = 'status-solicitado'; stText = 'Solicitado'; }
-                else if(st === 'pendente') { stClass = 'status-pendente'; stText = 'Pendente'; }
-                else if(st === 'em_rota') { stClass = 'status-em_rota'; stText = 'Em rota'; }
+                else if(st === 'pendente') { stClass = 'status-pendente'; stText = 'Aguardando Motoboy'; }
+                else if(st === 'em_rota') { stClass = 'status-em_rota'; stText = 'Em Rota'; }
                 else if(st === 'concluido') { stClass = 'status-concluido'; stText = 'Finalizado'; }
                 else if(st === 'cancelado') { stClass = 'status-cancelado'; stText = 'Cancelado'; }
 
                 const entregadorNome = p.entregador_id ? (entMap[p.entregador_id] || 'Motoboy') : '---';
                 const valorF = parseFloat(p.valor_frete).toFixed(2).replace('.', ',');
+                const idVisual = p.codigo_visual || '#-----';
 
                 lista.insertAdjacentHTML('beforeend', `
                     <div class="card-historico shadow-sm hover:bg-gray-50" onclick="verDetalhes('${p.id}')">
                         <div class="flex justify-between items-center mb-2">
                             <span class="badge-status ${stClass}">${stText}</span> 
-                            <span class="font-bold text-green-700 text-sm">R$ ${valorF}</span>
+                            <span class="text-xs font-mono bg-gray-100 px-1 rounded text-gray-500">${idVisual}</span>
                         </div>
-                        <div class="font-bold text-gray-800 text-sm truncate">${p.destino}</div>
-                        <div class="text-xs text-gray-500 flex justify-between mt-1">
-                            <span>${p.nome_destinatario}</span>
-                            <span>${st !== 'solicitado' && st !== 'cancelado' ? '<i class="fas fa-motorcycle"></i> ' + entregadorNome : ''}</span>
+                        <div class="flex justify-between items-end">
+                            <div class="truncate w-2/3">
+                                <div class="font-bold text-gray-800 text-sm truncate">${p.destino}</div>
+                                <div class="text-xs text-gray-500 mt-1">${p.nome_destinatario}</div>
+                            </div>
+                            <span class="font-bold text-green-700 text-sm">R$ ${valorF}</span>
                         </div>
                     </div>
                 `);
@@ -543,10 +637,29 @@
         }
 
         async function carregarHistoricoPedidos() {
-            const lista = document.getElementById('lista-pedidos');
-            if(lista.children.length === 0 && pedidosCache.length === 0) lista.innerHTML = '<div class="text-center mt-10">Carregando...</div>';
             const { data } = await sbClient.from('pedidos').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(20);
             if(data) { pedidosCache = data; renderizarLista(data); }
+        }
+
+        async function carregarExtrato() {
+            const lista = document.getElementById('lista-extrato');
+            lista.innerHTML = '<div class="text-center mt-10">Carregando...</div>';
+            const { data, error } = await sbClient.from('transacoes').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(30);
+            if(error || !data || data.length === 0) { lista.innerHTML = '<div class="text-center mt-10 text-gray-400">Nenhuma movimentação.</div>'; return; }
+            lista.innerHTML = '';
+            data.forEach(t => {
+                const isCredito = t.tipo === 'credito';
+                const cor = isCredito ? 'credito' : 'debito';
+                const sinal = isCredito ? '+' : '-';
+                const icone = isCredito ? 'fa-arrow-down' : 'fa-arrow-up';
+                const dataFormat = new Date(t.created_at).toLocaleDateString('pt-BR');
+                lista.insertAdjacentHTML('beforeend', `
+                    <div class="transacao-item px-4 bg-white mx-4 rounded-xl mb-2">
+                        <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full ${isCredito ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'} flex items-center justify-center"><i class="fas ${icone} text-xs"></i></div><div><p class="font-bold text-gray-700 text-sm">${t.descricao || 'Movimentação'}</p><p class="text-[10px] text-gray-400">${dataFormat}</p></div></div>
+                        <p class="transacao-valor ${cor} font-bold text-sm">${sinal} R$ ${parseFloat(t.valor).toFixed(2).replace('.',',')}</p>
+                    </div>
+                `);
+            });
         }
 
         async function verDetalhes(id) {
@@ -558,12 +671,13 @@
             document.getElementById('det-destino').innerText = pedido.destino;
             document.getElementById('det-valor').innerText = "R$ " + parseFloat(pedido.valor_frete).toFixed(2).replace('.', ',');
             document.getElementById('det-pin').innerText = pedido.pin_entrega;
+            document.getElementById('det-id-visual').innerText = pedido.codigo_visual || '#-----';
 
             const st = pedido.status;
             let stText = 'Desconhecido';
             if(st === 'solicitado') stText = 'Solicitado - Aguardando Entregador';
-            else if(st === 'pendente') stText = 'Pendente - Motoboy a caminho';
-            else if(st === 'em_rota') stText = 'Em rota - Saiu para entrega';
+            else if(st === 'pendente') stText = 'Aguardando Motoboy - Aceito';
+            else if(st === 'em_rota') stText = 'Em Rota - Saiu para entrega';
             else if(st === 'concluido') stText = 'Finalizado';
             else if(st === 'cancelado') stText = 'Cancelado';
             document.getElementById('det-status').innerText = stText;
@@ -625,18 +739,15 @@
         // --- LÓGICA DE PIN E SENHA ---
         function verificarPinParaSaldo() { 
             if(!userProfile.pin_carteira) {
-                // Se não tem PIN, abre modal para criar (sem pedir senha, pois é primeira vez/fluxo simples)
                 alert("PIN não gerado, vamos gerar o PIN para prosseguirmos.");
                 abrirModalCriarPin(false);
             } else {
-                // Se já tem PIN, pede confirmação
                 document.getElementById('modal-pin').style.display='flex'; 
                 document.getElementById('modal-pin').classList.remove('hidden'); 
                 pendingAction='saldo'; 
             }
         }
 
-        // Modal de Alteração de Senha
         function abrirModalAlterarSenha() {
             document.getElementById('input-senha-atual').value = '';
             document.getElementById('input-nova-senha').value = '';
@@ -654,11 +765,9 @@
             if(nova !== conf) return alert("A nova senha e a confirmação não batem.");
             if(nova.length < 6) return alert("A nova senha deve ter no mínimo 6 caracteres.");
 
-            // 1. Verificar senha atual (re-autenticando)
             const { error: loginError } = await sbClient.auth.signInWithPassword({ email: userSession.user.email, password: atual });
             if(loginError) return alert("Senha atual incorreta.");
 
-            // 2. Atualizar senha
             const { error: updateError } = await sbClient.auth.updateUser({ password: nova });
             if(updateError) alert("Erro ao atualizar: " + updateError.message);
             else {
@@ -667,7 +776,6 @@
             }
         }
 
-        // Modal Criar/Alterar PIN
         let isChangingPin = false;
         function abrirModalAlterarPin() {
             isChangingPin = true;
@@ -677,19 +785,17 @@
             document.getElementById('input-senha-para-pin').value = '';
             document.getElementById('input-novo-pin').value = '';
             document.getElementById('input-conf-pin').value = '';
-            
             document.getElementById('modal-gerenciar-pin').style.display='flex';
             document.getElementById('modal-gerenciar-pin').classList.remove('hidden');
         }
 
         function abrirModalCriarPin() {
-            isChangingPin = false; // Criação inicial
+            isChangingPin = false;
             document.getElementById('titulo-modal-pin').innerText = "Criar PIN";
             document.getElementById('subtitulo-modal-pin').innerText = "Crie um PIN para proteger seu saldo.";
-            document.getElementById('box-senha-login-pin').classList.add('hidden'); // Não pede senha no primeiro setup rápido
+            document.getElementById('box-senha-login-pin').classList.add('hidden'); 
             document.getElementById('input-novo-pin').value = '';
             document.getElementById('input-conf-pin').value = '';
-
             document.getElementById('modal-gerenciar-pin').style.display='flex';
             document.getElementById('modal-gerenciar-pin').classList.remove('hidden');
         }
@@ -702,19 +808,17 @@
             if(novo !== conf) return alert("Os PINs não conferem.");
 
             if(isChangingPin) {
-                // Se for alteração, valida a senha de login antes
                 const senhaLogin = document.getElementById('input-senha-para-pin').value;
                 if(!senhaLogin) return alert("Informe sua senha de login para confirmar.");
                 const { error: loginError } = await sbClient.auth.signInWithPassword({ email: userSession.user.email, password: senhaLogin });
                 if(loginError) return alert("Senha de login incorreta.");
             }
 
-            // Salva no banco
             const { error } = await sbClient.from('profiles').update({ pin_carteira: novo }).eq('id', userSession.user.id);
             if(error) alert("Erro ao salvar PIN: " + error.message);
             else {
                 alert("PIN salvo com sucesso!");
-                userProfile.pin_carteira = novo; // Atualiza local
+                userProfile.pin_carteira = novo;
                 document.getElementById('modal-gerenciar-pin').style.display='none';
             }
         }
