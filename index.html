@@ -22,7 +22,6 @@
         .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; }
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
         
-        /* Switch */
         .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -31,19 +30,14 @@
         input:checked + .slider { background-color: #1E40AF; }
         input:checked + .slider:before { transform: translateX(20px); }
         
-        /* Layout Mobile */
-        .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 100px; display: none; overflow-y: auto; }
+        .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 80px; display: none; overflow-y: auto; }
         @media (min-width: 768px) { .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; margin: auto; } body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } }
         
-        /* Menu Inferior (Aumentado) */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; justify-content: space-around; padding: 16px 0; max-width: 28rem; margin: 0 auto; display: none; z-index: 50; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; justify-content: space-around; padding: 12px 0; max-width: 28rem; margin: 0 auto; display: none; }
         @media (min-width: 768px) { .bottom-nav { border-radius: 0 0 1.5rem 1.5rem; } }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.2s; }
-        .nav-item i { font-size: 1.5rem; margin-bottom: 4px; } /* Ícone maior */
-        .nav-item span { font-size: 0.75rem; font-weight: 500; } /* Texto legível */
-        .nav-item.active { color: #1E40AF; transform: translateY(-2px); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.2s; }
+        .nav-item.active { color: #1E40AF; font-weight: bold; transform: translateY(-2px); }
         
-        /* Componentes */
         .card-historico { background: white; border-radius: 12px; border: 1px solid #E5E7EB; padding: 16px; margin-bottom: 12px; position: relative; transition: all 0.3s ease; cursor: pointer; }
         .card-historico:active { transform: scale(0.98); background-color: #f9fafb; }
         .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
@@ -107,21 +101,18 @@
                 <input type="tel" id="reg-zap-loja" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="WhatsApp Loja">
                 <input type="text" id="reg-endereco" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Endereço de Retirada">
             </div>
-
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3">
                 <p class="text-xs font-bold text-gray-600 uppercase mb-1">Responsável</p>
                 <input type="text" id="reg-nome-resp" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Nome Completo">
                 <input type="tel" id="reg-cpf-resp" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="CPF">
                 <input type="tel" id="reg-zap-resp" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="WhatsApp Pessoal">
             </div>
-
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3">
                 <p class="text-xs font-bold text-gray-600 uppercase mb-1">Acesso</p>
                 <input type="email" id="reg-email" class="w-full bg-white border rounded-lg p-3 text-sm mb-3" placeholder="E-mail">
                 <input type="password" id="reg-senha" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Senha (Min 6)">
                 <input type="password" id="reg-conf-senha" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Confirmar Senha">
             </div>
-
             <button onclick="fazerCadastro()" id="btn-cad" class="w-full btn-primary font-bold py-4 rounded-xl mt-2 flex justify-center items-center gap-2">
                 <span>Finalizar Cadastro</span>
                 <div id="load-cad" class="spinner hidden" style="width: 20px; height: 20px; border-width: 2px;"></div>
@@ -160,10 +151,7 @@
                     <div class="relative"><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Produto</label><button type="button" class="custom-select-btn border-green-300 text-gray-700" onclick="toggleDropdown('produto')"><span id="display-produto">✅ Já Pago</span><i class="fas fa-chevron-down text-xs"></i></button><input type="hidden" id="pagamento_produto" value="Já Pago"><div id="list-produto" class="custom-options"><div class="custom-option" onclick="selectOption('produto', 'Já Pago', '✅ Já Pago')">✅ Já Pago</div><div class="custom-option" onclick="selectOption('produto', 'Cartão', '💳 Cartão')">💳 Cartão</div><div class="custom-option" onclick="selectOption('produto', 'PIX', '💠 PIX')">💠 PIX</div><div class="custom-option" onclick="selectOption('produto', 'Dinheiro', '💵 Dinheiro')">💵 Dinheiro</div></div></div>
                 </div>
                 <label id="box-retorno" class="switch-container p-3 flex items-center justify-between cursor-pointer">
-                    <div class="flex items-center gap-2">
-                        <i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i>
-                        <span id="text-retorno" class="text-sm font-bold text-gray-500">Sem Retorno</span>
-                    </div>
+                    <div class="flex items-center gap-2"><i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i><span id="text-retorno" class="text-sm font-bold text-gray-500">Sem Retorno</span></div>
                     <div class="switch"><input type="checkbox" id="retorno" onchange="recalcularTotal(); mudarStatusRetorno()"><span class="slider"></span></div>
                 </label>
             </div>
@@ -206,7 +194,6 @@
                 <div><label class="text-xs text-gray-500">CPF</label><input type="tel" id="edit-cpf-resp" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
                 <div><label class="text-xs text-gray-500">WhatsApp Pessoal</label><input type="tel" id="edit-resp-zap" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
             </div>
-            
             <div class="bg-red-50 p-4 rounded-xl border border-red-100 space-y-3">
                 <p class="text-xs font-bold text-red-400 uppercase">Segurança</p>
                 <button onclick="abrirModalAlterarPin()" class="w-full bg-white border border-red-200 text-red-500 font-bold py-3 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-key"></i> Gerenciar PIN de Pagamento</button>
@@ -255,12 +242,6 @@
                 });
             }
             
-            // Failsafe: Se em 3s não carregar, libera a tela
-            setTimeout(() => {
-                document.getElementById('global-loading').style.display = 'none';
-                if(!userSession) showScreen('welcome');
-            }, 3000);
-
             await carregarAppConfig();
             const { data: { session } } = await sbClient.auth.getSession();
             if (session) { userSession = session; await carregarPerfil(true); } 
@@ -282,7 +263,7 @@
                     APP_CONFIG.taxa_retorno_valor = parseFloat(data.taxa_retorno_valor);
                     APP_CONFIG.taxa_app_percent = parseFloat(data.taxa_app_percent);
                 }
-            } catch(e) { console.log("Config local usada"); }
+            } catch(e) { console.log("Config local"); }
         }
 
         // --- LÓGICA DE RETORNO (CORRIGIDA) ---
@@ -320,34 +301,26 @@
             if(tela==='extrato') carregarExtrato();
         }
 
-        // --- DADOS DO PERFIL (ATUALIZADO) ---
+        // --- DADOS DO PERFIL ---
         function preencherDadosPerfil(data) {
             safeText('app-user-name', data.nome_loja || 'Minha Loja');
             safeText('app-user-code', data.codigo_visual || userSession.user.id.slice(0, 4).toUpperCase());
             safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
             safeVal('origem', data.endereco || data.nome_loja);
             
-            // Campos de Edição
-            safeVal('edit-nome-loja', data.nome_loja); 
-            safeVal('edit-razao', data.razao_social);
-            safeVal('edit-cnpj', data.cnpj); 
-            safeVal('edit-zap-loja', data.whatsapp_loja); 
-            safeVal('edit-endereco', data.endereco); 
-            safeVal('edit-resp-nome', data.responsavel); 
-            safeVal('edit-cpf-resp', data.cpf_responsavel); 
-            safeVal('edit-resp-zap', data.whatsapp_responsavel); 
+            // Edição
+            safeVal('edit-nome-loja', data.nome_loja); safeVal('edit-razao', data.razao_social);
+            safeVal('edit-cnpj', data.cnpj); safeVal('edit-zap-loja', data.whatsapp_loja); 
+            safeVal('edit-endereco', data.endereco); safeVal('edit-resp-nome', data.responsavel); 
+            safeVal('edit-cpf-resp', data.cpf_responsavel); safeVal('edit-resp-zap', data.whatsapp_responsavel); 
         }
 
         async function salvarPerfil() {
             const updates = { 
-                nome_loja: document.getElementById('edit-nome-loja').value, 
-                razao_social: document.getElementById('edit-razao').value,
-                cnpj: document.getElementById('edit-cnpj').value,
-                whatsapp_loja: document.getElementById('edit-zap-loja').value, 
-                endereco: document.getElementById('edit-endereco').value, 
-                responsavel: document.getElementById('edit-resp-nome').value,
-                cpf_responsavel: document.getElementById('edit-cpf-resp').value,
-                whatsapp_responsavel: document.getElementById('edit-resp-zap').value
+                nome_loja: document.getElementById('edit-nome-loja').value, razao_social: document.getElementById('edit-razao').value,
+                cnpj: document.getElementById('edit-cnpj').value, whatsapp_loja: document.getElementById('edit-zap-loja').value, 
+                endereco: document.getElementById('edit-endereco').value, responsavel: document.getElementById('edit-resp-nome').value,
+                cpf_responsavel: document.getElementById('edit-cpf-resp').value, whatsapp_responsavel: document.getElementById('edit-resp-zap').value
             };
             await sbClient.from('profiles').update(updates).eq('id', userSession.user.id); 
             alert("Salvo!"); carregarPerfil();
@@ -364,7 +337,7 @@
                 conf: document.getElementById('reg-conf-senha').value
             };
 
-            if(Object.values(dados).some(v => !v)) return alert("Preencha todos os campos obrigatórios!");
+            if(Object.values(dados).some(v => !v)) return alert("Preencha todos os campos!");
             if(dados.senha !== dados.conf) return alert("Senhas não conferem!");
             
             const btn = document.getElementById('btn-cad'); const spin = document.getElementById('load-cad');
@@ -379,7 +352,7 @@
                         whatsapp_loja: dados.zapLoja, endereco: dados.endereco, responsavel: dados.resp,
                         cpf_responsavel: dados.cpf, whatsapp_responsavel: dados.zapResp, email: dados.email
                     }]);
-                    alert("Cadastro realizado! Faça login."); showScreen('login');
+                    alert("Sucesso! Faça login."); showScreen('login');
                 }
             } catch (e) { alert("Erro: " + e.message); } 
             finally { btn.disabled = false; spin.classList.add('hidden'); }
@@ -448,7 +421,6 @@
         async function iniciarPedido() {
             if(!userSession) { alert("Faça login."); return; }
             let val = parseFloat(valorFinal);
-            
             try {
                 const pg = document.getElementById('pagamento_entrega').value;
                 if(pg === 'Carteira') {
@@ -472,7 +444,7 @@
             } catch(e) { alert(e.message); }
         }
 
-        // Utils, Historico, Extrato e Detalhes (Mantidos da versão anterior)
+        // Utils, Historico, Extrato e Detalhes
         function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
         function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val || ''; } 
         function toggleDropdown(id) { document.getElementById(`list-${id}`).classList.toggle('show'); }
@@ -483,6 +455,7 @@
         function ativarRealtimePedidos() { sbClient.channel('cl-pedidos').on('postgres_changes', {event:'*', schema:'public', table:'pedidos'}, ()=>carregarHistoricoPedidos()).subscribe(); }
         function verificarPinParaSaldo() { alert("Use o WhatsApp do Admin para recarregar."); solicitarSaldoZap(); }
         function solicitarSaldoZap() { window.open(`https://wa.me/${NUMERO_ADMIN}?text=Quero saldo. ID: ${userProfile.codigo_visual}`, '_blank'); }
+        
         async function carregarHistoricoPedidos() { const { data } = await sbClient.from('pedidos').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(20); if(data) { pedidosCache = data; renderizarLista(data); } }
         function renderizarLista(data) { 
             const lista = document.getElementById('lista-pedidos'); lista.innerHTML = '';
@@ -499,6 +472,26 @@
             document.getElementById('det-origem').innerText = p.origem; document.getElementById('det-destino').innerText = p.destino;
             document.getElementById('det-valor').innerText = "R$ " + parseFloat(p.valor_frete).toFixed(2); document.getElementById('det-pin').innerText = p.pin_entrega;
             document.getElementById('det-status').innerText = p.status.toUpperCase();
+            
+            const boxMoto = document.getElementById('box-motoboy');
+            const btnAvaliar = document.getElementById('btn-avaliar');
+            
+            if(p.entregador_id) {
+                const { data: moto } = await sbClient.from('profiles').select('*').eq('id', p.entregador_id).single();
+                if(moto) {
+                    boxMoto.classList.remove('hidden'); document.getElementById('det-moto-nome').innerText = moto.responsavel;
+                    document.getElementById('det-moto-placa').innerText = moto.placa_moto;
+                    document.getElementById('btn-zap-moto').onclick = function() { window.open(`https://wa.me/${moto.whatsapp_responsavel}`, '_blank'); };
+                    
+                    if(p.status === 'concluido') { btnAvaliar.classList.remove('hidden'); btnAvaliar.onclick = function() { abrirModalAvaliacao(p.id, p.entregador_id); }; } 
+                    else { btnAvaliar.classList.add('hidden'); }
+                }
+            } else { boxMoto.classList.add('hidden'); }
+            
+            const boxCancel = document.getElementById('box-cancelar');
+            if(p.status === 'solicitado') { boxCancel.classList.remove('hidden'); document.getElementById('btn-cancelar-detalhe').onclick = function() { cancelarPedido(id); document.getElementById('modal-detalhes').style.display='none'; }; } 
+            else { boxCancel.classList.add('hidden'); }
+            
             document.getElementById('modal-detalhes').style.display='flex'; document.getElementById('modal-detalhes').classList.remove('hidden');
         }
         async function carregarExtrato() {
@@ -510,6 +503,7 @@
         function abrirModalAlterarPin() { document.getElementById('modal-gerenciar-pin').style.display='flex'; document.getElementById('modal-gerenciar-pin').classList.remove('hidden'); }
         async function salvarNovoPin() { const n=document.getElementById('input-novo-pin').value, c=document.getElementById('input-conf-pin').value; if(n.length!==4||n!==c) return alert("Erro no PIN"); await sbClient.from('profiles').update({pin_carteira:n}).eq('id',userSession.user.id); alert("Salvo!"); document.getElementById('modal-gerenciar-pin').classList.add('hidden'); userProfile.pin_carteira=n; }
         async function salvarNovaSenha() { const n=document.getElementById('input-nova-senha').value, c=document.getElementById('input-conf-senha').value; if(n.length<6||n!==c) return alert("Erro na senha"); await sbClient.auth.updateUser({password:n}); alert("Senha alterada!"); document.getElementById('modal-alterar-senha').classList.add('hidden'); }
+        async function atualizarPedidosManual() { const i=document.getElementById('icon-refresh'); i.classList.add('fa-spin'); await carregarHistoricoPedidos(); setTimeout(()=>i.classList.remove('fa-spin'),500); }
     </script>
 </body>
 </html>
