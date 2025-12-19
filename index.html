@@ -241,7 +241,7 @@
         let APP_CONFIG = { taxa_base: 5.0, preco_km: 1.0, taxa_retorno_tipo: 'percent', taxa_retorno_valor: 20, taxa_app_percent: 10 };
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let userSession = null, userProfile = null, distanciaFinal = 0, valorFinal = 0, pedidosCache = [];
-        let isRegistering = false; // VARIÁVEL DE CONTROLE
+        let isRegistering = false; // VARIÁVEL DE CONTROLE DECLARADA NO TOPO
 
         window.onload = async function() {
             if(typeof $ !== 'undefined') {
@@ -252,8 +252,9 @@
                 });
             }
             
-            // REMOVIDO: O Timeout de 3s que forçava a saída
-            
+            // Failsafe Visual: Esconde loading após 3s se não tiver resposta
+            setTimeout(() => { document.getElementById('global-loading').style.display = 'none'; }, 3000);
+
             await carregarAppConfig();
             
             const { data: { session } } = await sbClient.auth.getSession();
@@ -261,7 +262,6 @@
                 userSession = session;
                 await carregarPerfil(true); 
             } else {
-                document.getElementById('global-loading').style.display = 'none';
                 showScreen('welcome');
             }
             
