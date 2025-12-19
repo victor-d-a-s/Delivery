@@ -22,6 +22,7 @@
         .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; }
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
         
+        /* Switch */
         .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -30,14 +31,19 @@
         input:checked + .slider { background-color: #1E40AF; }
         input:checked + .slider:before { transform: translateX(20px); }
         
-        .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 80px; display: none; overflow-y: auto; }
+        /* Layout Mobile */
+        .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 100px; display: none; overflow-y: auto; }
         @media (min-width: 768px) { .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; margin: auto; } body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } }
         
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; justify-content: space-around; padding: 12px 0; max-width: 28rem; margin: 0 auto; display: none; }
+        /* Menu Inferior (Aumentado) */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; justify-content: space-around; padding: 16px 0; max-width: 28rem; margin: 0 auto; display: none; z-index: 50; }
         @media (min-width: 768px) { .bottom-nav { border-radius: 0 0 1.5rem 1.5rem; } }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.2s; }
-        .nav-item.active { color: #1E40AF; font-weight: bold; transform: translateY(-2px); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.2s; }
+        .nav-item i { font-size: 1.5rem; margin-bottom: 4px; } /* Ícone maior */
+        .nav-item span { font-size: 0.75rem; font-weight: 500; } /* Texto legível */
+        .nav-item.active { color: #1E40AF; transform: translateY(-2px); }
         
+        /* Componentes */
         .card-historico { background: white; border-radius: 12px; border: 1px solid #E5E7EB; padding: 16px; margin-bottom: 12px; position: relative; transition: all 0.3s ease; cursor: pointer; }
         .card-historico:active { transform: scale(0.98); background-color: #f9fafb; }
         .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
@@ -58,15 +64,12 @@
         .transacao-valor.credito { color: #059669; }
         .transacao-valor.debito { color: #DC2626; }
         
-        /* Estrelas de Avaliação */
         .star-rating { direction: rtl; display: inline-flex; }
         .star-rating input { display: none; }
         .star-rating label { font-size: 2rem; color: #ddd; cursor: pointer; transition: color 0.2s; }
         .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #FBBF24; }
         
         .date-filter { font-size: 11px; padding: 6px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; }
-        
-        /* Loader Ajustado */
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #1E40AF; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -74,8 +77,7 @@
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
 
     <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
-        <div class="spinner mb-4"></div>
-        <p id="loading-msg" class="text-blue-900 text-sm font-bold animate-pulse">Carregando...</p>
+        <div class="spinner mb-4"></div><p id="loading-msg" class="text-blue-900 text-sm font-bold animate-pulse">CARREGANDO...</p>
     </div>
 
     <div id="screen-welcome" class="app-container p-8 text-center fade-in flex flex-col justify-center">
@@ -158,7 +160,10 @@
                     <div class="relative"><label class="text-[10px] font-bold text-gray-500 uppercase ml-1">Produto</label><button type="button" class="custom-select-btn border-green-300 text-gray-700" onclick="toggleDropdown('produto')"><span id="display-produto">✅ Já Pago</span><i class="fas fa-chevron-down text-xs"></i></button><input type="hidden" id="pagamento_produto" value="Já Pago"><div id="list-produto" class="custom-options"><div class="custom-option" onclick="selectOption('produto', 'Já Pago', '✅ Já Pago')">✅ Já Pago</div><div class="custom-option" onclick="selectOption('produto', 'Cartão', '💳 Cartão')">💳 Cartão</div><div class="custom-option" onclick="selectOption('produto', 'PIX', '💠 PIX')">💠 PIX</div><div class="custom-option" onclick="selectOption('produto', 'Dinheiro', '💵 Dinheiro')">💵 Dinheiro</div></div></div>
                 </div>
                 <label id="box-retorno" class="switch-container p-3 flex items-center justify-between cursor-pointer">
-                    <div class="flex items-center gap-2"><i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i><span id="text-retorno" class="text-sm font-bold text-gray-500">Sem Retorno</span></div>
+                    <div class="flex items-center gap-2">
+                        <i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i>
+                        <span id="text-retorno" class="text-sm font-bold text-gray-500">Sem Retorno</span>
+                    </div>
                     <div class="switch"><input type="checkbox" id="retorno" onchange="recalcularTotal(); mudarStatusRetorno()"><span class="slider"></span></div>
                 </label>
             </div>
@@ -187,19 +192,21 @@
     <div id="screen-perfil" class="app-container p-6 fade-in">
         <h2 class="text-xl font-bold mb-4">Editar Perfil</h2>
         <div class="space-y-4 pb-20">
-            <div class="bg-white p-4 rounded-xl border space-y-3">
-                <p class="text-xs font-bold text-gray-400 uppercase">Estabelecimento</p>
+            <div class="bg-white p-4 rounded-lg border border-blue-100 space-y-3">
+                <p class="text-xs font-bold text-blue-800 uppercase mb-1">Estabelecimento</p>
                 <div><label class="text-xs text-gray-500">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
                 <div><label class="text-xs text-gray-500">Razão Social</label><input type="text" id="edit-razao" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">CNPJ (Somente Números)</label><input type="text" id="edit-cnpj" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">WhatsApp Loja</label><input type="text" id="edit-zap-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs text-gray-500">CNPJ</label><input type="tel" id="edit-cnpj" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs text-gray-500">WhatsApp Loja</label><input type="tel" id="edit-zap-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
                 <div><label class="text-xs text-gray-500">Endereço de Coleta</label><input type="text" id="edit-endereco" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
             </div>
-            <div class="bg-white p-4 rounded-xl border space-y-3">
-                <p class="text-xs font-bold text-gray-400 uppercase">Responsável</p>
+            <div class="bg-white p-4 rounded-lg border border-gray-200 space-y-3">
+                <p class="text-xs font-bold text-gray-600 uppercase mb-1">Responsável</p>
                 <div><label class="text-xs text-gray-500">Nome Completo</label><input type="text" id="edit-resp-nome" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">WhatsApp Pessoal</label><input type="text" id="edit-resp-zap" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs text-gray-500">CPF</label><input type="tel" id="edit-cpf-resp" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
+                <div><label class="text-xs text-gray-500">WhatsApp Pessoal</label><input type="tel" id="edit-resp-zap" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
             </div>
+            
             <div class="bg-red-50 p-4 rounded-xl border border-red-100 space-y-3">
                 <p class="text-xs font-bold text-red-400 uppercase">Segurança</p>
                 <button onclick="abrirModalAlterarPin()" class="w-full bg-white border border-red-200 text-red-500 font-bold py-3 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-key"></i> Gerenciar PIN de Pagamento</button>
@@ -212,102 +219,15 @@
 
     <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[60] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Pedido Criado!</h2><p class="text-sm text-gray-500 mb-6">Aguardando entregador...</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
 
-    <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in" style="display:none">
-        <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
-            <h2 class="text-lg font-bold text-gray-800 mb-2">Segurança</h2>
-            <p class="text-sm text-gray-500 mb-4">Digite seu PIN de 4 dígitos</p>
-            <input type="tel" id="input-confirm-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-4 outline-none focus:ring-2 focus:ring-blue-500">
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="document.getElementById('modal-pin').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button>
-                <button onclick="confirmarPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Confirmar</button>
-            </div>
-        </div>
-    </div>
+    <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl"><h2 class="text-lg font-bold text-gray-800 mb-2">Segurança</h2><p class="text-sm text-gray-500 mb-4">Digite seu PIN de 4 dígitos</p><input type="tel" id="input-confirm-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-4 outline-none focus:ring-2 focus:ring-blue-500"><div class="grid grid-cols-2 gap-3"><button onclick="document.getElementById('modal-pin').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button><button onclick="confirmarPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Confirmar</button></div></div></div>
 
-    <div id="modal-detalhes" class="hidden fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 fade-in" style="display:none">
-        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="document.getElementById('modal-detalhes').style.display='none'" class="absolute top-2 right-3 text-gray-400 text-2xl z-10">&times;</button>
-            
-            <div class="bg-blue-600 p-6 text-white">
-                <h3 class="font-bold text-xl mb-1">Detalhes da Entrega</h3>
-                <div class="flex items-center gap-2 mt-1">
-                    <p id="det-id-visual" class="text-sm bg-blue-700 px-2 py-0.5 rounded font-mono">#00000</p>
-                    <p id="det-status" class="text-xs bg-white/20 px-2 py-1 rounded">Carregando...</p>
-                </div>
-            </div>
-            
-            <div class="p-6 space-y-4">
-                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100"><div><p class="text-xs text-gray-500 uppercase font-bold">Valor da Entrega</p><p id="det-valor" class="text-2xl font-bold text-green-700">R$ --,--</p></div><div class="text-right"><p class="text-xs text-gray-500 uppercase font-bold">PIN Entrega</p><p id="det-pin" class="text-xl font-mono font-bold text-blue-600">----</p></div></div>
-                <div class="space-y-3 border-b pb-4"><div class="flex gap-3"><div class="flex flex-col items-center"><i class="fas fa-circle text-blue-600 text-[10px] mt-1"></i><div class="h-full w-0.5 bg-gray-200 my-1"></div><i class="fas fa-map-marker-alt text-red-500"></i></div><div class="flex-1 space-y-4"><div><p class="text-xs text-gray-400 font-bold">RETIRADA</p><p id="det-origem" class="text-sm font-medium text-gray-700">...</p></div><div><p class="text-xs text-gray-400 font-bold">ENTREGA</p><p id="det-destino" class="text-sm font-medium text-gray-700">...</p></div></div></div></div>
-                
-                <div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl border border-blue-100">
-                    <p class="text-xs text-blue-500 font-bold uppercase mb-3 flex items-center gap-2"><i class="fas fa-motorcycle"></i> Dados do Entregador</p>
-                    <div class="flex items-center gap-4 mb-3">
-                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-blue-600 text-xl"><i class="fas fa-user"></i></div>
-                        <div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs text-gray-500 font-mono bg-gray-200 px-1 rounded inline-block">PLACA</p></div>
-                    </div>
-                    <p id="det-moto-modelo" class="text-xs text-gray-600 mb-3 ml-16 -mt-2">Modelo Moto</p>
-                    <button id="btn-zap-moto" onclick="" class="w-full bg-green-500 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-green-600"><i class="fab fa-whatsapp"></i> Chamar no WhatsApp</button>
-                    <button id="btn-avaliar" class="w-full bg-yellow-400 text-black py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-yellow-500 mt-2 hidden" onclick="abrirModalAvaliacao()">Avaliar Motoboy</button>
-                </div>
+    <div id="modal-detalhes" class="hidden fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto"><button onclick="document.getElementById('modal-detalhes').style.display='none'" class="absolute top-2 right-3 text-gray-400 text-2xl z-10">&times;</button><div class="bg-blue-600 p-6 text-white"><h3 class="font-bold text-xl mb-1">Detalhes da Entrega</h3><div class="flex items-center gap-2 mt-1"><p id="det-id-visual" class="text-sm bg-blue-700 px-2 py-0.5 rounded font-mono">#00000</p><p id="det-status" class="text-xs bg-white/20 px-2 py-1 rounded">Carregando...</p></div></div><div class="p-6 space-y-4"><div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100"><div><p class="text-xs text-gray-500 uppercase font-bold">Valor da Entrega</p><p id="det-valor" class="text-2xl font-bold text-green-700">R$ --,--</p></div><div class="text-right"><p class="text-xs text-gray-500 uppercase font-bold">PIN Entrega</p><p id="det-pin" class="text-xl font-mono font-bold text-blue-600">----</p></div></div><div class="space-y-3 border-b pb-4"><div class="flex gap-3"><div class="flex flex-col items-center"><i class="fas fa-circle text-blue-600 text-[10px] mt-1"></i><div class="h-full w-0.5 bg-gray-200 my-1"></div><i class="fas fa-map-marker-alt text-red-500"></i></div><div class="flex-1 space-y-4"><div><p class="text-xs text-gray-400 font-bold">RETIRADA</p><p id="det-origem" class="text-sm font-medium text-gray-700">...</p></div><div><p class="text-xs text-gray-400 font-bold">ENTREGA</p><p id="det-destino" class="text-sm font-medium text-gray-700">...</p></div></div></div></div><div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl border border-blue-100"><p class="text-xs text-blue-500 font-bold uppercase mb-3 flex items-center gap-2"><i class="fas fa-motorcycle"></i> Dados do Entregador</p><div class="flex items-center gap-4 mb-3"><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-blue-600 text-xl"><i class="fas fa-user"></i></div><div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs text-gray-500 font-mono bg-gray-200 px-1 rounded inline-block">PLACA</p></div></div><p id="det-moto-modelo" class="text-xs text-gray-600 mb-3 ml-16 -mt-2">Modelo Moto</p><button id="btn-zap-moto" onclick="" class="w-full bg-green-500 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-green-600"><i class="fab fa-whatsapp"></i> Chamar no WhatsApp</button><button id="btn-avaliar" class="w-full bg-yellow-400 text-black py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-yellow-500 mt-2 hidden" onclick="abrirModalAvaliacao()">Avaliar Motoboy</button></div><div id="box-cancelar" class="hidden pt-2"><button id="btn-cancelar-detalhe" onclick="" class="w-full text-red-500 font-bold text-sm border border-red-200 py-3 rounded-xl hover:bg-red-50">Cancelar Pedido</button></div></div></div></div>
 
-                <div id="box-cancelar" class="hidden pt-2"><button id="btn-cancelar-detalhe" onclick="" class="w-full text-red-500 font-bold text-sm border border-red-200 py-3 rounded-xl hover:bg-red-50">Cancelar Pedido</button></div>
-            </div>
-        </div>
-    </div>
+    <div id="modal-avaliacao" class="hidden fixed inset-0 bg-black/80 z-[90] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-2xl w-full max-w-sm p-6 text-center shadow-2xl relative"><button onclick="document.getElementById('modal-avaliacao').classList.add('hidden')" class="absolute top-2 right-2 text-gray-400 p-2 text-xl">&times;</button><div class="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4 text-yellow-500 text-2xl"><i class="fas fa-star"></i></div><h3 class="text-xl font-bold text-gray-800 mb-1">Avaliar Entrega</h3><p class="text-sm text-gray-500 mb-4">O que achou do serviço?</p><div class="star-rating justify-center mb-4"><input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label><input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label><input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label><input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label><input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label></div><textarea id="av-comentario" class="w-full border rounded-lg p-3 text-sm mb-4 bg-gray-50" placeholder="Deixe um comentário (opcional)..." rows="3"></textarea><button onclick="enviarAvaliacao()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-xl shadow-lg">ENVIAR AVALIAÇÃO</button><input type="hidden" id="av-pedido-id"><input type="hidden" id="av-motoboy-id"></div></div>
 
-    <div id="modal-avaliacao" class="hidden fixed inset-0 bg-black/80 z-[90] flex items-center justify-center p-4 fade-in" style="display:none">
-        <div class="bg-white rounded-2xl w-full max-w-sm p-6 text-center shadow-2xl relative">
-            <button onclick="document.getElementById('modal-avaliacao').classList.add('hidden')" class="absolute top-2 right-2 text-gray-400 p-2 text-xl">&times;</button>
-            <div class="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4 text-yellow-500 text-2xl"><i class="fas fa-star"></i></div>
-            <h3 class="text-xl font-bold text-gray-800 mb-1">Avaliar Entrega</h3>
-            <p class="text-sm text-gray-500 mb-4">O que achou do serviço?</p>
-            
-            <div class="star-rating justify-center mb-4">
-                <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
-                <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
-                <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
-                <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
-                <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
-            </div>
-            
-            <textarea id="av-comentario" class="w-full border rounded-lg p-3 text-sm mb-4 bg-gray-50" placeholder="Deixe um comentário (opcional)..." rows="3"></textarea>
-            
-            <button onclick="enviarAvaliacao()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-xl shadow-lg">ENVIAR AVALIAÇÃO</button>
-            
-            <input type="hidden" id="av-pedido-id">
-            <input type="hidden" id="av-motoboy-id">
-        </div>
-    </div>
+    <div id="modal-alterar-senha" class="hidden fixed inset-0 bg-gray-900/90 z-[90] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl"><h2 class="text-lg font-bold text-gray-800 mb-2">Alterar Senha</h2><div class="space-y-3 mb-4"><input type="password" id="input-senha-atual" class="w-full border rounded-lg p-3 text-sm" placeholder="Senha Atual (Obrigatório)"><input type="password" id="input-nova-senha" class="w-full border rounded-lg p-3 text-sm" placeholder="Nova Senha"><input type="password" id="input-conf-senha" class="w-full border rounded-lg p-3 text-sm" placeholder="Confirmar Nova Senha"></div><div class="grid grid-cols-2 gap-3"><button onclick="document.getElementById('modal-alterar-senha').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button><button onclick="salvarNovaSenha()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Alterar</button></div></div></div>
 
-    <div id="modal-alterar-senha" class="hidden fixed inset-0 bg-gray-900/90 z-[90] flex items-center justify-center p-4 fade-in" style="display:none">
-        <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
-            <h2 class="text-lg font-bold text-gray-800 mb-2">Alterar Senha</h2>
-            <div class="space-y-3 mb-4">
-                <input type="password" id="input-senha-atual" class="w-full border rounded-lg p-3 text-sm" placeholder="Senha Atual (Obrigatório)">
-                <input type="password" id="input-nova-senha" class="w-full border rounded-lg p-3 text-sm" placeholder="Nova Senha">
-                <input type="password" id="input-conf-senha" class="w-full border rounded-lg p-3 text-sm" placeholder="Confirmar Nova Senha">
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="document.getElementById('modal-alterar-senha').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button>
-                <button onclick="salvarNovaSenha()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Alterar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-gerenciar-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[90] flex items-center justify-center p-4 fade-in" style="display:none">
-        <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
-            <h2 class="text-lg font-bold text-gray-800 mb-2" id="titulo-modal-pin">Criar PIN</h2>
-            <p class="text-xs text-gray-500 mb-4" id="subtitulo-modal-pin">Crie um PIN de 4 dígitos para autorizar transações.</p>
-            <div id="box-senha-login-pin" class="mb-3 hidden"><p class="text-xs text-left mb-1 text-gray-600 font-bold">Senha de Login (Segurança)</p><input type="password" id="input-senha-para-pin" class="w-full border rounded-lg p-3 text-sm mb-2" placeholder="Sua senha de entrar no app"></div>
-            <input type="tel" id="input-novo-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-2 outline-none focus:ring-2 focus:ring-blue-500" placeholder="PIN">
-            <input type="tel" id="input-conf-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-4 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Confirmar">
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="document.getElementById('modal-gerenciar-pin').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button>
-                <button onclick="salvarNovoPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Salvar</button>
-            </div>
-        </div>
-    </div>
+    <div id="modal-gerenciar-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[90] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl"><h2 class="text-lg font-bold text-gray-800 mb-2" id="titulo-modal-pin">Criar PIN</h2><p class="text-xs text-gray-500 mb-4" id="subtitulo-modal-pin">Crie um PIN de 4 dígitos para autorizar transações.</p><div id="box-senha-login-pin" class="mb-3 hidden"><p class="text-xs text-left mb-1 text-gray-600 font-bold">Senha de Login (Segurança)</p><input type="password" id="input-senha-para-pin" class="w-full border rounded-lg p-3 text-sm mb-2" placeholder="Sua senha de entrar no app"></div><input type="tel" id="input-novo-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-2 outline-none focus:ring-2 focus:ring-blue-500" placeholder="PIN"><input type="tel" id="input-conf-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-4 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Confirmar"><div class="grid grid-cols-2 gap-3"><button onclick="document.getElementById('modal-gerenciar-pin').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button><button onclick="salvarNovoPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Salvar</button></div></div></div>
 
     <div id="bottom-menu" class="bottom-nav w-full z-[200]">
         <div class="nav-item active" onclick="navegar('app', this)"><i class="fas fa-home"></i><span>Início</span></div>
@@ -317,77 +237,40 @@
     </div>
 
     <script>
-        // CONFIGURAÇÕES GERAIS
         const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
         const NUMERO_ADMIN = "5584982005039"; 
         const CIDADE_FIXA = "Mossoró, RN"; 
-        const TAXA_RETORNO = 0.20; 
-        const PRECO_BASE = 5.00; 
-        const PRECO_POR_KM = 1.00;
-        const INACTIVITY_TIME = 30 * 60 * 1000;
-
-        // Configuração Dinâmica (Será carregada do banco)
-        let APP_CONFIG = { taxa_base: 5.0, preco_km: 1.0, taxa_retorno_tipo: 'percent', taxa_retorno_valor: 20, taxa_app_percent: 10 };
-
-        const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        let userSession = null;
-        let userProfile = null;
-        let distanciaFinal = 0;
-        let valorFinal = 0;
-        let pendingAction = null;
-        let isRegistering = false;
-        let pedidosCache = [];
-        let realTimeSubscription = null;
-        let inactivityTimer;
-
-        function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
-        function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val || ''; } 
         
-        function toggleDropdown(id) { 
-            const list = document.getElementById(`list-${id}`); 
-            document.querySelectorAll('.custom-options').forEach(el => { if(el.id !== `list-${id}`) el.classList.remove('show'); });
-            list.classList.toggle('show'); 
-        }
-        function selectOption(id, value, text) { 
-            document.getElementById(`pagamento_${id}`).value = value; 
-            document.getElementById(`display-${id}`).innerText = text; 
-            document.getElementById(`list-${id}`).classList.remove('show'); 
-        }
-        document.addEventListener('click', function(e) { if (!e.target.closest('.relative')) { document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show')); } });
+        let APP_CONFIG = { taxa_base: 5.0, preco_km: 1.0, taxa_retorno_tipo: 'percent', taxa_retorno_valor: 20, taxa_app_percent: 10 };
+        const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let userSession = null, userProfile = null, distanciaFinal = 0, valorFinal = 0, pedidosCache = [];
 
-        window.addEventListener('load', async function() {
+        window.onload = async function() {
             if(typeof $ !== 'undefined') {
                 $(document).ready(function(){ 
-                    $('#reg-zap-loja, #reg-zap-resp, #tel_dest').mask('(00) 00000-0000');
-                    $('#reg-cnpj').mask('00.000.000/0000-00');
-                    $('#reg-cpf-resp').mask('000.000.000-00');
+                    $('#reg-zap-loja, #reg-zap-resp, #tel_dest, #edit-zap-loja, #edit-resp-zap').mask('(00) 00000-0000');
+                    $('#reg-cnpj, #edit-cnpj').mask('00.000.000/0000-00');
+                    $('#reg-cpf-resp, #edit-cpf-resp').mask('000.000.000-00');
                 });
             }
             
-            // Failsafe: Se em 3 segundos não carregar, libera a tela
+            // Failsafe: Se em 3s não carregar, libera a tela
             setTimeout(() => {
                 document.getElementById('global-loading').style.display = 'none';
                 if(!userSession) showScreen('welcome');
             }, 3000);
 
-            // Carrega preços do banco
             await carregarAppConfig();
-
             const { data: { session } } = await sbClient.auth.getSession();
-            if (session) {
-                userSession = session;
-                await carregarPerfil(true); 
-            } else {
-                document.getElementById('global-loading').style.display = 'none';
-                showScreen('welcome');
-            }
+            if (session) { userSession = session; await carregarPerfil(true); } 
+            else { document.getElementById('global-loading').style.display = 'none'; showScreen('welcome'); }
+            
             sbClient.auth.onAuthStateChange(async (event, session) => {
-                if (isRegistering) return;
                 if (event === 'SIGNED_IN' && session) { userSession = session; await carregarPerfil(true); } 
                 else if (event === 'SIGNED_OUT') { userSession = null; userProfile = null; showScreen('welcome'); }
             });
-        });
+        };
 
         async function carregarAppConfig() {
             try {
@@ -395,258 +278,142 @@
                 if(data) {
                     APP_CONFIG.taxa_base = parseFloat(data.taxa_base);
                     APP_CONFIG.preco_km = parseFloat(data.preco_km);
-                    APP_CONFIG.taxa_retorno_tipo = data.taxa_retorno_tipo || 'percent';
+                    APP_CONFIG.taxa_retorno_tipo = data.taxa_retorno_tipo;
                     APP_CONFIG.taxa_retorno_valor = parseFloat(data.taxa_retorno_valor);
                     APP_CONFIG.taxa_app_percent = parseFloat(data.taxa_app_percent);
                 }
             } catch(e) { console.log("Config local usada"); }
         }
 
-        // --- SISTEMA DE INATIVIDADE ---
-        function setupInactivityListener() {
-            const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
-            events.forEach(event => { document.addEventListener(event, resetInactivityTimer, true); });
-            resetInactivityTimer();
-        }
-        function resetInactivityTimer() {
-            clearTimeout(inactivityTimer);
-            if(userSession) {
-                inactivityTimer = setTimeout(async () => { alert("Sessão expirada por inatividade."); await fazerLogout(); }, INACTIVITY_TIME);
-            }
+        // --- LÓGICA DE RETORNO (CORRIGIDA) ---
+        function mudarStatusRetorno() {
+            const isChecked = document.getElementById('retorno').checked;
+            const textEl = document.getElementById('text-retorno');
+            const iconEl = document.getElementById('icon-retorno');
+            
+            textEl.innerText = isChecked ? "Com Retorno" : "Sem Retorno";
+            textEl.style.color = isChecked ? "#1E40AF" : "#6B7280";
+            iconEl.className = isChecked ? "fas fa-exchange-alt text-blue-700" : "fas fa-arrow-right text-gray-400";
         }
 
-        // --- NAVEGAÇÃO ROBUSTA ---
+        // --- NAVEGAÇÃO ---
         function showScreen(id) {
-            // Esconde todas as telas
             ['welcome', 'register', 'login', 'app', 'pedidos', 'extrato', 'perfil'].forEach(s => {
-                const el = document.getElementById('screen-' + s);
-                if(el) {
-                    el.style.display = 'none';
-                    el.classList.remove('active');
-                }
+                const el = document.getElementById('screen-'+s);
+                if(el) { el.style.display = 'none'; el.classList.remove('active'); }
             });
-
-            // Mostra a tela alvo
-            const target = document.getElementById('screen-' + id);
-            if(target) {
-                // Telas de auth usam Flex para centralizar, App usa Block
-                if(['welcome', 'login', 'extrato'].includes(id)) target.style.display = 'flex';
-                else target.style.display = 'block';
+            const t = document.getElementById('screen-'+id); 
+            if(t) {
+                if(['welcome','login'].includes(id)) t.style.display='flex'; else t.style.display='block';
                 window.scrollTo(0,0);
             }
-
-            // Menu Inferior
-            const menu = document.getElementById('bottom-menu');
-            if(['app', 'pedidos', 'extrato', 'perfil'].includes(id)) {
-                menu.style.display = 'flex';
-            } else {
-                menu.style.display = 'none';
-            }
+            const m = document.getElementById('bottom-menu');
+            if(['app','pedidos','extrato','perfil'].includes(id)) { m.style.display='flex'; } else { m.style.display='none'; }
         }
 
         function navegar(tela, el) { 
             localStorage.setItem('lastScreen', tela); 
             showScreen(tela); 
-            if(el) {
-                document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
-                el.classList.add('active');
-            }
+            if(el) { document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active')); el.classList.add('active'); }
             if(tela==='perfil') carregarPerfil(); 
             if(tela==='pedidos') { renderizarLista(pedidosCache); carregarHistoricoPedidos(); }
             if(tela==='extrato') carregarExtrato();
         }
 
-        // --- LOGIN & CADASTRO (Lógica Completa) ---
-        async function fazerLogin() {
-            const email = document.getElementById('log-email').value;
-            const senha = document.getElementById('log-senha').value;
-            if(!email || !senha) return alert("Preencha todos os dados.");
-            
-            const btn = document.getElementById('btn-log');
-            const spin = document.getElementById('load-log');
-            btn.disabled = true; btn.querySelector('span').innerText = ""; spin.classList.remove('hidden');
-            
-            try { 
-                const { error } = await sbClient.auth.signInWithPassword({ email, password: senha }); 
-                if (error) throw error;
-                // Sucesso: AuthStateChange cuidará da navegação
-            } 
-            catch (e) { 
-                alert("Erro: " + e.message); 
-                btn.disabled = false; btn.querySelector('span').innerText = "Entrar"; spin.classList.add('hidden');
-            } 
-        }
-
-        async function fazerCadastro() {
-            const dados = {
-                razao: document.getElementById('reg-razao').value,
-                fantasia: document.getElementById('reg-nome-loja').value,
-                cnpj: document.getElementById('reg-cnpj').value,
-                zapLoja: document.getElementById('reg-zap-loja').value,
-                endereco: document.getElementById('reg-endereco').value,
-                resp: document.getElementById('reg-nome-resp').value,
-                cpf: document.getElementById('reg-cpf-resp').value,
-                zapResp: document.getElementById('reg-zap-resp').value,
-                email: document.getElementById('reg-email').value,
-                senha: document.getElementById('reg-senha').value,
-                conf: document.getElementById('reg-conf-senha').value
-            };
-
-            // Validação
-            if(Object.values(dados).some(v => !v)) return alert("Preencha todos os campos obrigatórios!");
-            if(dados.senha !== dados.conf) return alert("Senhas não conferem!");
-            if(dados.senha.length < 6) return alert("Senha muito curta (mín 6).");
-
-            const btn = document.getElementById('btn-cad');
-            const spin = document.getElementById('load-cad');
-            btn.disabled = true; btn.querySelector('span').innerText = ""; spin.classList.remove('hidden');
-
-            try {
-                // 1. Cria Auth
-                const { data, error } = await sbClient.auth.signUp({ email: dados.email, password: dados.senha });
-                if (error) throw error;
-
-                // 2. Salva Perfil Completo
-                if (data.user) {
-                    await sbClient.from('profiles').insert([{
-                        id: data.user.id,
-                        razao_social: dados.razao,
-                        nome_loja: dados.fantasia,
-                        cnpj: dados.cnpj,
-                        whatsapp_loja: dados.zapLoja,
-                        endereco: dados.endereco,
-                        responsavel: dados.resp,
-                        cpf_responsavel: dados.cpf,
-                        whatsapp_responsavel: dados.zapResp,
-                        email: dados.email
-                    }]);
-                    alert("Cadastro realizado! Faça login.");
-                    showScreen('login');
-                }
-            } catch (e) { 
-                alert("Erro: " + e.message); 
-                btn.disabled = false; btn.querySelector('span').innerText = "Cadastrar"; spin.classList.add('hidden');
-            } 
-        }
-
-        async function carregarPerfil(isLogin = false) {
-            try {
-                if (!userSession) return;
-                const { data, error } = await sbClient.from('profiles').select('*').eq('id', userSession.user.id).single();
-                if (error) throw error;
-                if (data) { 
-                    userProfile = data; 
-                    preencherDadosPerfil(data); 
-                    setupInactivityListener(); 
-                    
-                    let lastScreen = localStorage.getItem('lastScreen') || 'app';
-                    if(!['app', 'pedidos', 'extrato', 'perfil'].includes(lastScreen)) lastScreen = 'app';
-
-                    if(isLogin) {
-                        navegar(lastScreen, document.querySelector(`.nav-item[onclick*="'${lastScreen}'"]`));
-                        ativarRealtimePedidos();
-                    }
-                    document.getElementById('global-loading').style.display = 'none';
-                }
-            } catch (e) {
-                if(e.code !== 'PGRST116') { alert("Erro ao carregar perfil."); fazerLogout(); }
-            }
-        }
-
+        // --- DADOS DO PERFIL (ATUALIZADO) ---
         function preencherDadosPerfil(data) {
             safeText('app-user-name', data.nome_loja || 'Minha Loja');
             safeText('app-user-code', data.codigo_visual || userSession.user.id.slice(0, 4).toUpperCase());
             safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
             safeVal('origem', data.endereco || data.nome_loja);
             
-            // Preencher campos de edição
+            // Campos de Edição
             safeVal('edit-nome-loja', data.nome_loja); 
             safeVal('edit-razao', data.razao_social);
             safeVal('edit-cnpj', data.cnpj); 
             safeVal('edit-zap-loja', data.whatsapp_loja); 
             safeVal('edit-endereco', data.endereco); 
             safeVal('edit-resp-nome', data.responsavel); 
+            safeVal('edit-cpf-resp', data.cpf_responsavel); 
             safeVal('edit-resp-zap', data.whatsapp_responsavel); 
         }
 
-        // --- FILTRO POR DATA (MÁX 90 DIAS) ---
-        async function filtrarPorData(tipo) {
-            const dtIni = document.getElementById(`filtro-${tipo === 'pedidos' ? 'ped' : 'ext'}-ini`).value;
-            const dtFim = document.getElementById(`filtro-${tipo === 'pedidos' ? 'ped' : 'ext'}-fim`).value;
-
-            if(!dtIni || !dtFim) return alert("Selecione data inicial e final.");
-            
-            const d1 = new Date(dtIni);
-            const d2 = new Date(dtFim);
-            const diffTime = Math.abs(d2 - d1);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            if(diffDays > 90) return alert("O período máximo para consulta é de 90 dias.");
-            if(d1 > d2) return alert("A data inicial não pode ser maior que a final.");
-
-            const isoIni = d1.toISOString();
-            const isoFim = new Date(d2.setHours(23, 59, 59, 999)).toISOString();
-
-            if(tipo === 'pedidos') {
-                const lista = document.getElementById('lista-pedidos');
-                lista.innerHTML = '<div class="text-center mt-10">Filtrando...</div>';
-                const { data } = await sbClient.from('pedidos')
-                    .select('*')
-                    .eq('user_id', userSession.user.id)
-                    .gte('created_at', isoIni)
-                    .lte('created_at', isoFim)
-                    .order('created_at', { ascending: false });
-                
-                pedidosCache = data || [];
-                renderizarLista(pedidosCache);
-            } else {
-                const lista = document.getElementById('lista-extrato');
-                lista.innerHTML = '<div class="text-center mt-10">Filtrando...</div>';
-                const { data } = await sbClient.from('transacoes')
-                    .select('*')
-                    .eq('user_id', userSession.user.id)
-                    .gte('created_at', isoIni)
-                    .lte('created_at', isoFim)
-                    .order('created_at', { ascending: false });
-                
-                renderizarExtrato(data || []);
-            }
+        async function salvarPerfil() {
+            const updates = { 
+                nome_loja: document.getElementById('edit-nome-loja').value, 
+                razao_social: document.getElementById('edit-razao').value,
+                cnpj: document.getElementById('edit-cnpj').value,
+                whatsapp_loja: document.getElementById('edit-zap-loja').value, 
+                endereco: document.getElementById('edit-endereco').value, 
+                responsavel: document.getElementById('edit-resp-nome').value,
+                cpf_responsavel: document.getElementById('edit-cpf-resp').value,
+                whatsapp_responsavel: document.getElementById('edit-resp-zap').value
+            };
+            await sbClient.from('profiles').update(updates).eq('id', userSession.user.id); 
+            alert("Salvo!"); carregarPerfil();
         }
 
-        async function iniciarPedido() {
-            const btn = document.getElementById('btn-enviar'); btn.innerText = "Processando..."; btn.disabled = true;
-            if(!userSession) { alert("Faça login."); resetarBotao(); return; }
-            let val = parseFloat(valorFinal);
+        // --- AUTH ---
+        async function fazerCadastro() {
+            const dados = {
+                razao: document.getElementById('reg-razao').value, fantasia: document.getElementById('reg-nome-loja').value,
+                cnpj: document.getElementById('reg-cnpj').value, zapLoja: document.getElementById('reg-zap-loja').value,
+                endereco: document.getElementById('reg-endereco').value, resp: document.getElementById('reg-nome-resp').value,
+                cpf: document.getElementById('reg-cpf-resp').value, zapResp: document.getElementById('reg-zap-resp').value,
+                email: document.getElementById('reg-email').value, senha: document.getElementById('reg-senha').value,
+                conf: document.getElementById('reg-conf-senha').value
+            };
+
+            if(Object.values(dados).some(v => !v)) return alert("Preencha todos os campos obrigatórios!");
+            if(dados.senha !== dados.conf) return alert("Senhas não conferem!");
             
+            const btn = document.getElementById('btn-cad'); const spin = document.getElementById('load-cad');
+            btn.disabled = true; spin.classList.remove('hidden');
+
             try {
-                const pg = document.getElementById('pagamento_entrega').value;
-                if(pg === 'Carteira') {
-                    if(userProfile.saldo < val) throw new Error("Saldo insuficiente.");
-                    const novoSaldo = userProfile.saldo - val;
-                    const { error: e1 } = await sbClient.from('profiles').update({ saldo: novoSaldo }).eq('id', userSession.user.id);
-                    if(e1) throw e1;
-                    await sbClient.from('transacoes').insert([{ user_id: userSession.user.id, tipo: 'debito', valor: val, descricao: 'Pagamento Entrega' }]);
-                    userProfile.saldo = novoSaldo; document.getElementById('display-saldo').innerText = "R$ " + novoSaldo.toFixed(2);
+                const { data, error } = await sbClient.auth.signUp({ email: dados.email, password: dados.senha });
+                if (error) throw error;
+                if (data.user) {
+                    await sbClient.from('profiles').insert([{
+                        id: data.user.id, razao_social: dados.razao, nome_loja: dados.fantasia, cnpj: dados.cnpj,
+                        whatsapp_loja: dados.zapLoja, endereco: dados.endereco, responsavel: dados.resp,
+                        cpf_responsavel: dados.cpf, whatsapp_responsavel: dados.zapResp, email: dados.email
+                    }]);
+                    alert("Cadastro realizado! Faça login."); showScreen('login');
                 }
-                
-                // Grava a taxa atual no pedido para histórico
-                const novo = {
-                    user_id: userSession.user.id, origem: document.getElementById('origem').value, destino: document.getElementById('destino').value,
-                    valor_frete: val, forma_pagamento: pg, pin_entrega: Math.floor(1000 + Math.random() * 9000).toString(),
-                    nome_destinatario: document.getElementById('nome_dest').value, telefone_destinatario: document.getElementById('tel_dest').value,
-                    status: 'solicitado', codigo_visual: '#' + Math.floor(10000 + Math.random() * 90000),
-                    taxa_app_aplicada: APP_CONFIG.taxa_app_percent // Snapshot da taxa
-                };
-                
-                const { error } = await sbClient.from('pedidos').insert([novo]);
-                if(error) throw error;
-                document.getElementById('display-pin').innerText = novo.pin_entrega;
-                document.getElementById('modal-success').style.display='flex'; document.getElementById('modal-success').classList.remove('hidden');
-            } catch(e) { alert(e.message); } finally { resetarBotao(); }
+            } catch (e) { alert("Erro: " + e.message); } 
+            finally { btn.disabled = false; spin.classList.add('hidden'); }
         }
-        
-        function resetarBotao() { const btn = document.getElementById('btn-enviar'); btn.disabled = false; btn.innerText = 'Confirmar Pedido'; }
 
+        async function fazerLogin() {
+            const email = document.getElementById('log-email').value;
+            const senha = document.getElementById('log-senha').value;
+            if(!email || !senha) return alert("Preencha tudo.");
+            
+            const btn = document.getElementById('btn-log'); const spin = document.getElementById('load-log');
+            btn.disabled = true; spin.classList.remove('hidden');
+            
+            try { 
+                const { error } = await sbClient.auth.signInWithPassword({ email, password: senha }); 
+                if (error) throw error;
+            } catch (e) { alert("Erro: " + e.message); btn.disabled = false; spin.classList.add('hidden'); } 
+        }
+
+        async function carregarPerfil(isLogin = false) {
+            try {
+                if (!userSession) return;
+                const { data, error } = await sbClient.from('profiles').select('*').eq('id', userSession.user.id).single();
+                if (data) { 
+                    userProfile = data; 
+                    preencherDadosPerfil(data); 
+                    setupInactivityListener();
+                    if(isLogin) { navegar('app', document.querySelector('.nav-item')); ativarRealtimePedidos(); }
+                    document.getElementById('global-loading').style.display = 'none';
+                }
+            } catch (e) { if(e.code !== 'PGRST116') fazerLogout(); }
+        }
+
+        // --- PEDIDOS ---
         async function calcularDistancia() {
             const or = document.getElementById('origem').value, des = document.getElementById('destino').value;
             if(!or || !des) return alert("Preencha endereços.");
@@ -668,7 +435,6 @@
         }
 
         function recalcularTotal() { 
-            // Usa Config do Admin
             let p = APP_CONFIG.taxa_base + (distanciaFinal * APP_CONFIG.preco_km); 
             if(document.getElementById('retorno').checked) {
                 if(APP_CONFIG.taxa_retorno_tipo === 'percent') p += (p * (APP_CONFIG.taxa_retorno_valor / 100));
@@ -679,173 +445,71 @@
             document.getElementById('valor-display').innerText = valorFinal.replace('.',',');
         }
 
-        function showScreen(id) { 
-            ['welcome', 'register', 'login', 'app', 'pedidos', 'extrato', 'perfil'].forEach(s => {
-                const el = document.getElementById('screen-'+s);
-                if(el) { el.style.display = 'none'; el.classList.remove('active'); }
-            });
-            const t = document.getElementById('screen-'+id); 
-            if(t) {
-                if(['welcome','login'].includes(id)) t.style.display='flex'; else t.style.display='block';
-                window.scrollTo(0,0);
-            }
-            const m = document.getElementById('bottom-menu');
-            if(['app','pedidos','extrato','perfil'].includes(id)) { m.style.display='flex'; } else { m.style.display='none'; }
-        }
-
-        async function fazerLogout() { localStorage.clear(); await sbClient.auth.signOut(); location.reload(); }
-
-        async function renderizarLista(data) {
-            const lista = document.getElementById('lista-pedidos');
-            if(!data || data.length === 0) { lista.innerHTML = '<div class="text-center mt-10 text-gray-400">Nenhum pedido encontrado.</div>'; return; }
-            const eIds = data.filter(p=>p.entregador_id).map(p=>p.entregador_id);
-            let entMap = {};
-            if(eIds.length > 0) { const { data: profs } = await sbClient.from('profiles').select('id, responsavel').in('id', eIds); if(profs) profs.forEach(p => entMap[p.id] = p.responsavel); }
-            lista.innerHTML = '';
-            data.forEach(p => {
-                const st = p.status || 'solicitado';
-                let stClass = '', stText = '';
-                // STATUS NOVOS SOLICITADOS
-                if(st === 'solicitado') { stClass = 'status-solicitado'; stText = 'Solicitado'; }
-                else if(st === 'pendente') { stClass = 'status-pendente'; stText = 'A caminho'; } 
-                else if(st === 'em_rota') { stClass = 'status-em_rota'; stText = 'Em rota'; }
-                else if(st === 'concluido') { stClass = 'status-concluido'; stText = 'Finalizado'; }
-                else if(st === 'cancelado') { stClass = 'status-cancelado'; stText = 'Cancelado'; }
-                
-                const entregador = p.entregador_id ? (entMap[p.entregador_id] || 'Motoboy') : '---';
-                lista.insertAdjacentHTML('beforeend', `
-                    <div class="card-historico shadow-sm" onclick="verDetalhes('${p.id}')">
-                        <div class="flex justify-between items-center mb-2"><span class="badge-status ${stClass}">${stText}</span><span class="text-xs font-mono bg-gray-100 px-1 rounded text-gray-500">${p.codigo_visual||'#'}</span></div>
-                        <div class="flex justify-between items-end"><div class="truncate w-2/3"><div class="font-bold text-gray-800 text-sm truncate">${p.destino}</div><div class="text-xs text-gray-500 mt-1">${p.nome_destinatario}</div></div><span class="font-bold text-green-700 text-sm">R$ ${parseFloat(p.valor_frete).toFixed(2).replace('.',',')}</span></div>
-                    </div>`);
-            });
-        }
-
-        async function carregarHistoricoPedidos() {
-            const { data } = await sbClient.from('pedidos').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(20);
-            if(data) { pedidosCache = data; renderizarLista(data); } else { renderizarLista([]); }
-        }
-
-        function renderizarExtrato(data) {
-            const lista = document.getElementById('lista-extrato');
-            if(!data || data.length === 0) { lista.innerHTML = '<div class="text-center mt-10 text-gray-400">Nenhuma movimentação.</div>'; return; }
-            lista.innerHTML = '';
-            data.forEach(t => {
-                const isC = t.tipo === 'credito';
-                const dt = new Date(t.created_at).toLocaleDateString('pt-BR');
-                lista.insertAdjacentHTML('beforeend', `
-                    <div class="transacao-item px-4 bg-white mx-4 rounded-xl mb-2">
-                        <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full ${isC?'bg-green-100 text-green-600':'bg-red-100 text-red-600'} flex items-center justify-center"><i class="fas ${isC?'fa-arrow-down':'fa-arrow-up'} text-xs"></i></div><div><p class="font-bold text-gray-700 text-sm">${t.descricao||'Movimentação'}</p><p class="text-[10px] text-gray-400">${dt}</p></div></div>
-                        <p class="transacao-valor ${isC?'credito':'debito'} font-bold text-sm">${isC?'+':'-'} R$ ${parseFloat(t.valor).toFixed(2).replace('.',',')}</p>
-                    </div>`);
-            });
-        }
-
-        async function carregarExtrato() {
-            const lista = document.getElementById('lista-extrato');
-            if(lista.children.length === 0) lista.innerHTML = '<div class="text-center mt-10">Carregando...</div>';
-            const { data } = await sbClient.from('transacoes').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(30);
-            renderizarExtrato(data || []);
-        }
-
-        async function verDetalhes(id) {
-            let pedido = pedidosCache.find(p => p.id === id);
-            if(!pedido) { const { data } = await sbClient.from('pedidos').select('*').eq('id', id).single(); pedido = data; }
-            if(!pedido) return;
-            document.getElementById('det-origem').innerText = pedido.origem; document.getElementById('det-destino').innerText = pedido.destino;
-            document.getElementById('det-valor').innerText = "R$ " + parseFloat(pedido.valor_frete).toFixed(2).replace('.', ',');
-            document.getElementById('det-pin').innerText = pedido.pin_entrega; document.getElementById('det-id-visual').innerText = pedido.codigo_visual || '#';
-            const st = pedido.status; let stText = 'Desconhecido';
-            // Status Detalhados
-            if(st === 'solicitado') stText = 'Solicitado - Aguardando Motoboy'; 
-            else if(st === 'pendente') stText = 'A caminho - Motoboy indo à loja'; 
-            else if(st === 'em_rota') stText = 'Em rota - Saiu para entrega'; 
-            else if(st === 'concluido') stText = 'Finalizado'; 
-            else if(st === 'cancelado') stText = 'Cancelado';
-            document.getElementById('det-status').innerText = stText;
+        async function iniciarPedido() {
+            if(!userSession) { alert("Faça login."); return; }
+            let val = parseFloat(valorFinal);
             
-            const boxMoto = document.getElementById('box-motoboy');
-            const btnAvaliar = document.getElementById('btn-avaliar');
-            
-            if(pedido.entregador_id) {
-                const { data: moto } = await sbClient.from('profiles').select('*').eq('id', pedido.entregador_id).single();
-                if(moto) {
-                    boxMoto.classList.remove('hidden'); document.getElementById('det-moto-nome').innerText = moto.responsavel;
-                    document.getElementById('det-moto-placa').innerText = moto.placa_moto || 'SEM PLACA'; document.getElementById('det-moto-modelo').innerText = moto.modelo_moto || '-';
-                    document.getElementById('btn-zap-moto').onclick = function() { window.open(`https://wa.me/${moto.whatsapp_responsavel}`, '_blank'); };
-                    
-                    // Lógica de Avaliação
-                    if(st === 'concluido') {
-                        btnAvaliar.classList.remove('hidden');
-                        // Prepara o modal para este pedido/motoboy
-                        btnAvaliar.onclick = function() { abrirModalAvaliacao(pedido.id, pedido.entregador_id); };
-                    } else {
-                        btnAvaliar.classList.add('hidden');
-                    }
+            try {
+                const pg = document.getElementById('pagamento_entrega').value;
+                if(pg === 'Carteira') {
+                    if(userProfile.saldo < val) throw new Error("Saldo insuficiente.");
+                    const novoSaldo = userProfile.saldo - val;
+                    await sbClient.from('profiles').update({ saldo: novoSaldo }).eq('id', userSession.user.id);
+                    await sbClient.from('transacoes').insert([{ user_id: userSession.user.id, tipo: 'debito', valor: val, descricao: 'Pagamento Entrega' }]);
+                    userProfile.saldo = novoSaldo; document.getElementById('display-saldo').innerText = "R$ " + novoSaldo.toFixed(2);
                 }
-            } else { boxMoto.classList.add('hidden'); }
-            
-            const boxCancel = document.getElementById('box-cancelar');
-            if(st === 'solicitado') { boxCancel.classList.remove('hidden'); document.getElementById('btn-cancelar-detalhe').onclick = function() { cancelarPedido(id); document.getElementById('modal-detalhes').style.display='none'; }; } 
-            else { boxCancel.classList.add('hidden'); }
-            document.getElementById('modal-detalhes').style.display = 'flex'; document.getElementById('modal-detalhes').classList.remove('hidden');
+                const novo = {
+                    user_id: userSession.user.id, origem: document.getElementById('origem').value, destino: document.getElementById('destino').value,
+                    valor_frete: val, forma_pagamento: pg, pin_entrega: Math.floor(1000 + Math.random() * 9000).toString(),
+                    nome_destinatario: document.getElementById('nome_dest').value, telefone_destinatario: document.getElementById('tel_dest').value,
+                    status: 'solicitado', codigo_visual: '#' + Math.floor(10000 + Math.random() * 90000),
+                    taxa_app_aplicada: APP_CONFIG.taxa_app_percent
+                };
+                const { error } = await sbClient.from('pedidos').insert([novo]);
+                if(error) throw error;
+                document.getElementById('display-pin').innerText = novo.pin_entrega;
+                document.getElementById('modal-success').style.display='flex'; document.getElementById('modal-success').classList.remove('hidden');
+            } catch(e) { alert(e.message); }
         }
 
-        // --- SISTEMA DE AVALIAÇÃO ---
-        function abrirModalAvaliacao(pedidoId, motoboyId) {
-            document.getElementById('modal-detalhes').style.display = 'none'; // Fecha detalhes
-            document.getElementById('modal-avaliacao').classList.remove('hidden');
-            document.getElementById('modal-avaliacao').style.display = 'flex';
-            
-            // Limpa campos
-            document.getElementById('av-comentario').value = '';
-            document.querySelectorAll('input[name="rating"]').forEach(el => el.checked = false);
-            
-            // Seta IDs ocultos
-            document.getElementById('av-pedido-id').value = pedidoId;
-            document.getElementById('av-motoboy-id').value = motoboyId;
-        }
-
-        async function enviarAvaliacao() {
-            const nota = document.querySelector('input[name="rating"]:checked');
-            const comentario = document.getElementById('av-comentario').value;
-            const pedidoId = document.getElementById('av-pedido-id').value;
-            const motoboyId = document.getElementById('av-motoboy-id').value;
-
-            if(!nota) return alert("Por favor, selecione uma nota (estrelas).");
-
-            const { error } = await sbClient.from('avaliacoes').insert([{
-                pedido_id: pedidoId,
-                motoboy_id: motoboyId,
-                nota: parseInt(nota.value),
-                comentario: comentario
-            }]);
-
-            if(error) {
-                alert("Erro ao avaliar (talvez você já tenha avaliado este pedido).");
-            } else {
-                alert("Avaliação enviada com sucesso!");
-                document.getElementById('modal-avaliacao').classList.add('hidden');
-            }
-        }
-
-        // Utils e Auth
+        // Utils, Historico, Extrato e Detalhes (Mantidos da versão anterior)
+        function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
+        function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val || ''; } 
+        function toggleDropdown(id) { document.getElementById(`list-${id}`).classList.toggle('show'); }
+        function selectOption(id, value, text) { document.getElementById(`pagamento_${id}`).value=value; document.getElementById(`display-${id}`).innerText=text; document.getElementById(`list-${id}`).classList.remove('show'); }
         function getDist(lat1,lon1,lat2,lon2) { var R=6371, dLat=d2r(lat2-lat1), dLon=d2r(lon2-lon1), a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(d2r(lat1))*Math.cos(d2r(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2); return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))); }
         function d2r(deg) { return deg*(Math.PI/180); }
         async function fazerLogout() { await sbClient.auth.signOut(); location.reload(); }
         function ativarRealtimePedidos() { sbClient.channel('cl-pedidos').on('postgres_changes', {event:'*', schema:'public', table:'pedidos'}, ()=>carregarHistoricoPedidos()).subscribe(); }
-        function verificarPinParaSaldo() { alert("Para recarregar, contate o suporte."); solicitarSaldoZap(); }
-        function solicitarSaldoZap() { window.open(`https://wa.me/${NUMERO_ADMIN}?text=Olá, desejo recarregar. ID: ${userProfile.codigo_visual}`, '_blank'); }
-        
-        async function salvarPerfil() {
-            const updates = { nome_loja: document.getElementById('edit-nome-loja').value, whatsapp_loja: document.getElementById('edit-zap-loja').value, endereco: document.getElementById('edit-endereco').value, responsavel: document.getElementById('edit-resp-nome').value };
-            await sbClient.from('profiles').update(updates).eq('id', userSession.user.id); alert("Salvo!"); carregarPerfil();
+        function verificarPinParaSaldo() { alert("Use o WhatsApp do Admin para recarregar."); solicitarSaldoZap(); }
+        function solicitarSaldoZap() { window.open(`https://wa.me/${NUMERO_ADMIN}?text=Quero saldo. ID: ${userProfile.codigo_visual}`, '_blank'); }
+        async function carregarHistoricoPedidos() { const { data } = await sbClient.from('pedidos').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(20); if(data) { pedidosCache = data; renderizarLista(data); } }
+        function renderizarLista(data) { 
+            const lista = document.getElementById('lista-pedidos'); lista.innerHTML = '';
+            if(!data.length) { lista.innerHTML = '<div class="text-center mt-10 text-gray-400">Vazio</div>'; return; }
+            data.forEach(p => {
+                let stClass = 'status-solicitado';
+                if(p.status==='pendente') stClass='status-pendente'; else if(p.status==='em_rota') stClass='status-em_rota'; else if(p.status==='concluido') stClass='status-concluido';
+                lista.insertAdjacentHTML('beforeend', `<div class="card-historico shadow-sm" onclick="verDetalhes('${p.id}')"><div class="flex justify-between items-center mb-2"><span class="badge-status ${stClass}">${p.status}</span><span class="text-xs font-mono bg-gray-100 px-1 rounded text-gray-500">${p.codigo_visual}</span></div><div class="flex justify-between items-end"><div class="truncate w-2/3"><div class="font-bold text-gray-800 text-sm truncate">${p.destino}</div></div><span class="font-bold text-green-700 text-sm">R$ ${parseFloat(p.valor_frete).toFixed(2).replace('.',',')}</span></div></div>`);
+            });
         }
-        function abrirModalAlterarSenha() { document.getElementById('modal-alterar-senha').classList.remove('hidden'); document.getElementById('modal-alterar-senha').style.display='flex'; }
-        function abrirModalAlterarPin() { document.getElementById('modal-gerenciar-pin').classList.remove('hidden'); document.getElementById('modal-gerenciar-pin').style.display='flex'; }
-        async function salvarNovoPin() { const n=document.getElementById('input-novo-pin').value, c=document.getElementById('input-conf-pin').value; if(n.length!==4||n!==c) return alert("Erro no PIN"); await sbClient.from('profiles').update({pin_carteira:n}).eq('id',userSession.user.id); alert("PIN Salvo!"); document.getElementById('modal-gerenciar-pin').classList.add('hidden'); userProfile.pin_carteira=n; }
+        async function verDetalhes(id) {
+            let p = pedidosCache.find(x => x.id === id);
+            if(!p) { const {data} = await sbClient.from('pedidos').select('*').eq('id', id).single(); p = data; }
+            document.getElementById('det-origem').innerText = p.origem; document.getElementById('det-destino').innerText = p.destino;
+            document.getElementById('det-valor').innerText = "R$ " + parseFloat(p.valor_frete).toFixed(2); document.getElementById('det-pin').innerText = p.pin_entrega;
+            document.getElementById('det-status').innerText = p.status.toUpperCase();
+            document.getElementById('modal-detalhes').style.display='flex'; document.getElementById('modal-detalhes').classList.remove('hidden');
+        }
+        async function carregarExtrato() {
+            const lista = document.getElementById('lista-extrato'); lista.innerHTML = '<div class="text-center mt-4">Carregando...</div>';
+            const { data } = await sbClient.from('transacoes').select('*').eq('user_id', userSession.user.id).order('created_at', {ascending:false});
+            lista.innerHTML = ''; data.forEach(t => { const isC = t.tipo === 'credito'; lista.insertAdjacentHTML('beforeend', `<div class="transacao-item px-4 bg-white mx-4 rounded-xl mb-2"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full ${isC?'bg-green-100':'bg-red-100'} flex items-center justify-center"><i class="fas ${isC?'fa-arrow-down':'fa-arrow-up'} text-xs"></i></div><div><p class="font-bold text-gray-700 text-sm">${t.descricao}</p><p class="text-[10px] text-gray-400">${new Date(t.created_at).toLocaleDateString()}</p></div></div><p class="transacao-valor ${isC?'credito':'debito'} font-bold text-sm">${isC?'+':'-'} R$ ${parseFloat(t.valor).toFixed(2)}</p></div>`); });
+        }
+        function abrirModalAlterarSenha() { document.getElementById('modal-alterar-senha').style.display='flex'; document.getElementById('modal-alterar-senha').classList.remove('hidden'); }
+        function abrirModalAlterarPin() { document.getElementById('modal-gerenciar-pin').style.display='flex'; document.getElementById('modal-gerenciar-pin').classList.remove('hidden'); }
+        async function salvarNovoPin() { const n=document.getElementById('input-novo-pin').value, c=document.getElementById('input-conf-pin').value; if(n.length!==4||n!==c) return alert("Erro no PIN"); await sbClient.from('profiles').update({pin_carteira:n}).eq('id',userSession.user.id); alert("Salvo!"); document.getElementById('modal-gerenciar-pin').classList.add('hidden'); userProfile.pin_carteira=n; }
         async function salvarNovaSenha() { const n=document.getElementById('input-nova-senha').value, c=document.getElementById('input-conf-senha').value; if(n.length<6||n!==c) return alert("Erro na senha"); await sbClient.auth.updateUser({password:n}); alert("Senha alterada!"); document.getElementById('modal-alterar-senha').classList.add('hidden'); }
-        async function atualizarPedidosManual() { const i=document.getElementById('icon-refresh'); i.classList.add('fa-spin'); await carregarHistoricoPedidos(); setTimeout(()=>i.classList.remove('fa-spin'),500); }
     </script>
 </body>
 </html>
