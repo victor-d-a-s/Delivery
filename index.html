@@ -14,69 +14,66 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
         .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.3s ease-out; }
+        .fade-in { animation: fadeIn 0.2s ease-out; } /* Animação mais rápida */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
-        .btn-primary { background-color: #1E40AF; color: white; transition: 0.2s; }
-        .btn-primary:active { transform: scale(0.96); }
-        .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; }
+        .btn-primary { background-color: #1E40AF; color: white; transition: 0.1s; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { background-color: #93C5FD; cursor: wait; }
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
         
+        /* Switch */
         .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #9CA3AF; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #9CA3AF; transition: .2s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
         input:checked + .slider { background-color: #1E40AF; }
         input:checked + .slider:before { transform: translateX(20px); }
         
+        /* App Container */
         .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 80px; display: none; overflow-y: auto; }
-        @media (min-width: 768px) { .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; margin: auto; } body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } }
+        @media (min-width: 768px) { .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; position: relative; margin: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); } body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } }
         
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; justify-content: space-around; padding: 16px 0; max-width: 28rem; margin: 0 auto; display: none; z-index: 50; }
+        /* Menu Inferior */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; justify-content: space-around; padding: 14px 0; max-width: 28rem; margin: 0 auto; display: none; z-index: 50; }
         @media (min-width: 768px) { .bottom-nav { border-radius: 0 0 1.5rem 1.5rem; } }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.2s; }
-        .nav-item i { font-size: 1.5rem; margin-bottom: 4px; }
-        .nav-item span { font-size: 0.75rem; font-weight: 500; }
-        .nav-item.active { color: #1E40AF; transform: translateY(-2px); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.1s; }
+        .nav-item i { font-size: 1.4rem; margin-bottom: 3px; }
+        .nav-item span { font-size: 0.7rem; font-weight: 600; }
+        .nav-item.active { color: #1E40AF; transform: translateY(-1px); }
         
-        .card-historico { background: white; border-radius: 12px; border: 1px solid #E5E7EB; padding: 16px; margin-bottom: 12px; position: relative; transition: all 0.3s ease; cursor: pointer; }
-        .card-historico:active { transform: scale(0.98); background-color: #f9fafb; }
+        /* Utilitários */
+        .card-historico { background: white; border-radius: 12px; border: 1px solid #E5E7EB; padding: 16px; margin-bottom: 12px; cursor: pointer; }
         .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        
-        .status-solicitado { background: #E5E7EB; color: #374151; border: 1px solid #D1D5DB; }
-        .status-pendente { background: #FEF3C7; color: #D97706; border: 1px solid #FCD34D; }
-        .status-em_rota { background: #DBEAFE; color: #1E40AF; border: 1px solid #93C5FD; }
-        .status-concluido { background: #D1FAE5; color: #059669; border: 1px solid #6EE7B7; }
-        .status-cancelado { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-
+        .status-solicitado { background: #E5E7EB; color: #374151; }
+        .status-pendente { background: #FEF3C7; color: #D97706; }
+        .status-em_rota { background: #DBEAFE; color: #1E40AF; }
+        .status-concluido { background: #D1FAE5; color: #059669; }
+        .status-cancelado { background: #fee2e2; color: #991b1b; }
         .custom-options { display: none; position: absolute; background: white; border: 1px solid #ddd; z-index: 50; width: 100%; border-radius: 8px; margin-top: 5px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
         .custom-options.show { display: block; }
         .custom-option { padding: 10px; cursor: pointer; font-size: 12px; }
-        .custom-option:hover { background-color: #f3f4f6; }
         .custom-select-btn { width: 100%; text-align: left; padding: 8px; background: white; border: 1px solid; border-radius: 8px; font-size: 12px; display: flex; justify-content: space-between; items-center; }
-        
         .transacao-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
         .transacao-valor.credito { color: #059669; }
         .transacao-valor.debito { color: #DC2626; }
-        
         .star-rating { direction: rtl; display: inline-flex; }
         .star-rating input { display: none; }
-        .star-rating label { font-size: 2rem; color: #ddd; cursor: pointer; transition: color 0.2s; }
+        .star-rating label { font-size: 2rem; color: #ddd; cursor: pointer; }
         .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #FBBF24; }
-        
         .date-filter { font-size: 11px; padding: 6px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; }
         
-        /* Spinner e Loader */
-        .spinner { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
-        .loader-blue { border: 3px solid #f3f3f3; border-top: 3px solid #1E40AF; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto; }
+        /* Loader Otimizado */
+        .spinner { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.6s linear infinite; }
+        .loader-blue { border: 3px solid #f3f3f3; border-top: 3px solid #1E40AF; border-radius: 50%; width: 32px; height: 32px; animation: spin 0.6s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
 
     <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
-        <div class="loader-blue mb-4"></div><p id="loading-msg" class="text-blue-900 text-sm font-bold animate-pulse">Carregando...</p>
+        <div class="loader-blue mb-3"></div><p class="text-blue-900 text-xs font-bold tracking-widest animate-pulse">CARREGANDO</p>
     </div>
 
     <div id="screen-welcome" class="app-container p-8 text-center fade-in flex flex-col justify-center">
@@ -85,7 +82,7 @@
             <h1 class="text-3xl font-bold text-gray-800">Drop Entregas</h1>
             <p class="text-gray-500">Cliente</p>
         </div>
-        <div class="space-y-4">
+        <div class="space-y-3">
             <button onclick="showScreen('register')" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg">Cadastrar Loja</button>
             <button onclick="showScreen('login')" class="w-full btn-outline font-bold py-4 rounded-xl shadow-sm">Entrar</button>
         </div>
@@ -96,7 +93,6 @@
             <button onclick="showScreen('welcome')" class="absolute top-4 left-4 text-gray-400 p-2"><i class="fas fa-arrow-left"></i></button>
             <h2 class="text-xl font-bold text-center w-full mt-2">Nova Loja</h2>
         </div>
-        
         <div class="space-y-4 pb-10">
             <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-3">
                 <p class="text-xs font-bold text-blue-800 uppercase mb-1">Estabelecimento</p>
@@ -106,21 +102,18 @@
                 <input type="tel" id="reg-zap-loja" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="WhatsApp Loja">
                 <input type="text" id="reg-endereco" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Endereço de Retirada">
             </div>
-
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3">
                 <p class="text-xs font-bold text-gray-600 uppercase mb-1">Responsável</p>
                 <input type="text" id="reg-nome-resp" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Nome Completo">
                 <input type="tel" id="reg-cpf-resp" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="CPF">
                 <input type="tel" id="reg-zap-resp" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="WhatsApp Pessoal">
             </div>
-
             <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3">
                 <p class="text-xs font-bold text-gray-600 uppercase mb-1">Acesso</p>
                 <input type="email" id="reg-email" class="w-full bg-white border rounded-lg p-3 text-sm mb-3" placeholder="E-mail">
                 <input type="password" id="reg-senha" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Senha (Min 6)">
                 <input type="password" id="reg-conf-senha" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Confirmar Senha">
             </div>
-
             <button onclick="fazerCadastro()" id="btn-cad" class="w-full btn-primary font-bold py-4 rounded-xl mt-2 flex justify-center items-center gap-2">
                 <span id="txt-cad">Finalizar Cadastro</span>
                 <div id="load-cad" class="spinner hidden"></div>
@@ -136,7 +129,7 @@
         <div class="space-y-4">
             <input type="email" id="log-email" class="w-full border rounded-lg p-4 text-lg" placeholder="E-mail">
             <input type="password" id="log-senha" class="w-full border rounded-lg p-4 text-lg" placeholder="Senha">
-            <button onclick="fazerLogin()" id="btn-log" class="w-full btn-primary font-bold py-4 rounded-xl flex justify-center items-center gap-2">
+            <button onclick="fazerLogin()" id="btn-log" class="w-full btn-primary font-bold py-4 rounded-xl flex justify-center items-center gap-2 h-14">
                 <span id="txt-log">Entrar</span>
                 <div id="load-log" class="spinner hidden"></div>
             </button>
@@ -163,7 +156,6 @@
                     <div class="switch"><input type="checkbox" id="retorno" onchange="recalcularTotal(); mudarStatusRetorno()"><span class="slider"></span></div>
                 </label>
             </div>
-            
             <button onclick="calcularDistancia()" id="btn-calcular" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2 active:scale-95 transition-transform"><span id="btn-text">Calcular Frete</span><div id="loading" class="spinner hidden" style="display:none; width: 20px; height: 20px; border-width: 2px;"></div></button>
             <div id="resultado-box" class="hidden bg-green-50 border border-green-200 p-4 rounded-xl flex justify-between items-center animate-pulse" style="display:none"><div><p class="text-xs text-gray-500">Distância</p><p class="font-bold text-gray-800"><span id="km-display">0</span> km</p></div><div class="text-right"><p class="text-xs text-gray-500">Total Frete</p><p class="font-bold text-2xl text-green-700">R$ <span id="valor-display">0,00</span></p></div></div>
             <button type="button" onclick="iniciarPedido()" id="btn-enviar" class="hidden w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2" style="display:none"><i class="fas fa-check text-2xl"></i> Confirmar Pedido</button>
@@ -171,17 +163,13 @@
     </div>
 
     <div id="screen-pedidos" class="app-container p-6 fade-in flex flex-col h-screen">
-        <div class="flex justify-between items-center mb-2">
-            <h2 class="text-xl font-bold text-gray-700">Meus Pedidos</h2>
-            <button onclick="atualizarPedidosManual()" class="text-blue-600 p-2"><i id="icon-refresh" class="fas fa-sync-alt"></i></button>
-        </div>
+        <div class="flex justify-between items-center mb-2"><h2 class="text-xl font-bold text-gray-700">Meus Pedidos</h2><button onclick="atualizarPedidosManual()" class="text-blue-600 p-2"><i id="icon-refresh" class="fas fa-sync-alt"></i></button></div>
         <div class="bg-gray-50 p-3 rounded-lg border mb-4 flex gap-2 items-end"><div class="flex-1"><p class="text-[10px] text-gray-500 mb-1">Início</p><input type="date" id="filtro-ped-ini" class="date-filter bg-white"></div><div class="flex-1"><p class="text-[10px] text-gray-500 mb-1">Fim</p><input type="date" id="filtro-ped-fim" class="date-filter bg-white"></div><button onclick="filtrarPorData('pedidos')" class="bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs h-[29px]"><i class="fas fa-search"></i></button></div>
         <div id="lista-pedidos" class="flex-1 overflow-y-auto pb-20 space-y-3"><div class="text-center text-gray-400 mt-10">Carregando histórico...</div></div>
     </div>
 
     <div id="screen-extrato" class="app-container p-6 fade-in text-center flex flex-col h-screen">
-        <i class="fas fa-file-invoice-dollar text-6xl text-gray-200 mb-2 mt-4"></i>
-        <h2 class="text-xl font-bold text-gray-700 mb-4">Extrato Financeiro</h2>
+        <i class="fas fa-file-invoice-dollar text-6xl text-gray-200 mb-2 mt-4"></i><h2 class="text-xl font-bold text-gray-700 mb-4">Extrato Financeiro</h2>
         <div class="bg-gray-50 p-3 rounded-lg border mb-4 flex gap-2 items-end w-full text-left"><div class="flex-1"><p class="text-[10px] text-gray-500 mb-1">Início</p><input type="date" id="filtro-ext-ini" class="date-filter bg-white"></div><div class="flex-1"><p class="text-[10px] text-gray-500 mb-1">Fim</p><input type="date" id="filtro-ext-fim" class="date-filter bg-white"></div><button onclick="filtrarPorData('extrato')" class="bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs h-[29px]"><i class="fas fa-search"></i></button></div>
         <div id="lista-extrato" class="flex-1 overflow-y-auto pb-20 space-y-2 w-full px-1"><div class="text-center text-gray-400 mt-10">Carregando transações...</div></div>
     </div>
@@ -189,40 +177,19 @@
     <div id="screen-perfil" class="app-container p-6 fade-in">
         <h2 class="text-xl font-bold mb-4">Editar Perfil</h2>
         <div class="space-y-4 pb-20">
-            <div class="bg-white p-4 rounded-lg border border-blue-100 space-y-3">
-                <p class="text-xs font-bold text-blue-800 uppercase mb-1">Estabelecimento</p>
-                <div><label class="text-xs text-gray-500">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">Razão Social</label><input type="text" id="edit-razao" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">CNPJ</label><input type="tel" id="edit-cnpj" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">WhatsApp Loja</label><input type="tel" id="edit-zap-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">Endereço de Coleta</label><input type="text" id="edit-endereco" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-            </div>
-            <div class="bg-white p-4 rounded-lg border border-gray-200 space-y-3">
-                <p class="text-xs font-bold text-gray-600 uppercase mb-1">Responsável</p>
-                <div><label class="text-xs text-gray-500">Nome Completo</label><input type="text" id="edit-resp-nome" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">CPF</label><input type="tel" id="edit-cpf-resp" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">WhatsApp Pessoal</label><input type="tel" id="edit-resp-zap" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-            </div>
-            <div class="bg-red-50 p-4 rounded-xl border border-red-100 space-y-3">
-                <p class="text-xs font-bold text-red-400 uppercase">Segurança</p>
-                <button onclick="abrirModalAlterarPin()" class="w-full bg-white border border-red-200 text-red-500 font-bold py-3 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-key"></i> Gerenciar PIN de Pagamento</button>
-                <button onclick="abrirModalAlterarSenha()" class="w-full bg-white border border-gray-200 text-gray-600 font-bold py-3 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-lock"></i> Alterar Senha de Login</button>
-            </div>
+            <div class="bg-white p-4 rounded-lg border border-blue-100 space-y-3"><p class="text-xs font-bold text-blue-800 uppercase mb-1">Estabelecimento</p><div><label class="text-xs text-gray-500">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div><div><label class="text-xs text-gray-500">Razão Social</label><input type="text" id="edit-razao" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div><div><label class="text-xs text-gray-500">CNPJ</label><input type="tel" id="edit-cnpj" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div><div><label class="text-xs text-gray-500">WhatsApp Loja</label><input type="tel" id="edit-zap-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div><div><label class="text-xs text-gray-500">Endereço de Coleta</label><input type="text" id="edit-endereco" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div></div>
+            <div class="bg-white p-4 rounded-lg border border-gray-200 space-y-3"><p class="text-xs font-bold text-gray-600 uppercase mb-1">Responsável</p><div><label class="text-xs text-gray-500">Nome Completo</label><input type="text" id="edit-resp-nome" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div><div><label class="text-xs text-gray-500">CPF</label><input type="tel" id="edit-cpf-resp" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div><div><label class="text-xs text-gray-500">WhatsApp Pessoal</label><input type="tel" id="edit-resp-zap" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div></div>
+            <div class="bg-red-50 p-4 rounded-xl border border-red-100 space-y-3"><p class="text-xs font-bold text-red-400 uppercase">Segurança</p><button onclick="abrirModalAlterarPin()" class="w-full bg-white border border-red-200 text-red-500 font-bold py-3 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-key"></i> Gerenciar PIN de Pagamento</button><button onclick="abrirModalAlterarSenha()" class="w-full bg-white border border-gray-200 text-gray-600 font-bold py-3 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-lock"></i> Alterar Senha de Login</button></div>
             <button onclick="salvarPerfil()" id="btn-save-perf" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform">Salvar Alterações</button>
             <button onclick="fazerLogout()" class="w-full text-red-500 font-bold py-4 rounded-xl text-sm active:scale-95 transition-transform">Sair do App</button>
         </div>
     </div>
 
     <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[60] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Pedido Criado!</h2><p class="text-sm text-gray-500 mb-6">Aguardando entregador...</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
-
     <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl"><h2 class="text-lg font-bold text-gray-800 mb-2">Segurança</h2><p class="text-sm text-gray-500 mb-4">Digite seu PIN de 4 dígitos</p><input type="tel" id="input-confirm-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-4 outline-none focus:ring-2 focus:ring-blue-500"><div class="grid grid-cols-2 gap-3"><button onclick="document.getElementById('modal-pin').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button><button onclick="confirmarPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Confirmar</button></div></div></div>
-
     <div id="modal-detalhes" class="hidden fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto"><button onclick="document.getElementById('modal-detalhes').style.display='none'" class="absolute top-2 right-3 text-gray-400 text-2xl z-10">&times;</button><div class="bg-blue-600 p-6 text-white"><h3 class="font-bold text-xl mb-1">Detalhes da Entrega</h3><div class="flex items-center gap-2 mt-1"><p id="det-id-visual" class="text-sm bg-blue-700 px-2 py-0.5 rounded font-mono">#00000</p><p id="det-status" class="text-xs bg-white/20 px-2 py-1 rounded">Carregando...</p></div></div><div class="p-6 space-y-4"><div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100"><div><p class="text-xs text-gray-500 uppercase font-bold">Valor da Entrega</p><p id="det-valor" class="text-2xl font-bold text-green-700">R$ --,--</p></div><div class="text-right"><p class="text-xs text-gray-500 uppercase font-bold">PIN Entrega</p><p id="det-pin" class="text-xl font-mono font-bold text-blue-600">----</p></div></div><div class="space-y-3 border-b pb-4"><div class="flex gap-3"><div class="flex flex-col items-center"><i class="fas fa-circle text-blue-600 text-[10px] mt-1"></i><div class="h-full w-0.5 bg-gray-200 my-1"></div><i class="fas fa-map-marker-alt text-red-500"></i></div><div class="flex-1 space-y-4"><div><p class="text-xs text-gray-400 font-bold">RETIRADA</p><p id="det-origem" class="text-sm font-medium text-gray-700">...</p></div><div><p class="text-xs text-gray-400 font-bold">ENTREGA</p><p id="det-destino" class="text-sm font-medium text-gray-700">...</p></div></div></div></div><div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl border border-blue-100"><p class="text-xs text-blue-500 font-bold uppercase mb-3 flex items-center gap-2"><i class="fas fa-motorcycle"></i> Dados do Entregador</p><div class="flex items-center gap-4 mb-3"><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-blue-600 text-xl"><i class="fas fa-user"></i></div><div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs text-gray-500 font-mono bg-gray-200 px-1 rounded inline-block">PLACA</p></div></div><p id="det-moto-modelo" class="text-xs text-gray-600 mb-3 ml-16 -mt-2">Modelo Moto</p><button id="btn-zap-moto" onclick="" class="w-full bg-green-500 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-green-600"><i class="fab fa-whatsapp"></i> Chamar no WhatsApp</button><button id="btn-avaliar" class="w-full bg-yellow-400 text-black py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-yellow-500 mt-2 hidden" onclick="abrirModalAvaliacao()">Avaliar Motoboy</button></div><div id="box-cancelar" class="hidden pt-2"><button id="btn-cancelar-detalhe" onclick="" class="w-full text-red-500 font-bold text-sm border border-red-200 py-3 rounded-xl hover:bg-red-50">Cancelar Pedido</button></div></div></div></div>
-
     <div id="modal-avaliacao" class="hidden fixed inset-0 bg-black/80 z-[90] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-2xl w-full max-w-sm p-6 text-center shadow-2xl relative"><button onclick="document.getElementById('modal-avaliacao').classList.add('hidden')" class="absolute top-2 right-2 text-gray-400 p-2 text-xl">&times;</button><div class="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4 text-yellow-500 text-2xl"><i class="fas fa-star"></i></div><h3 class="text-xl font-bold text-gray-800 mb-1">Avaliar Entrega</h3><p class="text-sm text-gray-500 mb-4">O que achou do serviço?</p><div class="star-rating justify-center mb-4"><input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label><input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label><input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label><input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label><input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label></div><textarea id="av-comentario" class="w-full border rounded-lg p-3 text-sm mb-4 bg-gray-50" placeholder="Deixe um comentário (opcional)..." rows="3"></textarea><button onclick="enviarAvaliacao()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-xl shadow-lg">ENVIAR AVALIAÇÃO</button><input type="hidden" id="av-pedido-id"><input type="hidden" id="av-motoboy-id"></div></div>
-
     <div id="modal-alterar-senha" class="hidden fixed inset-0 bg-gray-900/90 z-[90] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl"><h2 class="text-lg font-bold text-gray-800 mb-2">Alterar Senha</h2><div class="space-y-3 mb-4"><input type="password" id="input-senha-atual" class="w-full border rounded-lg p-3 text-sm" placeholder="Senha Atual (Obrigatório)"><input type="password" id="input-nova-senha" class="w-full border rounded-lg p-3 text-sm" placeholder="Nova Senha"><input type="password" id="input-conf-senha" class="w-full border rounded-lg p-3 text-sm" placeholder="Confirmar Nova Senha"></div><div class="grid grid-cols-2 gap-3"><button onclick="document.getElementById('modal-alterar-senha').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button><button onclick="salvarNovaSenha()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Alterar</button></div></div></div>
-
     <div id="modal-gerenciar-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[90] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl"><h2 class="text-lg font-bold text-gray-800 mb-2" id="titulo-modal-pin">Criar PIN</h2><p class="text-xs text-gray-500 mb-4" id="subtitulo-modal-pin">Crie um PIN de 4 dígitos para autorizar transações.</p><div id="box-senha-login-pin" class="mb-3 hidden"><p class="text-xs text-left mb-1 text-gray-600 font-bold">Senha de Login (Segurança)</p><input type="password" id="input-senha-para-pin" class="w-full border rounded-lg p-3 text-sm mb-2" placeholder="Sua senha de entrar no app"></div><input type="tel" id="input-novo-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-2 outline-none focus:ring-2 focus:ring-blue-500" placeholder="PIN"><input type="tel" id="input-conf-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-4 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Confirmar"><div class="grid grid-cols-2 gap-3"><button onclick="document.getElementById('modal-gerenciar-pin').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button><button onclick="salvarNovoPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Salvar</button></div></div></div>
 
     <div id="bottom-menu" class="bottom-nav w-full z-[200]">
@@ -241,7 +208,7 @@
         let APP_CONFIG = { taxa_base: 5.0, preco_km: 1.0, taxa_retorno_tipo: 'percent', taxa_retorno_valor: 20, taxa_app_percent: 10 };
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let userSession = null, userProfile = null, distanciaFinal = 0, valorFinal = 0, pedidosCache = [];
-        let isRegistering = false; // VARIÁVEL DE CONTROLE DECLARADA NO TOPO
+        let isRegistering = false; // VARIVEL QUE FALTAVA
 
         window.onload = async function() {
             if(typeof $ !== 'undefined') {
@@ -252,26 +219,37 @@
                 });
             }
             
-            // Failsafe Visual: Esconde loading após 3s se não tiver resposta
-            setTimeout(() => { document.getElementById('global-loading').style.display = 'none'; }, 3000);
+            // Inicia tudo de uma vez para ganhar velocidade
+            const [config, auth] = await Promise.all([
+                sbClient.from('app_config').select('*').single(),
+                sbClient.auth.getSession()
+            ]);
 
-            await carregarAppConfig();
-            
-            const { data: { session } } = await sbClient.auth.getSession();
-            if (session) {
-                userSession = session;
-                await carregarPerfil(true); 
+            // Config
+            if(config.data) APP_CONFIG = {
+                taxa_base: parseFloat(config.data.taxa_base),
+                preco_km: parseFloat(config.data.preco_km),
+                taxa_retorno_tipo: config.data.taxa_retorno_tipo,
+                taxa_retorno_valor: parseFloat(config.data.taxa_retorno_valor),
+                taxa_app_percent: parseFloat(config.data.taxa_app_percent)
+            };
+
+            // Auth
+            if (auth.data.session) {
+                userSession = auth.data.session;
+                await carregarPerfil(true); // Tenta carregar perfil e ir pro App
             } else {
+                document.getElementById('global-loading').style.display = 'none';
                 showScreen('welcome');
             }
             
+            // Listener de mudança de estado (para login/logout)
             sbClient.auth.onAuthStateChange(async (event, session) => {
-                // Se estiver registrando, não faz nada
-                if (isRegistering) return;
+                if (isRegistering) return; // Não atrapalha o cadastro
 
                 if (event === 'SIGNED_IN' && session) { 
                     userSession = session; 
-                    await carregarPerfil(true); // Força entrada no app
+                    await carregarPerfil(true); 
                 } 
                 else if (event === 'SIGNED_OUT') { 
                     userSession = null; 
@@ -280,19 +258,6 @@
                 }
             });
         };
-
-        async function carregarAppConfig() {
-            try {
-                const { data } = await sbClient.from('app_config').select('*').single();
-                if(data) {
-                    APP_CONFIG.taxa_base = parseFloat(data.taxa_base);
-                    APP_CONFIG.preco_km = parseFloat(data.preco_km);
-                    APP_CONFIG.taxa_retorno_tipo = data.taxa_retorno_tipo;
-                    APP_CONFIG.taxa_retorno_valor = parseFloat(data.taxa_retorno_valor);
-                    APP_CONFIG.taxa_app_percent = parseFloat(data.taxa_app_percent);
-                }
-            } catch(e) { console.log("Config local usada"); }
-        }
 
         function mudarStatusRetorno() {
             const isChecked = document.getElementById('retorno').checked;
@@ -310,8 +275,7 @@
             });
             const t = document.getElementById('screen-'+id); 
             if(t) {
-                // Remove qualquer loading que possa estar cobrindo
-                document.getElementById('global-loading').style.display = 'none';
+                document.getElementById('global-loading').style.display = 'none'; // Garante que loading some
                 if(['welcome','login'].includes(id)) t.style.display='flex'; else t.style.display='block';
                 window.scrollTo(0,0);
             }
@@ -336,6 +300,7 @@
             safeText('app-user-code', data.codigo_visual || userSession.user.id.slice(0, 4).toUpperCase());
             safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
             safeVal('origem', data.endereco || data.nome_loja);
+            
             safeVal('edit-nome-loja', data.nome_loja); safeVal('edit-razao', data.razao_social);
             safeVal('edit-cnpj', data.cnpj); safeVal('edit-zap-loja', data.whatsapp_loja); 
             safeVal('edit-endereco', data.endereco); safeVal('edit-resp-nome', data.responsavel); 
@@ -354,8 +319,7 @@
         }
 
         async function fazerCadastro() {
-            isRegistering = true; // ATIVA PROTEÇÃO
-            
+            isRegistering = true;
             const dados = {
                 razao: document.getElementById('reg-razao').value, fantasia: document.getElementById('reg-nome-loja').value,
                 cnpj: document.getElementById('reg-cnpj').value, zapLoja: document.getElementById('reg-zap-loja').value,
@@ -365,20 +329,14 @@
                 conf: document.getElementById('reg-conf-senha').value
             };
 
-            if(Object.values(dados).some(v => !v)) {
-                isRegistering = false; return alert("Preencha todos os campos obrigatórios!");
-            }
-            if(dados.senha !== dados.conf) {
-                isRegistering = false; return alert("Senhas não conferem!");
-            }
+            if(Object.values(dados).some(v => !v)) { isRegistering=false; return alert("Preencha todos os campos obrigatórios!"); }
+            if(dados.senha !== dados.conf) { isRegistering=false; return alert("Senhas não conferem!"); }
 
             const btn = document.getElementById('btn-cad'); 
             const txt = document.getElementById('txt-cad');
             const spin = document.getElementById('load-cad');
             
-            btn.disabled = true; 
-            txt.innerText = "";
-            spin.classList.remove('hidden');
+            btn.disabled = true; txt.innerText = ""; spin.classList.remove('hidden');
 
             try {
                 const { data, error } = await sbClient.auth.signUp({ email: dados.email, password: dados.senha });
@@ -394,10 +352,8 @@
                 }
             } catch (e) { alert("Erro: " + e.message); } 
             finally { 
-                btn.disabled = false; 
-                txt.innerText = "Finalizar Cadastro";
-                spin.classList.add('hidden'); 
-                isRegistering = false; // LIBERA PROTEÇÃO
+                btn.disabled = false; txt.innerText = "Finalizar Cadastro"; spin.classList.add('hidden'); 
+                isRegistering = false; 
             }
         }
 
@@ -410,19 +366,15 @@
             const txt = document.getElementById('txt-log');
             const spin = document.getElementById('load-log');
             
-            btn.disabled = true; 
-            txt.innerText = ""; // Limpa texto para mostrar spinner centralizado
-            spin.classList.remove('hidden');
+            btn.disabled = true; txt.innerText = ""; spin.classList.remove('hidden');
             
             try { 
                 const { error } = await sbClient.auth.signInWithPassword({ email, password: senha }); 
                 if (error) throw error;
-                // AuthStateChange vai pegar o login
+                // Deixa o AuthStateChange lidar com o redirecionamento
             } catch (e) { 
                 alert("Erro: " + e.message); 
-                btn.disabled = false; 
-                txt.innerText = "Entrar";
-                spin.classList.add('hidden'); 
+                btn.disabled = false; txt.innerText = "Entrar"; spin.classList.add('hidden'); 
             } 
         }
 
@@ -435,11 +387,8 @@
                     userProfile = data; 
                     preencherDadosPerfil(data); 
                     setupInactivityListener();
-                    
-                    // FORÇA a entrada no App se o login foi bem sucedido
                     navegar('app', document.querySelector('.nav-item')); 
                     ativarRealtimePedidos();
-                    
                     document.getElementById('global-loading').style.display = 'none';
                 }
             } catch (e) { console.error("Erro perfil:", e); }
