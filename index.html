@@ -13,6 +13,8 @@
     
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
+        
+        /* Utilitários */
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -23,17 +25,18 @@
         .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; }
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
         
-        /* Layout Mobile */
+        /* Layout */
         .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 90px; display: none; overflow-y: auto; }
+        .app-container.active { display: block; }
         @media (min-width: 768px) { .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; margin: auto; } body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } }
         
-        /* Menu Inferior */
+        /* Menu */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e5e7eb; justify-content: space-around; padding: 12px 0; max-width: 28rem; margin: 0 auto; display: none; z-index: 50; }
         @media (min-width: 768px) { .bottom-nav { border-radius: 0 0 1.5rem 1.5rem; } }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.2s; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #9CA3AF; cursor: pointer; flex: 1; }
         .nav-item.active { color: #1E40AF; font-weight: bold; }
 
-        /* Utilitários */
+        /* Switch */
         .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -42,6 +45,7 @@
         input:checked + .slider { background-color: #1E40AF; }
         input:checked + .slider:before { transform: translateX(20px); }
 
+        /* Estilos Extras */
         .card-historico { background: white; border-radius: 12px; border: 1px solid #E5E7EB; padding: 16px; margin-bottom: 12px; cursor: pointer; }
         .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         .status-solicitado { background: #E5E7EB; color: #374151; }
@@ -56,18 +60,23 @@
         .star-rating label { font-size: 2rem; color: #ddd; cursor: pointer; }
         .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #FBBF24; }
         .date-filter { font-size: 11px; padding: 6px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; }
+        
+        /* Ajuste do Ícone de Carregamento */
+        .loader { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #1E40AF; width: 40px; height: 40px; -webkit-animation: spin 1s linear infinite; animation: spin 1s linear infinite; margin: 0 auto; }
+        @-webkit-keyframes spin { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(360deg); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
 
     <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
-        <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-700 border-t-transparent mb-4"></div>
-        <p class="text-blue-900 font-bold text-lg animate-pulse">Carregando...</p>
+        <div class="loader mb-4"></div>
+        <p class="text-blue-800 text-sm font-bold animate-pulse">Carregando...</p>
     </div>
 
     <div id="screen-welcome" class="app-container p-8 text-center flex flex-col justify-center">
         <div class="mb-12">
-            <i class="fas fa-box-open text-7xl text-blue-700 mb-4 block"></i>
+            <i class="fas fa-box-open text-7xl text-blue-700 mb-4 inline-block"></i>
             <h1 class="text-3xl font-bold text-gray-800">Drop Entregas</h1>
             <p class="text-gray-500">Cliente</p>
         </div>
@@ -79,7 +88,7 @@
 
     <div id="screen-register" class="app-container p-6">
         <div class="flex items-center mb-6">
-            <button type="button" onclick="showScreen('welcome')" class="text-gray-500 p-2 mr-2"><i class="fas fa-arrow-left text-xl"></i></button>
+            <button type="button" onclick="showScreen('welcome')" class="text-gray-500 p-2 mr-2 active:bg-gray-100 rounded-full"><i class="fas fa-arrow-left text-xl"></i></button>
             <h2 class="text-xl font-bold text-gray-800">Nova Loja</h2>
         </div>
         
@@ -109,18 +118,18 @@
 
             <button type="button" onclick="fazerCadastro()" id="btn-cad" class="w-full btn-primary font-bold py-4 rounded-xl mt-2 flex justify-center items-center gap-2 shadow-lg">
                 <span>Finalizar Cadastro</span>
-                <div id="load-cad" class="hidden animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <div id="load-cad" class="hidden loader w-4 h-4 border-2"></div>
             </button>
         </div>
     </div>
 
     <div id="screen-login" class="app-container p-6 flex flex-col justify-center">
         <div class="absolute top-6 left-6">
-            <button type="button" onclick="showScreen('welcome')" class="text-gray-400 hover:text-blue-600"><i class="fas fa-arrow-left text-2xl"></i></button>
+            <button type="button" onclick="showScreen('welcome')" class="text-gray-400 hover:text-blue-600 p-2"><i class="fas fa-arrow-left text-2xl"></i></button>
         </div>
         
         <div class="text-center mb-8">
-            <i class="fas fa-box-open text-5xl text-blue-700 mb-4 block"></i>
+            <i class="fas fa-box-open text-5xl text-blue-700 mb-4 inline-block"></i>
             <h2 class="text-2xl font-bold text-gray-800">Acesse sua conta</h2>
             <p class="text-sm text-gray-500">Bem-vindo de volta!</p>
         </div>
@@ -137,7 +146,7 @@
             
             <button type="button" onclick="fazerLogin()" id="btn-log" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg flex justify-center gap-2">
                 <span>Entrar</span>
-                <div id="load-log" class="hidden animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <div id="load-log" class="hidden loader w-5 h-5 border-2"></div>
             </button>
         </div>
         <p class="text-center text-sm text-gray-400 mt-8 cursor-pointer hover:text-blue-600" onclick="showScreen('register')">Não tem conta? <span class="font-bold">Cadastre-se</span></p>
@@ -216,7 +225,7 @@
             <div class="sticky bottom-20 z-40 bg-gray-100 pt-2 pb-1">
                 <button type="button" onclick="calcularDistancia()" id="btn-calcular" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg flex justify-center items-center gap-2 active:scale-95 transition-transform text-lg">
                     <i class="fas fa-calculator"></i> <span id="btn-text">Calcular Frete</span>
-                    <div id="loading" class="hidden animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <div id="loading" class="hidden loader w-5 h-5 border-2"></div>
                 </button>
                 
                 <div id="resultado-box" class="hidden bg-green-50 border border-green-200 p-4 rounded-xl flex justify-between items-center animate-fade-in shadow-sm mb-2">
@@ -385,18 +394,6 @@
         </div>
     </div>
 
-    <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[70] flex items-center justify-center p-4 fade-in" style="display:none">
-        <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
-            <h2 class="text-lg font-bold text-gray-800 mb-2">Confirmar PIN</h2>
-            <p class="text-sm text-gray-500 mb-6">Digite seu PIN para continuar</p>
-            <input type="tel" id="input-confirm-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-3xl font-bold tracking-[0.5em] mb-6 outline-none focus:ring-2 focus:ring-blue-500">
-            <div class="flex gap-2">
-                <button type="button" onclick="document.getElementById('modal-pin').style.display='none'" class="flex-1 bg-gray-200 font-bold py-3 rounded-xl text-gray-600">Voltar</button>
-                <button type="button" onclick="confirmarPin()" class="flex-1 bg-blue-700 text-white font-bold py-3 rounded-xl">Confirmar</button>
-            </div>
-        </div>
-    </div>
-
     <div id="bottom-menu" class="bottom-nav w-full z-[200]">
         <div class="nav-item active" onclick="navegar('app', this)"><i class="fas fa-home"></i><span>Início</span></div>
         <div class="nav-item" onclick="navegar('pedidos', this)"><i class="fas fa-list"></i><span>Pedidos</span></div>
@@ -425,11 +422,25 @@
                     $('#reg-cpf-resp').mask('000.000.000-00');
                 });
             }
-            await carregarAppConfig();
             
-            const { data: { session } } = await sbClient.auth.getSession();
-            if (session) { userSession = session; await carregarPerfil(true); } 
-            else { document.getElementById('global-loading').classList.add('hidden'); showScreen('welcome'); }
+            // Try/Catch na inicialização para evitar travamento da tela de load
+            try {
+                await carregarAppConfig();
+            } catch(e) { console.log("Config fallback"); }
+
+            try {
+                const { data: { session } } = await sbClient.auth.getSession();
+                if (session) { 
+                    userSession = session; 
+                    await carregarPerfil(true); 
+                } else { 
+                    document.getElementById('global-loading').classList.add('hidden');
+                    showScreen('welcome'); 
+                }
+            } catch(e) {
+                document.getElementById('global-loading').classList.add('hidden');
+                showScreen('welcome');
+            }
             
             sbClient.auth.onAuthStateChange(async (event, session) => {
                 if(event === 'SIGNED_IN' && session) { userSession = session; await carregarPerfil(true); }
@@ -437,7 +448,6 @@
             });
         });
 
-        // Configuração
         async function carregarAppConfig() {
             const { data } = await sbClient.from('app_config').select('*').single();
             if(data) {
@@ -453,16 +463,18 @@
 
         // Navegação Blindada
         function showScreen(id) {
-            document.querySelectorAll('[id^="screen-"]').forEach(el => el.classList.add('hidden'));
-            document.getElementById('screen-' + id).classList.remove('hidden');
-            
+            document.querySelectorAll('[id^="screen-"]').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById('screen-' + id);
+            if(target) {
+                target.classList.add('active');
+                if(id.includes('welcome') || id.includes('login') || id.includes('extrato')) target.scrollTop = 0;
+                window.scrollTo(0,0);
+            }
             const menu = document.getElementById('bottom-menu');
             if(['app', 'pedidos', 'extrato', 'perfil'].includes(id)) {
-                menu.classList.remove('hidden'); menu.style.display = 'flex';
-                // Rolagem pro topo
-                document.getElementById('screen-' + id).scrollTop = 0;
+                menu.style.display = 'flex';
             } else {
-                menu.classList.add('hidden');
+                menu.style.display = 'none';
             }
         }
 
@@ -495,7 +507,6 @@
         }
 
         async function fazerCadastro() {
-            // Coleta de dados
             const dados = {
                 razao: document.getElementById('reg-razao').value,
                 fantasia: document.getElementById('reg-nome-loja').value,
@@ -510,7 +521,6 @@
                 conf: document.getElementById('reg-conf-senha').value
             };
 
-            // Validação Básica
             if(Object.values(dados).some(v => !v)) return alert("Preencha todos os campos obrigatórios.");
             if(dados.senha !== dados.conf) return alert("As senhas não coincidem.");
             if(dados.senha.length < 6) return alert("Senha deve ter no mínimo 6 dígitos.");
@@ -566,15 +576,11 @@
         }
 
         function preencherDadosPerfil(data) {
-            safeText('app-user-name', data.nome_loja || 'Loja');
+            safeText('app-user-name', data.nome_loja || 'Minha Loja');
             safeText('app-user-code', data.codigo_visual || '#'+userSession.user.id.slice(0,4));
             safeText('display-saldo', "R$ " + (data.saldo || 0).toFixed(2));
             safeText('extrato-saldo-display', "R$ " + (data.saldo || 0).toFixed(2));
-            
-            // Auto-preencher campos de pedido
             safeVal('origem', data.endereco || data.nome_loja);
-            
-            // Preencher campos de edição
             safeVal('edit-nome-loja', data.nome_loja); 
             safeVal('edit-zap-loja', data.whatsapp_loja);
             safeVal('edit-endereco', data.endereco); 
@@ -584,7 +590,6 @@
         function safeText(id, txt) { const el=document.getElementById(id); if(el) el.innerText = txt; }
         function safeVal(id, val) { const el=document.getElementById(id); if(el) el.value = val || ''; }
 
-        // Pedidos
         async function calcularDistancia() {
             const or = document.getElementById('origem').value;
             const des = document.getElementById('destino').value;
@@ -628,17 +633,11 @@
         }
 
         async function iniciarPedido() {
-            const btn = document.getElementById('btn-enviar'); btn.disabled = true; btn.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>';
+            const btn = document.getElementById('btn-enviar'); btn.disabled = true; btn.innerText = "Processando...";
+            if(!userSession) return alert("Faça login.");
+            let val = parseFloat(valorFinal);
             
-            if(!userSession) return alert("Sessão inválida.");
-            const val = parseFloat(valorFinal);
-            
-            // Validações
-            const dados = {
-                nome: document.getElementById('nome_dest').value,
-                tel: document.getElementById('tel_dest').value,
-                ref: document.getElementById('referencia').value
-            };
+            const dados = { nome: document.getElementById('nome_dest').value, tel: document.getElementById('tel_dest').value, ref: document.getElementById('referencia').value };
             if(!dados.nome || !dados.tel || !dados.ref) {
                 alert("Preencha os dados do cliente (Nome, WhatsApp, Referência).");
                 btn.disabled = false; btn.innerText = "Confirmar Pedido";
@@ -665,7 +664,6 @@
                     status: 'solicitado', codigo_visual: '#' + Math.floor(10000 + Math.random() * 90000),
                     taxa_app_aplicada: APP_CONFIG.taxa_app_percent
                 };
-                
                 const { error } = await sbClient.from('pedidos').insert([novo]);
                 if(error) throw error;
                 
@@ -674,7 +672,6 @@
             } catch(e) { alert(e.message); } finally { btn.disabled = false; btn.innerText = 'Confirmar Pedido'; }
         }
 
-        // Histórico e Detalhes
         async function carregarHistoricoPedidos() {
             const { data } = await sbClient.from('pedidos').select('*').eq('user_id', userSession.user.id).order('created_at', { ascending: false }).limit(30);
             if(data) { pedidosCache = data; renderizarLista(data); }
@@ -746,7 +743,6 @@
             document.getElementById('modal-detalhes').classList.remove('hidden'); document.getElementById('modal-detalhes').style.display='flex';
         }
 
-        // Extrato, Avaliação e Perfil (Mantidos e Otimizados)
         async function carregarExtrato() {
             const lista = document.getElementById('lista-extrato'); lista.innerHTML = '<div class="text-center mt-4">Carregando...</div>';
             const { data } = await sbClient.from('transacoes').select('*').eq('user_id', userSession.user.id).order('created_at', {ascending:false}).limit(30);
@@ -778,7 +774,6 @@
         function verificarPinParaSaldo() { alert("Para recarregar, contate o suporte."); solicitarSaldoZap(); }
         function solicitarSaldoZap() { window.open(`https://wa.me/${NUMERO_ADMIN}?text=Olá, desejo recarregar. ID: ${userProfile.codigo_visual}`, '_blank'); }
         
-        // Inatividade
         function setupInactivityListener() { ['mousedown','scroll','touchstart'].forEach(e => document.addEventListener(e, resetInactivityTimer, true)); resetInactivityTimer(); }
         function resetInactivityTimer() { clearTimeout(inactivityTimer); if(userSession) inactivityTimer = setTimeout(async () => { alert("Sessão expirada."); await fazerLogout(); }, INACTIVITY_TIME); }
         
