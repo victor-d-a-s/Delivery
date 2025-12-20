@@ -22,7 +22,6 @@
         .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; }
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
         
-        /* Switch */
         .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -31,11 +30,9 @@
         input:checked + .slider { background-color: #1E40AF; }
         input:checked + .slider:before { transform: translateX(20px); }
         
-        /* App Container */
         .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 80px; display: none; overflow-y: auto; }
         @media (min-width: 768px) { .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; margin: auto; } body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } }
         
-        /* Menu Inferior */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; background: white; border-top: 1px solid #e5e7eb; display: none; justify-content: space-around; align-items: center; padding: 14px 0; z-index: 50; }
         @media (min-width: 768px) { .bottom-nav { position: absolute; max-width: 100%; border-radius: 0; } }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.1s; }
@@ -43,7 +40,6 @@
         .nav-item span { font-size: 0.7rem; font-weight: 600; }
         .nav-item.active { color: #1E40AF; transform: translateY(-1px); }
         
-        /* Utilitários */
         .custom-select-btn { width: 100%; text-align: left; padding: 12px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; font-weight: 600; color: #374151; display: flex; justify-content: space-between; items-center; cursor: pointer; }
         .custom-options { display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 12px; margin-top: 6px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 60; overflow: hidden; }
         .custom-options.show { display: block; }
@@ -171,16 +167,10 @@
             <div class="bg-blue-600 p-4 text-white flex justify-between items-center"><h3 class="font-bold text-lg"><i class="fas fa-motorcycle"></i> Enviar para <span id="dir-moto-nome">...</span></h3><button onclick="document.getElementById('modal-direcionado').style.display='none'" class="text-white text-2xl">&times;</button></div>
             <div class="p-5 space-y-4">
                 <input type="hidden" id="dir-moto-id">
-                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100"><p class="text-xs text-blue-500 font-bold uppercase mb-1">Rota</p><input type="text" id="dir-origem" class="w-full bg-white border p-2 text-sm rounded mb-2" readonly><input type="text" id="dir-destino" class="w-full bg-white border p-2 text-sm rounded" placeholder="Endereço de Entrega"></div>
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100"><p class="text-xs text-blue-500 font-bold uppercase mb-1">Rota</p><input type="text" id="dir-origem" class="w-full bg-white border p-2 text-sm rounded mb-2" readonly><input type="text" id="dir-destino" class="w-full bg-white border p-2 text-sm rounded" placeholder="Endereço de Entrega*"></div>
                 <div class="space-y-2"><input type="text" id="dir-nome-dest" class="w-full border p-2 text-sm rounded" placeholder="Nome Cliente*"><input type="tel" id="dir-tel-dest" class="w-full border p-2 text-sm rounded" placeholder="WhatsApp Cliente*"><input type="text" id="dir-ref" class="w-full border p-2 text-sm rounded" placeholder="Referência*"></div>
-                
-                <div class="grid grid-cols-2 gap-2">
-                    <div><label class="text-[10px] font-bold text-gray-500 uppercase">Entrega</label><select id="dir-pag-entrega" class="w-full border p-2 text-sm rounded bg-white"><option value="PIX">💠 PIX</option><option value="Dinheiro">💵 Dinheiro</option><option value="Carteira">💳 Saldo Conta</option></select></div>
-                    <div><label class="text-[10px] font-bold text-gray-500 uppercase">Produto</label><select id="dir-pag-produto" class="w-full border p-2 text-sm rounded bg-white"><option value="Pago">✅ Pago</option><option value="Cartão">💳 Cartão</option><option value="PIX">💠 PIX</option><option value="Dinheiro">💵 Dinheiro</option></select></div>
-                </div>
-                
+                <div class="grid grid-cols-2 gap-2"><div><label class="text-[10px] font-bold text-gray-500 uppercase">Entrega</label><select id="dir-pag-entrega" class="w-full border p-2 text-sm rounded bg-white"><option value="PIX">💠 PIX</option><option value="Dinheiro">💵 Dinheiro</option><option value="Carteira">💳 Saldo Conta</option></select></div><div><label class="text-[10px] font-bold text-gray-500 uppercase">Produto</label><select id="dir-pag-produto" class="w-full border p-2 text-sm rounded bg-white"><option value="Pago">✅ Pago</option><option value="Cartão">💳 Cartão</option><option value="PIX">💠 PIX</option><option value="Dinheiro">💵 Dinheiro</option></select></div></div>
                 <div class="flex items-center gap-2 border p-2 rounded"><input type="checkbox" id="dir-retorno" onchange="calcDir()"><span class="text-xs font-bold text-gray-500">Com Retorno</span></div>
-                
                 <button onclick="calcDir()" id="btn-calc-dir" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg shadow-sm">Calcular</button>
                 <div id="res-dir" class="hidden justify-between items-center bg-gray-50 p-3 rounded border"><div><span class="text-xs">Distância</span><br><b id="dir-km">0</b> km</div><div><span class="text-xs">Valor</span><br><b class="text-green-600 text-xl">R$ <span id="dir-val">0,00</span></b></div></div>
                 <button onclick="envDir()" id="btn-env-dir" class="hidden w-full bg-green-600 text-white font-bold py-3 rounded-lg shadow-sm">Confirmar Envio</button>
@@ -209,10 +199,10 @@
         const NUMERO_ADMIN = "5584982005039"; 
         const CIDADE_FIXA = "Mossoró, RN"; 
         
-        let APP_CONFIG = { taxa_base: 5.0, preco_km: 1.0, taxa_retorno_tipo: 'percent', taxa_retorno_valor: 20, taxa_app_percent: 10 };
+        let APP_CONFIG = { taxa_base: 5.0, preco_km: 1.0, taxa_retorno_tipo: 'percent', taxa_retorno_valor: 20, taxa_app_percent: 10, tempo_inatividade: 30 };
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let userSession = null, userProfile = null, distanciaFinal = 0, valorFinal = 0, pedidosCache = [];
-        let isRegistering = false, currentTab = 'todos', dirDist = 0, dirVal = 0;
+        let isRegistering = false, currentTab = 'todos', dirDist = 0, dirVal = 0, inactivityTimer;
 
         window.onload = async function() {
             if(typeof $ !== 'undefined') {
@@ -230,7 +220,7 @@
             sbClient.auth.onAuthStateChange(async (event, session) => { if(isRegistering)return; if(event==='SIGNED_IN'&&session){userSession=session;showScreen('app');carregarPerfil(true);}else if(event==='SIGNED_OUT'){userSession=null;userProfile=null;showScreen('welcome');}});
         };
 
-        async function carregarAppConfig() { try{const{data}=await sbClient.from('app_config').select('*').single();if(data){APP_CONFIG.taxa_base=parseFloat(data.taxa_base);APP_CONFIG.preco_km=parseFloat(data.preco_km);APP_CONFIG.taxa_retorno_tipo=data.taxa_retorno_tipo;APP_CONFIG.taxa_retorno_valor=parseFloat(data.taxa_retorno_valor);APP_CONFIG.taxa_app_percent=parseFloat(data.taxa_app_percent);}}catch(e){} }
+        async function carregarAppConfig() { try{const{data}=await sbClient.from('app_config').select('*').single();if(data){APP_CONFIG={...APP_CONFIG, ...data}; APP_CONFIG.taxa_base=parseFloat(data.taxa_base);APP_CONFIG.preco_km=parseFloat(data.preco_km);APP_CONFIG.taxa_retorno_valor=parseFloat(data.taxa_retorno_valor);APP_CONFIG.taxa_app_percent=parseFloat(data.taxa_app_percent);}}catch(e){} }
         function toggleDropdown(id){const l=document.getElementById(`list-${id}`);document.querySelectorAll('.custom-options').forEach(e=>{if(e.id!==`list-${id}`)e.classList.remove('show');});l.classList.toggle('show');}
         function selectOption(id,v,t){document.getElementById(`pagamento_${id}`).value=v;document.getElementById(`display-${id}`).innerText=t;document.getElementById(`list-${id}`).classList.remove('show');}
         document.addEventListener('click', function(e){if(!e.target.closest('.relative')){document.querySelectorAll('.custom-options').forEach(e=>e.classList.remove('show'));}});
@@ -250,7 +240,6 @@
         async function iniciarPedido(){
             if(!userSession){alert("Faça login.");return;}
             let v=parseFloat(valorFinal);
-            // VALIDAÇÃO RIGOROSA
             const nome = document.getElementById('nome_dest').value.trim();
             const tel = document.getElementById('tel_dest').value.trim();
             const ref = document.getElementById('referencia').value.trim();
@@ -323,15 +312,11 @@
             const pg = document.getElementById('dir-pag-entrega').value;
             const motoId = document.getElementById('dir-moto-id').value;
             
-            // VALIDAÇÃO RIGOROSA
             const nome = document.getElementById('dir-nome-dest').value.trim();
             const tel = document.getElementById('dir-tel-dest').value.trim();
             const ref = document.getElementById('dir-ref').value.trim();
 
-            if (!nome || !tel || !ref) {
-                alert("Por favor, preencha o Nome, WhatsApp e Ponto de Referência do cliente.");
-                return;
-            }
+            if (!nome || !tel || !ref) { alert("Preencha Nome, WhatsApp e Referência."); return; }
             
             try {
                 if(pg === 'Carteira') {
@@ -395,10 +380,9 @@
             
             const boxMoto = document.getElementById('box-motoboy');
             const btnAvaliar = document.getElementById('btn-avaliar');
-            const boxCancel = document.getElementById('box-cancelar');
             const btnNovo = document.getElementById('btn-novo-pedido-moto');
+            const boxCancel = document.getElementById('box-cancelar');
             
-            // Motoboy e Lógica de Novo Pedido (Corrigido para só aparecer se estiver Pendente ou Em Rota)
             if(p.entregador_id) {
                 const { data: moto } = await sbClient.from('profiles').select('*').eq('id', p.entregador_id).single();
                 if(moto) {
@@ -447,7 +431,6 @@
         async function filtrarPorData(tipo) { 
             if(tipo === 'pedidos') renderizarLista(pedidosCache); 
             else {
-                // Filtro simples para extrato
                 const dtIni = document.getElementById('filtro-ext-ini').value;
                 const dtFim = document.getElementById('filtro-ext-fim').value;
                 if(!dtIni || !dtFim) return alert("Selecione as datas");
@@ -461,7 +444,7 @@
         }
         
         function setupInactivityListener() { ['mousedown','scroll','touchstart'].forEach(e => document.addEventListener(e, resetInactivityTimer, true)); resetInactivityTimer(); }
-        function resetInactivityTimer() { clearTimeout(inactivityTimer); if(userSession) inactivityTimer = setTimeout(async () => { alert("Sessão expirada."); await fazerLogout(); }, INACTIVITY_TIME); }
+        function resetInactivityTimer() { clearTimeout(inactivityTimer); if(userSession) inactivityTimer = setTimeout(async () => { alert("Sessão expirada."); await fazerLogout(); }, (APP_CONFIG.tempo_inatividade || 30) * 60 * 1000); }
     </script>
 </body>
 </html>
