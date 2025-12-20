@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; padding-bottom: 90px; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; padding-bottom: 100px; -webkit-tap-highlight-color: transparent; }
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.2s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -32,55 +32,29 @@
         input:checked + .slider:before { transform: translateX(20px); }
         
         /* App Container */
-        .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 100px; display: none; overflow-y: auto; }
+        .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 80px; display: none; overflow-y: auto; }
+        @media (min-width: 768px) { .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; margin: auto; } body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } }
         
-        /* Desktop View */
-        @media (min-width: 768px) { 
-            .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; position: relative; margin: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); } 
-            body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } 
-            /* No desktop, o menu fica dentro da caixinha */
-            .bottom-nav { position: absolute; max-width: 100%; border-radius: 0; }
-        }
-        
-        /* Menu Inferior (Full Width Mobile) */
-        .bottom-nav { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            width: 100%;
-            background: white; 
-            border-top: 1px solid #e5e7eb; 
-            display: none; 
-            justify-content: space-around; 
-            align-items: center;
-            padding: 12px 0 20px 0; /* Padding extra embaixo para iPhones novos */
-            z-index: 50; 
-            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
+        /* Menu Inferior (Full Width) */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; background: white; border-top: 1px solid #e5e7eb; display: none; justify-content: space-around; align-items: center; padding: 12px 0 20px 0; z-index: 50; box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05); }
+        @media (min-width: 768px) { .bottom-nav { position: absolute; max-width: 100%; border-radius: 0; } }
         
         .nav-item { display: flex; flex-direction: column; align-items: center; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.1s; }
         .nav-item i { font-size: 1.5rem; margin-bottom: 4px; }
         .nav-item span { font-size: 0.75rem; font-weight: 600; }
         .nav-item.active { color: #1E40AF; }
         
-        /* Select Customizado (Menu Suspenso) */
-        .custom-select-wrapper { position: relative; }
-        .custom-select {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 100%;
-            background-color: white;
-            border: 1px solid #e5e7eb;
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #374151;
-            outline: none;
-        }
-        .custom-select:focus { border-color: #1E40AF; }
-        .select-arrow { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #6B7280; font-size: 12px; }
+        /* Menu Suspenso Flutuante (Custom) */
+        .custom-select-btn { width: 100%; text-align: left; padding: 12px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; font-weight: 600; color: #374151; display: flex; justify-content: space-between; items-center; cursor: pointer; transition: border-color 0.2s; }
+        .custom-select-btn:active { border-color: #1E40AF; background-color: #f9fafb; }
+        
+        .custom-options { display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 12px; margin-top: 6px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); z-index: 60; overflow: hidden; animation: fadeIn 0.1s ease-out; }
+        .custom-options.show { display: block; }
+        
+        .custom-option { padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500; color: #4B5563; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f3f4f6; transition: background 0.1s; }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover { background-color: #eff6ff; color: #1E40AF; }
+        .custom-option i { width: 20px; text-align: center; }
 
         /* Utilitários */
         .card-historico { background: white; border-radius: 12px; border: 1px solid #E5E7EB; padding: 16px; margin-bottom: 12px; cursor: pointer; }
@@ -90,7 +64,6 @@
         .status-em_rota { background: #DBEAFE; color: #1E40AF; }
         .status-concluido { background: #D1FAE5; color: #059669; }
         .status-cancelado { background: #fee2e2; color: #991b1b; }
-        
         .transacao-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
         .transacao-valor.credito { color: #059669; }
         .transacao-valor.debito { color: #DC2626; }
@@ -100,7 +73,6 @@
         .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #FBBF24; }
         .date-filter { font-size: 11px; padding: 6px; border: 1px solid #e5e7eb; border-radius: 6px; width: 100%; }
         
-        /* Loader Otimizado */
         .spinner { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid white; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.6s linear infinite; }
         .loader-blue { border: 3px solid #f3f3f3; border-top: 3px solid #1E40AF; border-radius: 50%; width: 32px; height: 32px; animation: spin 0.6s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -130,45 +102,19 @@
             <h2 class="text-xl font-bold text-center w-full mt-2">Nova Loja</h2>
         </div>
         <div class="space-y-4 pb-10">
-            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-3">
-                <p class="text-xs font-bold text-blue-800 uppercase mb-1">Estabelecimento</p>
-                <input type="text" id="reg-razao" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Razão Social">
-                <input type="text" id="reg-nome-loja" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Nome Fantasia">
-                <input type="tel" id="reg-cnpj" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="CNPJ">
-                <input type="tel" id="reg-zap-loja" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="WhatsApp Loja">
-                <input type="text" id="reg-endereco" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Endereço de Retirada">
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3">
-                <p class="text-xs font-bold text-gray-600 uppercase mb-1">Responsável</p>
-                <input type="text" id="reg-nome-resp" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Nome Completo">
-                <input type="tel" id="reg-cpf-resp" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="CPF">
-                <input type="tel" id="reg-zap-resp" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="WhatsApp Pessoal">
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3">
-                <p class="text-xs font-bold text-gray-600 uppercase mb-1">Acesso</p>
-                <input type="email" id="reg-email" class="w-full bg-white border rounded-lg p-3 text-sm mb-3" placeholder="E-mail">
-                <input type="password" id="reg-senha" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Senha (Min 6)">
-                <input type="password" id="reg-conf-senha" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Confirmar Senha">
-            </div>
-            <button onclick="fazerCadastro()" id="btn-cad" class="w-full btn-primary font-bold py-4 rounded-xl mt-2 flex justify-center items-center gap-2">
-                <span id="txt-cad">Finalizar Cadastro</span>
-                <div id="load-cad" class="spinner hidden"></div>
-            </button>
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 space-y-3"><p class="text-xs font-bold text-blue-800 uppercase mb-1">Estabelecimento</p><input type="text" id="reg-razao" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Razão Social"><input type="text" id="reg-nome-loja" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Nome Fantasia"><input type="tel" id="reg-cnpj" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="CNPJ"><input type="tel" id="reg-zap-loja" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="WhatsApp Loja"><input type="text" id="reg-endereco" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Endereço de Retirada"></div>
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3"><p class="text-xs font-bold text-gray-600 uppercase mb-1">Responsável</p><input type="text" id="reg-nome-resp" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Nome Completo"><input type="tel" id="reg-cpf-resp" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="CPF"><input type="tel" id="reg-zap-resp" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="WhatsApp Pessoal"></div>
+            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 space-y-3"><p class="text-xs font-bold text-gray-600 uppercase mb-1">Acesso</p><input type="email" id="reg-email" class="w-full bg-white border rounded-lg p-3 text-sm mb-3" placeholder="E-mail"><input type="password" id="reg-senha" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Senha (Min 6)"><input type="password" id="reg-conf-senha" class="w-full bg-white border rounded-lg p-3 text-sm" placeholder="Confirmar Senha"></div>
+            <button onclick="fazerCadastro()" id="btn-cad" class="w-full btn-primary font-bold py-4 rounded-xl mt-2 flex justify-center items-center gap-2"><span id="txt-cad">Finalizar Cadastro</span><div id="load-cad" class="spinner hidden"></div></button>
         </div>
     </div>
 
     <div id="screen-login" class="app-container p-6 fade-in flex flex-col justify-center">
-        <div class="text-center mb-8">
-            <i class="fas fa-box-open text-5xl text-blue-700 mb-4"></i>
-            <h2 class="text-xl font-bold">Login</h2>
-        </div>
+        <div class="text-center mb-8"><i class="fas fa-box-open text-5xl text-blue-700 mb-4"></i><h2 class="text-xl font-bold">Login</h2></div>
         <div class="space-y-4">
             <input type="email" id="log-email" class="w-full border rounded-lg p-4 text-lg" placeholder="E-mail">
             <input type="password" id="log-senha" class="w-full border rounded-lg p-4 text-lg" placeholder="Senha">
-            <button onclick="fazerLogin()" id="btn-log" class="w-full btn-primary font-bold py-4 rounded-xl flex justify-center items-center gap-2 h-14">
-                <span id="txt-log">Entrar</span>
-                <div id="load-log" class="spinner hidden"></div>
-            </button>
+            <button onclick="fazerLogin()" id="btn-log" class="w-full btn-primary font-bold py-4 rounded-xl flex justify-center items-center gap-2 h-14"><span id="txt-log">Entrar</span><div id="load-log" class="spinner hidden"></div></button>
         </div>
         <p class="text-center text-sm text-gray-400 mt-6 cursor-pointer" onclick="showScreen('register')">Não tem conta? <span class="text-blue-600 font-bold">Cadastre-se</span></p>
     </div>
@@ -185,27 +131,31 @@
                 <div class="grid grid-cols-2 gap-2"><input type="text" id="complemento" placeholder="Apto/Bloco" class="bg-white border w-full p-2 text-sm rounded-lg"><input type="text" id="referencia" placeholder="Ref.*" class="bg-white border w-full p-2 text-sm rounded-lg"></div>
                 
                 <div class="grid grid-cols-2 gap-3 pt-2">
-                    <div>
+                    <div class="relative">
                         <label class="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 block">Entrega</label>
-                        <div class="custom-select-wrapper">
-                            <select id="pagamento_entrega" class="custom-select">
-                                <option value="PIX">💠 PIX</option>
-                                <option value="Dinheiro">💵 Dinheiro</option>
-                                <option value="Carteira">💳 Saldo Conta</option>
-                            </select>
-                            <i class="fas fa-chevron-down select-arrow"></i>
+                        <button type="button" class="custom-select-btn" onclick="toggleDropdown('entrega')">
+                            <span id="display-entrega">💠 PIX</span>
+                            <i class="fas fa-chevron-down text-gray-400"></i>
+                        </button>
+                        <input type="hidden" id="pagamento_entrega" value="PIX">
+                        <div id="list-entrega" class="custom-options">
+                            <div class="custom-option" onclick="selectOption('entrega', 'PIX', '💠 PIX')"><i class="fas fa-qrcode text-blue-500"></i> PIX</div>
+                            <div class="custom-option" onclick="selectOption('entrega', 'Dinheiro', '💵 Dinheiro')"><i class="fas fa-money-bill-wave text-green-600"></i> Dinheiro</div>
+                            <div class="custom-option" onclick="selectOption('entrega', 'Carteira', '💳 Saldo Conta')"><i class="fas fa-wallet text-purple-600"></i> Saldo Conta</div>
                         </div>
                     </div>
-                    <div>
+                    <div class="relative">
                         <label class="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 block">Produto</label>
-                        <div class="custom-select-wrapper">
-                            <select id="pagamento_produto" class="custom-select">
-                                <option value="Já Pago">✅ Já Pago</option>
-                                <option value="Cartão">💳 Cartão</option>
-                                <option value="PIX">💠 PIX</option>
-                                <option value="Dinheiro">💵 Dinheiro</option>
-                            </select>
-                            <i class="fas fa-chevron-down select-arrow"></i>
+                        <button type="button" class="custom-select-btn" onclick="toggleDropdown('produto')">
+                            <span id="display-produto">✅ Já Pago</span>
+                            <i class="fas fa-chevron-down text-gray-400"></i>
+                        </button>
+                        <input type="hidden" id="pagamento_produto" value="Já Pago">
+                        <div id="list-produto" class="custom-options">
+                            <div class="custom-option" onclick="selectOption('produto', 'Já Pago', '✅ Já Pago')"><i class="fas fa-check-circle text-green-600"></i> Já Pago</div>
+                            <div class="custom-option" onclick="selectOption('produto', 'Cartão', '💳 Cartão')"><i class="fas fa-credit-card text-blue-600"></i> Cartão</div>
+                            <div class="custom-option" onclick="selectOption('produto', 'PIX', '💠 PIX')"><i class="fas fa-qrcode text-blue-500"></i> PIX</div>
+                            <div class="custom-option" onclick="selectOption('produto', 'Dinheiro', '💵 Dinheiro')"><i class="fas fa-money-bill-wave text-green-600"></i> Dinheiro</div>
                         </div>
                     </div>
                 </div>
@@ -223,17 +173,13 @@
     </div>
 
     <div id="screen-pedidos" class="app-container p-6 fade-in flex flex-col h-screen">
-        <div class="flex justify-between items-center mb-2">
-            <h2 class="text-xl font-bold text-gray-700">Meus Pedidos</h2>
-            <button onclick="atualizarPedidosManual()" class="text-blue-600 p-2"><i id="icon-refresh" class="fas fa-sync-alt"></i></button>
-        </div>
+        <div class="flex justify-between items-center mb-2"><h2 class="text-xl font-bold text-gray-700">Meus Pedidos</h2><button onclick="atualizarPedidosManual()" class="text-blue-600 p-2"><i id="icon-refresh" class="fas fa-sync-alt"></i></button></div>
         <div class="bg-gray-50 p-3 rounded-lg border mb-4 flex gap-2 items-end"><div class="flex-1"><p class="text-[10px] text-gray-500 mb-1">Início</p><input type="date" id="filtro-ped-ini" class="date-filter bg-white"></div><div class="flex-1"><p class="text-[10px] text-gray-500 mb-1">Fim</p><input type="date" id="filtro-ped-fim" class="date-filter bg-white"></div><button onclick="filtrarPorData('pedidos')" class="bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs h-[29px]"><i class="fas fa-search"></i></button></div>
         <div id="lista-pedidos" class="flex-1 overflow-y-auto pb-20 space-y-3"><div class="text-center text-gray-400 mt-10">Carregando histórico...</div></div>
     </div>
 
     <div id="screen-extrato" class="app-container p-6 fade-in text-center flex flex-col h-screen">
-        <i class="fas fa-file-invoice-dollar text-6xl text-gray-200 mb-2 mt-4"></i>
-        <h2 class="text-xl font-bold text-gray-700 mb-4">Extrato Financeiro</h2>
+        <i class="fas fa-file-invoice-dollar text-6xl text-gray-200 mb-2 mt-4"></i><h2 class="text-xl font-bold text-gray-700 mb-4">Extrato Financeiro</h2>
         <div class="bg-gray-50 p-3 rounded-lg border mb-4 flex gap-2 items-end w-full text-left"><div class="flex-1"><p class="text-[10px] text-gray-500 mb-1">Início</p><input type="date" id="filtro-ext-ini" class="date-filter bg-white"></div><div class="flex-1"><p class="text-[10px] text-gray-500 mb-1">Fim</p><input type="date" id="filtro-ext-fim" class="date-filter bg-white"></div><button onclick="filtrarPorData('extrato')" class="bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs h-[29px]"><i class="fas fa-search"></i></button></div>
         <div id="lista-extrato" class="flex-1 overflow-y-auto pb-20 space-y-2 w-full px-1"><div class="text-center text-gray-400 mt-10">Carregando transações...</div></div>
     </div>
@@ -241,25 +187,9 @@
     <div id="screen-perfil" class="app-container p-6 fade-in">
         <h2 class="text-xl font-bold mb-4">Editar Perfil</h2>
         <div class="space-y-4 pb-20">
-            <div class="bg-white p-4 rounded-lg border border-blue-100 space-y-3">
-                <p class="text-xs font-bold text-blue-800 uppercase mb-1">Estabelecimento</p>
-                <div><label class="text-xs text-gray-500">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">Razão Social</label><input type="text" id="edit-razao" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">CNPJ</label><input type="tel" id="edit-cnpj" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">WhatsApp Loja</label><input type="tel" id="edit-zap-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">Endereço de Coleta</label><input type="text" id="edit-endereco" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-            </div>
-            <div class="bg-white p-4 rounded-lg border border-gray-200 space-y-3">
-                <p class="text-xs font-bold text-gray-600 uppercase mb-1">Responsável</p>
-                <div><label class="text-xs text-gray-500">Nome Completo</label><input type="text" id="edit-resp-nome" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">CPF</label><input type="tel" id="edit-cpf-resp" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-                <div><label class="text-xs text-gray-500">WhatsApp Pessoal</label><input type="tel" id="edit-resp-zap" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div>
-            </div>
-            <div class="bg-red-50 p-4 rounded-xl border border-red-100 space-y-3">
-                <p class="text-xs font-bold text-red-400 uppercase">Segurança</p>
-                <button onclick="abrirModalAlterarPin()" class="w-full bg-white border border-red-200 text-red-500 font-bold py-3 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-key"></i> Gerenciar PIN de Pagamento</button>
-                <button onclick="abrirModalAlterarSenha()" class="w-full bg-white border border-gray-200 text-gray-600 font-bold py-3 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-lock"></i> Alterar Senha de Login</button>
-            </div>
+            <div class="bg-white p-4 rounded-lg border border-blue-100 space-y-3"><p class="text-xs font-bold text-blue-800 uppercase mb-1">Estabelecimento</p><div><label class="text-xs text-gray-500">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div><div><label class="text-xs text-gray-500">Razão Social</label><input type="text" id="edit-razao" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div><div><label class="text-xs text-gray-500">CNPJ</label><input type="tel" id="edit-cnpj" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div><div><label class="text-xs text-gray-500">WhatsApp Loja</label><input type="tel" id="edit-zap-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div><div><label class="text-xs text-gray-500">Endereço de Coleta</label><input type="text" id="edit-endereco" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div></div>
+            <div class="bg-white p-4 rounded-lg border border-gray-200 space-y-3"><p class="text-xs font-bold text-gray-600 uppercase mb-1">Responsável</p><div><label class="text-xs text-gray-500">Nome Completo</label><input type="text" id="edit-resp-nome" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div><div><label class="text-xs text-gray-500">CPF</label><input type="tel" id="edit-cpf-resp" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div><div><label class="text-xs text-gray-500">WhatsApp Pessoal</label><input type="tel" id="edit-resp-zap" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500"></div></div>
+            <div class="bg-red-50 p-4 rounded-xl border border-red-100 space-y-3"><p class="text-xs font-bold text-red-400 uppercase">Segurança</p><button onclick="abrirModalAlterarPin()" class="w-full bg-white border border-red-200 text-red-500 font-bold py-3 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-key"></i> Gerenciar PIN de Pagamento</button><button onclick="abrirModalAlterarSenha()" class="w-full bg-white border border-gray-200 text-gray-600 font-bold py-3 rounded-lg text-sm flex items-center justify-center gap-2"><i class="fas fa-lock"></i> Alterar Senha de Login</button></div>
             <button onclick="salvarPerfil()" id="btn-save-perf" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform">Salvar Alterações</button>
             <button onclick="fazerLogout()" class="w-full text-red-500 font-bold py-4 rounded-xl text-sm active:scale-95 transition-transform">Sair do App</button>
         </div>
@@ -299,22 +229,15 @@
                 });
             }
             
-            // Failsafe: Remove loading se demorar mais que 3s
-            setTimeout(() => { 
-                const load = document.getElementById('global-loading');
-                if(load && load.style.display !== 'none') {
-                    if(userSession) showScreen('app'); else showScreen('welcome');
-                }
-            }, 3000);
-
-            // Carregamento em Paralelo
+            setTimeout(() => { document.getElementById('global-loading').style.display = 'none'; }, 3000);
+            
             carregarAppConfig();
             
             const { data: { session } } = await sbClient.auth.getSession();
             if (session) {
                 userSession = session;
-                showScreen('app'); // Mostra APP imediatamente
-                carregarPerfil(true); // Preenche dados depois
+                showScreen('app'); 
+                carregarPerfil(true); 
             } else {
                 document.getElementById('global-loading').style.display = 'none';
                 showScreen('welcome');
@@ -347,6 +270,18 @@
                 }
             } catch(e) {}
         }
+
+        function toggleDropdown(id) { 
+            const list = document.getElementById(`list-${id}`); 
+            document.querySelectorAll('.custom-options').forEach(el => { if(el.id !== `list-${id}`) el.classList.remove('show'); });
+            list.classList.toggle('show'); 
+        }
+        function selectOption(id, value, text) { 
+            document.getElementById(`pagamento_${id}`).value=value; 
+            document.getElementById(`display-${id}`).innerText=text; 
+            document.getElementById(`list-${id}`).classList.remove('show'); 
+        }
+        document.addEventListener('click', function(e) { if (!e.target.closest('.relative')) { document.querySelectorAll('.custom-options').forEach(el => el.classList.remove('show')); } });
 
         function mudarStatusRetorno() {
             const isChecked = document.getElementById('retorno').checked;
@@ -421,10 +356,7 @@
             if(Object.values(dados).some(v => !v)) { isRegistering=false; return alert("Preencha todos os campos obrigatórios!"); }
             if(dados.senha !== dados.conf) { isRegistering=false; return alert("Senhas não conferem!"); }
 
-            const btn = document.getElementById('btn-cad'); 
-            const txt = document.getElementById('txt-cad');
-            const spin = document.getElementById('load-cad');
-            
+            const btn = document.getElementById('btn-cad'); const txt = document.getElementById('txt-cad'); const spin = document.getElementById('load-cad');
             btn.disabled = true; txt.innerText = ""; spin.classList.remove('hidden');
 
             try {
@@ -440,10 +372,7 @@
                     showScreen('login');
                 }
             } catch (e) { alert("Erro: " + e.message); } 
-            finally { 
-                btn.disabled = false; txt.innerText = "Finalizar Cadastro"; spin.classList.add('hidden'); 
-                isRegistering = false; 
-            }
+            finally { btn.disabled = false; txt.innerText = "Finalizar Cadastro"; spin.classList.add('hidden'); isRegistering = false; }
         }
 
         async function fazerLogin() {
@@ -451,23 +380,15 @@
             const senha = document.getElementById('log-senha').value;
             if(!email || !senha) return alert("Preencha tudo.");
             
-            const btn = document.getElementById('btn-log'); 
-            const txt = document.getElementById('txt-log');
-            const spin = document.getElementById('load-log');
-            
-            btn.disabled = true; 
-            txt.innerText = ""; 
-            spin.classList.remove('hidden');
+            const btn = document.getElementById('btn-log'); const txt = document.getElementById('txt-log'); const spin = document.getElementById('load-log');
+            btn.disabled = true; txt.innerText = ""; spin.classList.remove('hidden');
             
             try { 
                 const { error } = await sbClient.auth.signInWithPassword({ email, password: senha }); 
                 if (error) throw error;
-                // AuthStateChange vai pegar o login
             } catch (e) { 
                 alert("Erro: " + e.message); 
-                btn.disabled = false; 
-                txt.innerText = "Entrar";
-                spin.classList.add('hidden'); 
+                btn.disabled = false; txt.innerText = "Entrar"; spin.classList.add('hidden'); 
             } 
         }
 
@@ -475,7 +396,6 @@
             try {
                 if (!userSession) return;
                 const { data, error } = await sbClient.from('profiles').select('*').eq('id', userSession.user.id).single();
-                
                 if (data) { 
                     userProfile = data; 
                     preencherDadosPerfil(data); 
@@ -542,11 +462,8 @@
             } catch(e) { alert(e.message); }
         }
 
-        // Utils
         function safeText(id, text) { const el = document.getElementById(id); if (el) el.innerText = text; }
         function safeVal(id, val) { const el = document.getElementById(id); if (el) el.value = val || ''; } 
-        function toggleDropdown(id) { document.getElementById(`list-${id}`).classList.toggle('show'); }
-        function selectOption(id, value, text) { document.getElementById(`pagamento_${id}`).value=value; document.getElementById(`display-${id}`).innerText=text; document.getElementById(`list-${id}`).classList.remove('show'); }
         function getDist(lat1,lon1,lat2,lon2) { var R=6371, dLat=d2r(lat2-lat1), dLon=d2r(lon2-lon1), a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(d2r(lat1))*Math.cos(d2r(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2); return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))); }
         function d2r(deg) { return deg*(Math.PI/180); }
         async function fazerLogout() { await sbClient.auth.signOut(); location.reload(); }
