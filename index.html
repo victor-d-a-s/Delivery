@@ -22,6 +22,7 @@
         .btn-primary:disabled { background-color: #93C5FD; cursor: not-allowed; }
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
         
+        /* Switch */
         .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -30,9 +31,11 @@
         input:checked + .slider { background-color: #1E40AF; }
         input:checked + .slider:before { transform: translateX(20px); }
         
+        /* App Container */
         .app-container { width: 100%; min-height: 100vh; background-color: white; padding-bottom: 80px; display: none; overflow-y: auto; }
         @media (min-width: 768px) { .app-container { max-width: 28rem; min-height: auto; height: 90vh; border-radius: 1.5rem; overflow: hidden; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; margin: auto; } body { display: flex; align-items: center; justify-content: center; min-height: 100vh; } }
         
+        /* Menu Inferior */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; width: 100%; background: white; border-top: 1px solid #e5e7eb; display: none; justify-content: space-around; align-items: center; padding: 14px 0; z-index: 50; }
         @media (min-width: 768px) { .bottom-nav { position: absolute; max-width: 100%; border-radius: 0; } }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: #9CA3AF; cursor: pointer; flex: 1; transition: 0.1s; }
@@ -40,6 +43,7 @@
         .nav-item span { font-size: 0.7rem; font-weight: 600; }
         .nav-item.active { color: #1E40AF; transform: translateY(-1px); }
         
+        /* Utilitários */
         .custom-select-btn { width: 100%; text-align: left; padding: 12px; background: white; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 13px; font-weight: 600; color: #374151; display: flex; justify-content: space-between; items-center; cursor: pointer; }
         .custom-options { display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 12px; margin-top: 6px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 60; overflow: hidden; }
         .custom-options.show { display: block; }
@@ -114,6 +118,7 @@
             <div class="space-y-3">
                 <div class="grid grid-cols-2 gap-2"><input type="text" id="nome_dest" placeholder="Nome Cliente*" class="bg-white border w-full p-2 text-sm rounded-lg"><input type="text" id="tel_dest" placeholder="Zap Cliente*" class="bg-white border w-full p-2 text-sm rounded-lg"></div>
                 <div class="grid grid-cols-2 gap-2"><input type="text" id="complemento" placeholder="Apto/Bloco" class="bg-white border w-full p-2 text-sm rounded-lg"><input type="text" id="referencia" placeholder="Ref.*" class="bg-white border w-full p-2 text-sm rounded-lg"></div>
+                
                 <div class="grid grid-cols-2 gap-3 pt-2">
                     <div class="relative">
                         <label class="text-[10px] font-bold text-gray-500 uppercase ml-1 mb-1 block">Entrega</label>
@@ -167,7 +172,7 @@
             <div class="p-5 space-y-4">
                 <input type="hidden" id="dir-moto-id">
                 <div class="bg-blue-50 p-3 rounded-lg border border-blue-100"><p class="text-xs text-blue-500 font-bold uppercase mb-1">Rota</p><input type="text" id="dir-origem" class="w-full bg-white border p-2 text-sm rounded mb-2" readonly><input type="text" id="dir-destino" class="w-full bg-white border p-2 text-sm rounded" placeholder="Endereço de Entrega"></div>
-                <div class="space-y-2"><input type="text" id="dir-nome-dest" class="w-full border p-2 text-sm rounded" placeholder="Nome Cliente"><input type="tel" id="dir-tel-dest" class="w-full border p-2 text-sm rounded" placeholder="WhatsApp Cliente"><input type="text" id="dir-ref" class="w-full border p-2 text-sm rounded" placeholder="Referência"></div>
+                <div class="space-y-2"><input type="text" id="dir-nome-dest" class="w-full border p-2 text-sm rounded" placeholder="Nome Cliente*"><input type="tel" id="dir-tel-dest" class="w-full border p-2 text-sm rounded" placeholder="WhatsApp Cliente*"><input type="text" id="dir-ref" class="w-full border p-2 text-sm rounded" placeholder="Referência*"></div>
                 
                 <div class="grid grid-cols-2 gap-2">
                     <div><label class="text-[10px] font-bold text-gray-500 uppercase">Entrega</label><select id="dir-pag-entrega" class="w-full border p-2 text-sm rounded bg-white"><option value="PIX">💠 PIX</option><option value="Dinheiro">💵 Dinheiro</option><option value="Carteira">💳 Saldo Conta</option></select></div>
@@ -184,7 +189,6 @@
     </div>
 
     <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[110] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Sucesso!</h2><p class="text-sm text-gray-500 mb-6">Pedido enviado.</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
-    
     <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[110] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl"><h2 class="text-lg font-bold text-gray-800 mb-2">Segurança</h2><p class="text-sm text-gray-500 mb-4">Digite seu PIN de 4 dígitos</p><input type="tel" id="input-confirm-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-4 outline-none focus:ring-2 focus:ring-blue-500"><div class="grid grid-cols-2 gap-3"><button onclick="document.getElementById('modal-pin').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button><button onclick="confirmarPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Confirmar</button></div></div></div>
     
     <div id="modal-detalhes" class="hidden fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto"><button onclick="document.getElementById('modal-detalhes').style.display='none'" class="absolute top-2 right-3 text-gray-400 text-2xl z-10">&times;</button><div class="bg-blue-600 p-6 text-white"><h3 class="font-bold text-xl mb-1">Detalhes da Entrega</h3><div class="flex items-center gap-2 mt-1"><p id="det-id-visual" class="text-sm bg-blue-700 px-2 py-0.5 rounded font-mono">#00000</p><p id="det-status" class="text-xs bg-white/20 px-2 py-1 rounded">Carregando...</p></div></div><div class="p-6 space-y-4"><div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100"><div><p class="text-xs text-gray-500 uppercase font-bold">Valor da Entrega</p><p id="det-valor" class="text-2xl font-bold text-green-700">R$ --,--</p></div><div class="text-right"><p class="text-xs text-gray-500 uppercase font-bold">PIN Entrega</p><p id="det-pin" class="text-xl font-mono font-bold text-blue-600">----</p></div></div><div class="space-y-3 border-b pb-4"><div class="flex gap-3"><div class="flex flex-col items-center"><i class="fas fa-circle text-blue-600 text-[10px] mt-1"></i><div class="h-full w-0.5 bg-gray-200 my-1"></div><i class="fas fa-map-marker-alt text-red-500"></i></div><div class="flex-1 space-y-4"><div><p class="text-xs text-gray-400 font-bold">RETIRADA</p><p id="det-origem" class="text-sm font-medium text-gray-700">...</p></div><div><p class="text-xs text-gray-400 font-bold">ENTREGA</p><p id="det-destino" class="text-sm font-medium text-gray-700">...</p></div></div></div></div><div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl border border-blue-100"><p class="text-xs text-blue-500 font-bold uppercase mb-3 flex items-center gap-2"><i class="fas fa-motorcycle"></i> Dados do Entregador</p><div class="flex items-center gap-4 mb-3"><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-blue-600 text-xl"><i class="fas fa-user"></i></div><div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs text-gray-500 font-mono bg-gray-200 px-1 rounded inline-block">PLACA</p></div></div><p id="det-moto-modelo" class="text-xs text-gray-600 mb-3 ml-16 -mt-2">Modelo Moto</p><button id="btn-zap-moto" onclick="" class="w-full bg-green-500 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-green-600 mb-2"><i class="fab fa-whatsapp"></i> Chamar no WhatsApp</button><button id="btn-novo-pedido-moto" class="w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-blue-700 mb-2 hidden"><i class="fas fa-box"></i> Enviar mais com este Motoboy</button><button id="btn-avaliar" class="w-full bg-yellow-400 text-black py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-yellow-500 mt-2 hidden" onclick="abrirModalAvaliacao()">Avaliar Motoboy</button></div><div id="box-cancelar" class="hidden pt-2"><button id="btn-cancelar-detalhe" onclick="" class="w-full text-red-500 font-bold text-sm border border-red-200 py-3 rounded-xl hover:bg-red-50">Cancelar Pedido</button></div></div></div></div>
@@ -242,7 +246,25 @@
         
         async function calcularDistancia(){const o=document.getElementById('origem').value,d=document.getElementById('destino').value;if(!o||!d)return alert("Preencha endereços.");document.getElementById('loading').style.display='block';document.getElementById('btn-text').innerText="Calculando...";try{const[rA,rB]=await Promise.all([fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(o+', '+CIDADE_FIXA)}&limit=1`),fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(d+', '+CIDADE_FIXA)}&limit=1`)]);const[dA,dB]=await Promise.all([rA.json(),rB.json()]);if(!dA.length||!dB.length)throw new Error("Endereço não encontrado.");distanciaFinal=(getDist(dA[0].lat,dA[0].lon,dB[0].lat,dB[0].lon)*1.3).toFixed(1);if(distanciaFinal<1)distanciaFinal=1;recalcularTotal();document.getElementById('loading').style.display='none';document.getElementById('btn-calcular').style.display='none';document.getElementById('resultado-box').style.display='flex';document.getElementById('resultado-box').classList.remove('hidden');document.getElementById('btn-enviar').style.display='flex';document.getElementById('btn-enviar').classList.remove('hidden');}catch(e){alert(e.message);document.getElementById('loading').style.display='none';document.getElementById('btn-text').innerText="Calcular Frete";}}
         function recalcularTotal(){let p=APP_CONFIG.taxa_base+(distanciaFinal*APP_CONFIG.preco_km);if(document.getElementById('retorno').checked){if(APP_CONFIG.taxa_retorno_tipo==='percent')p+=(p*(APP_CONFIG.taxa_retorno_valor/100));else p+=APP_CONFIG.taxa_retorno_valor;}valorFinal=p.toFixed(2);document.getElementById('km-display').innerText=distanciaFinal;document.getElementById('valor-display').innerText=valorFinal.replace('.',',');}
-        async function iniciarPedido(){if(!userSession){alert("Faça login.");return;}let v=parseFloat(valorFinal);try{const pg=document.getElementById('pagamento_entrega').value;if(pg==='Carteira'){if(userProfile.saldo<v)throw new Error("Saldo insuficiente.");const ns=userProfile.saldo-v;await sbClient.from('profiles').update({saldo:ns}).eq('id',userSession.user.id);await sbClient.from('transacoes').insert([{user_id:userSession.user.id,tipo:'debito',valor:v,descricao:'Pagamento Entrega'}]);userProfile.saldo=ns;document.getElementById('display-saldo').innerText="R$ "+ns.toFixed(2);}const n={user_id:userSession.user.id,origem:document.getElementById('origem').value,destino:document.getElementById('destino').value,valor_frete:v,forma_pagamento:pg,pin_entrega:Math.floor(1000+Math.random()*9000).toString(),nome_destinatario:document.getElementById('nome_dest').value,telefone_destinatario:document.getElementById('tel_dest').value,status:'solicitado',codigo_visual:'#'+Math.floor(10000+Math.random()*90000),taxa_app_aplicada:APP_CONFIG.taxa_app_percent};const{error}=await sbClient.from('pedidos').insert([n]);if(error)throw error;document.getElementById('display-pin').innerText=n.pin_entrega;document.getElementById('modal-success').style.display='flex';document.getElementById('modal-success').classList.remove('hidden');}catch(e){alert(e.message);}}
+        
+        async function iniciarPedido(){
+            if(!userSession){alert("Faça login.");return;}
+            let v=parseFloat(valorFinal);
+            // VALIDAÇÃO RIGOROSA
+            const nome = document.getElementById('nome_dest').value.trim();
+            const tel = document.getElementById('tel_dest').value.trim();
+            const ref = document.getElementById('referencia').value.trim();
+            if(!nome || !tel || !ref) { alert("Preencha Nome, WhatsApp e Referência."); return; }
+
+            try{
+                const pg=document.getElementById('pagamento_entrega').value;
+                if(pg==='Carteira'){if(userProfile.saldo<v)throw new Error("Saldo insuficiente.");const ns=userProfile.saldo-v;await sbClient.from('profiles').update({saldo:ns}).eq('id',userSession.user.id);await sbClient.from('transacoes').insert([{user_id:userSession.user.id,tipo:'debito',valor:v,descricao:'Pagamento Entrega'}]);userProfile.saldo=ns;document.getElementById('display-saldo').innerText="R$ "+ns.toFixed(2);}
+                const n={user_id:userSession.user.id,origem:document.getElementById('origem').value,destino:document.getElementById('destino').value,valor_frete:v,forma_pagamento:pg,pin_entrega:Math.floor(1000+Math.random()*9000).toString(),nome_destinatario:nome,telefone_destinatario:tel,status:'solicitado',codigo_visual:'#'+Math.floor(10000+Math.random()*90000),taxa_app_aplicada:APP_CONFIG.taxa_app_percent};
+                const{error}=await sbClient.from('pedidos').insert([n]);
+                if(error)throw error;
+                document.getElementById('display-pin').innerText=n.pin_entrega;document.getElementById('modal-success').style.display='flex';document.getElementById('modal-success').classList.remove('hidden');
+            }catch(e){alert(e.message);}
+        }
         
         // --- FUNÇÕES DE PEDIDO DIRECIONADO ---
         function abrirModalDirecionado(mId, mNome) {
@@ -301,6 +323,16 @@
             const pg = document.getElementById('dir-pag-entrega').value;
             const motoId = document.getElementById('dir-moto-id').value;
             
+            // VALIDAÇÃO RIGOROSA
+            const nome = document.getElementById('dir-nome-dest').value.trim();
+            const tel = document.getElementById('dir-tel-dest').value.trim();
+            const ref = document.getElementById('dir-ref').value.trim();
+
+            if (!nome || !tel || !ref) {
+                alert("Por favor, preencha o Nome, WhatsApp e Ponto de Referência do cliente.");
+                return;
+            }
+            
             try {
                 if(pg === 'Carteira') {
                     if(userProfile.saldo < v) throw new Error("Saldo insuficiente.");
@@ -317,8 +349,8 @@
                     valor_frete: v, 
                     forma_pagamento: pg, 
                     pin_entrega: Math.floor(1000 + Math.random() * 9000).toString(),
-                    nome_destinatario: document.getElementById('dir-nome-dest').value, 
-                    telefone_destinatario: document.getElementById('dir-tel-dest').value,
+                    nome_destinatario: nome, 
+                    telefone_destinatario: tel,
                     status: 'pendente', // Já entra como pendente para o motoboy
                     entregador_id: motoId, // Já vinculado
                     codigo_visual: '#' + Math.floor(10000 + Math.random() * 90000),
@@ -363,9 +395,10 @@
             
             const boxMoto = document.getElementById('box-motoboy');
             const btnAvaliar = document.getElementById('btn-avaliar');
-            const btnNovo = document.getElementById('btn-novo-pedido-moto');
             const boxCancel = document.getElementById('box-cancelar');
+            const btnNovo = document.getElementById('btn-novo-pedido-moto');
             
+            // Motoboy e Lógica de Novo Pedido (Corrigido para só aparecer se estiver Pendente ou Em Rota)
             if(p.entregador_id) {
                 const { data: moto } = await sbClient.from('profiles').select('*').eq('id', p.entregador_id).single();
                 if(moto) {
@@ -374,20 +407,26 @@
                     document.getElementById('det-moto-placa').innerText = moto.placa_moto;
                     document.getElementById('btn-zap-moto').onclick = function() { window.open(`https://wa.me/${moto.whatsapp_responsavel}`, '_blank'); };
                     
-                    // BOTÃO NOVO PEDIDO (SÓ PENDENTE OU EM ROTA)
+                    // Lógica do botão "Enviar mais com este motoboy"
                     if(['pendente', 'em_rota'].includes(p.status)) {
                         btnNovo.classList.remove('hidden');
                         btnNovo.onclick = function() { abrirModalDirecionado(p.entregador_id, moto.responsavel); };
-                    } else { btnNovo.classList.add('hidden'); }
+                    } else {
+                        btnNovo.classList.add('hidden');
+                    }
 
                     if(p.status === 'concluido') { btnAvaliar.classList.remove('hidden'); btnAvaliar.onclick = function() { abrirModalAvaliacao(p.id, p.entregador_id); }; } 
                     else { btnAvaliar.classList.add('hidden'); }
                 }
             } else { boxMoto.classList.add('hidden'); }
             
-            // CANCELAR
-            if(['em_rota', 'concluido', 'cancelado'].includes(p.status)) { boxCancel.classList.add('hidden'); } 
-            else { boxCancel.classList.remove('hidden'); document.getElementById('btn-cancelar-detalhe').onclick = function() { cancelarPedido(id); document.getElementById('modal-detalhes').style.display='none'; }; }
+            // Lógica de Cancelamento (Cancelável apenas se NÃO estiver em rota, concluído ou já cancelado)
+            if(['em_rota', 'concluido', 'cancelado'].includes(p.status)) {
+                boxCancel.classList.add('hidden');
+            } else {
+                boxCancel.classList.remove('hidden');
+                document.getElementById('btn-cancelar-detalhe').onclick = function() { cancelarPedido(id); document.getElementById('modal-detalhes').style.display='none'; };
+            }
             
             document.getElementById('modal-detalhes').style.display='flex'; document.getElementById('modal-detalhes').classList.remove('hidden');
         }
@@ -396,7 +435,7 @@
         function abrirModalAvaliacao(pId, mId) { document.getElementById('modal-detalhes').style.display='none'; document.getElementById('modal-avaliacao').style.display='flex'; document.getElementById('modal-avaliacao').classList.remove('hidden'); document.getElementById('av-comentario').value=''; document.querySelectorAll('input[name="rating"]').forEach(e=>e.checked=false); document.getElementById('av-pedido-id').value=pId; document.getElementById('av-motoboy-id').value=mId; }
         async function enviarAvaliacao() { const n = document.querySelector('input[name="rating"]:checked'); if(!n) return alert("Selecione estrelas."); const {error} = await sbClient.from('avaliacoes').insert([{pedido_id:document.getElementById('av-pedido-id').value, motoboy_id:document.getElementById('av-motoboy-id').value, nota:parseInt(n.value), comentario:document.getElementById('av-comentario').value}]); if(error) alert("Erro ao avaliar."); else { alert("Obrigado!"); document.getElementById('modal-avaliacao').classList.add('hidden'); } }
 
-        async function cancelarPedido(id) { if(!confirm("Cancelar?")) return; const { error } = await sbClient.from('pedidos').update({ status: 'cancelado' }).eq('id', id); if(!error) carregarHistoricoPedidos(); }
+        async function cancelarPedido(id) { if(!confirm("Cancelar pedido?")) return; const { error } = await sbClient.from('pedidos').update({ status: 'cancelado' }).eq('id', id); if(!error) carregarHistoricoPedidos(); }
         async function carregarExtrato() { const l = document.getElementById('lista-extrato'); l.innerHTML = '<div class="text-center mt-4">Carregando...</div>'; const { data } = await sbClient.from('transacoes').select('*').eq('user_id', userSession.user.id).order('created_at', {ascending:false}); l.innerHTML = ''; if(!data.length) l.innerHTML = '<div class="text-center mt-4 text-gray-400">Vazio</div>'; data.forEach(t => { const isC = t.tipo === 'credito'; l.insertAdjacentHTML('beforeend', `<div class="transacao-item px-4 bg-white mx-4 rounded-xl mb-2"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full ${isC?'bg-green-100':'bg-red-100'} flex items-center justify-center"><i class="fas ${isC?'fa-arrow-down':'fa-arrow-up'} text-xs"></i></div><div><p class="font-bold text-gray-700 text-sm">${t.descricao}</p><p class="text-[10px] text-gray-400">${new Date(t.created_at).toLocaleDateString()}</p></div></div><p class="transacao-valor ${isC?'credito':'debito'} font-bold text-sm">${isC?'+':'-'} R$ ${parseFloat(t.valor).toFixed(2)}</p></div>`); }); }
         
         function abrirModalAlterarSenha() { document.getElementById('modal-alterar-senha').style.display='flex'; document.getElementById('modal-alterar-senha').classList.remove('hidden'); }
@@ -405,7 +444,21 @@
         async function salvarNovaSenha() { const n=document.getElementById('input-nova-senha').value, c=document.getElementById('input-conf-senha').value; if(n.length<6||n!==c) return alert("Erro na senha"); await sbClient.auth.updateUser({password:n}); alert("Senha alterada!"); document.getElementById('modal-alterar-senha').classList.add('hidden'); }
         async function atualizarPedidosManual() { const i=document.getElementById('icon-refresh'); i.classList.add('fa-spin'); await carregarHistoricoPedidos(); setTimeout(()=>i.classList.remove('fa-spin'),500); }
         async function atualizarExtratoManual() { const i=document.getElementById('icon-refresh-ext'); i.classList.add('fa-spin'); await carregarExtrato(); setTimeout(()=>i.classList.remove('fa-spin'),500); }
-        async function filtrarPorData(tipo) { if(tipo === 'pedidos') renderizarLista(pedidosCache); else { const dtIni = document.getElementById('filtro-ext-ini').value; const dtFim = document.getElementById('filtro-ext-fim').value; if(!dtIni || !dtFim) return alert("Selecione as datas"); const l = document.getElementById('lista-extrato'); l.innerHTML = '<div class="text-center mt-4">Filtrando...</div>'; const { data } = await sbClient.from('transacoes').select('*').eq('user_id', userSession.user.id).gte('created_at', new Date(dtIni).toISOString()).lte('created_at', new Date(dtFim + 'T23:59:59').toISOString()).order('created_at', {ascending:false}); l.innerHTML = ''; if(!data.length) l.innerHTML = '<div class="text-center mt-4 text-gray-400">Vazio</div>'; data.forEach(t => { const isC = t.tipo === 'credito'; l.insertAdjacentHTML('beforeend', `<div class="transacao-item px-4 bg-white mx-4 rounded-xl mb-2"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full ${isC?'bg-green-100':'bg-red-100'} flex items-center justify-center"><i class="fas ${isC?'fa-arrow-down':'fa-arrow-up'} text-xs"></i></div><div><p class="font-bold text-gray-700 text-sm">${t.descricao}</p><p class="text-[10px] text-gray-400">${new Date(t.created_at).toLocaleDateString()}</p></div></div><p class="transacao-valor ${isC?'credito':'debito'} font-bold text-sm">${isC?'+':'-'} R$ ${parseFloat(t.valor).toFixed(2)}</p></div>`); }); } }
+        async function filtrarPorData(tipo) { 
+            if(tipo === 'pedidos') renderizarLista(pedidosCache); 
+            else {
+                // Filtro simples para extrato
+                const dtIni = document.getElementById('filtro-ext-ini').value;
+                const dtFim = document.getElementById('filtro-ext-fim').value;
+                if(!dtIni || !dtFim) return alert("Selecione as datas");
+                const lista = document.getElementById('lista-extrato');
+                lista.innerHTML = '<div class="text-center mt-4">Filtrando...</div>';
+                const { data } = await sbClient.from('transacoes').select('*').eq('user_id', userSession.user.id).gte('created_at', new Date(dtIni).toISOString()).lte('created_at', new Date(dtFim + 'T23:59:59').toISOString()).order('created_at', {ascending:false});
+                lista.innerHTML = ''; 
+                if(!data.length) lista.innerHTML = '<div class="text-center mt-4 text-gray-400">Vazio</div>';
+                data.forEach(t => { const isC = t.tipo === 'credito'; lista.insertAdjacentHTML('beforeend', `<div class="transacao-item px-4 bg-white mx-4 rounded-xl mb-2"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full ${isC?'bg-green-100':'bg-red-100'} flex items-center justify-center"><i class="fas ${isC?'fa-arrow-down':'fa-arrow-up'} text-xs"></i></div><div><p class="font-bold text-gray-700 text-sm">${t.descricao}</p><p class="text-[10px] text-gray-400">${new Date(t.created_at).toLocaleDateString()}</p></div></div><p class="transacao-valor ${isC?'credito':'debito'} font-bold text-sm">${isC?'+':'-'} R$ ${parseFloat(t.valor).toFixed(2)}</p></div>`); });
+            }
+        }
         
         function setupInactivityListener() { ['mousedown','scroll','touchstart'].forEach(e => document.addEventListener(e, resetInactivityTimer, true)); resetInactivityTimer(); }
         function resetInactivityTimer() { clearTimeout(inactivityTimer); if(userSession) inactivityTimer = setTimeout(async () => { alert("Sessão expirada."); await fazerLogout(); }, INACTIVITY_TIME); }
