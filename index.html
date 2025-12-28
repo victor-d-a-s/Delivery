@@ -50,10 +50,13 @@
         .custom-option { padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500; color: #4B5563; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f3f4f6; }
         .custom-option:hover { background-color: #eff6ff; color: #1E40AF; }
         
-        /* Autocomplete de Endereço */
-        .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px; z-index: 70; max-height: 180px; overflow-y: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: none; }
-        .autocomplete-item { padding: 10px; font-size: 12px; cursor: pointer; border-bottom: 1px solid #f3f4f6; color: #374151; }
-        .autocomplete-item:hover { background-color: #eff6ff; }
+        /* Autocomplete de Endereço - Ajustado */
+        .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px; z-index: 70; max-height: 220px; overflow-y: auto; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: none; }
+        .autocomplete-header { padding: 8px; background: #f3f4f6; text-align: right; border-bottom: 1px solid #e5e7eb; cursor: pointer; font-size: 12px; color: #6b7280; font-weight: bold; }
+        .autocomplete-header:hover { color: #1E40AF; background: #e5e7eb; }
+        .autocomplete-item { padding: 12px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #f3f4f6; color: #374151; display: flex; align-items: center; gap: 8px; }
+        .autocomplete-item:hover { background-color: #eff6ff; color: #1E40AF; }
+        .autocomplete-item i { color: #9CA3AF; font-size: 10px; }
         
         .card-historico { background: white; border-radius: 12px; border: 1px solid #E5E7EB; padding: 16px; margin-bottom: 12px; cursor: pointer; }
         .badge-status { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
@@ -332,6 +335,10 @@
             const listId = `sugestoes-${fieldId}`;
             const listEl = document.getElementById(listId);
             
+            // Só pesquisa se não tiver vírgula (ou seja, antes de digitar número)
+            // Isso permite que o usuário digite o número livremente sem reabrir a lista
+            if (query.includes(',')) { listEl.style.display = 'none'; return; }
+
             if (query.length < 4) { listEl.style.display = 'none'; return; }
             
             try {
@@ -341,14 +348,35 @@
                 const data = await response.json();
                 
                 listEl.innerHTML = '';
+                // HEADER COM BOTÃO DE FECHAR
+                const header = document.createElement('div');
+                header.className = 'autocomplete-header';
+                header.innerHTML = '<i class="fas fa-chevron-up"></i> Fechar';
+                header.onclick = (e) => { e.stopPropagation(); listEl.style.display = 'none'; };
+                listEl.appendChild(header);
+
                 if (data.length > 0) {
                     listEl.style.display = 'block';
                     data.forEach(item => {
                         const div = document.createElement('div');
                         div.className = 'autocomplete-item';
-                        div.innerText = item.display_name.split(',')[0] + ', ' + item.display_name.split(',')[1]; // Simplifica endereço
+                        // Pega Rua e Bairro
+                        const parts = item.display_name.split(',');
+                        const cleanAddr = parts[0] + (parts[1] ? ', ' + parts[1] : '');
+                        
+                        div.innerHTML = `<span>${cleanAddr}</span>`;
                         div.onclick = () => {
-                            document.getElementById(fieldId).value = div.innerText; // Pega o texto limpo
+                            // Ao clicar, preenche o campo
+                            // Se o usuário já tinha digitado um número após vírgula, preservamos
+                            const currentVal = document.getElementById(fieldId).value;
+                            const numberMatch = currentVal.match(/,?\s*(\d+)$/);
+                            
+                            let finalVal = cleanAddr;
+                            if(numberMatch) {
+                                finalVal += `, ${numberMatch[1]}`;
+                            }
+
+                            document.getElementById(fieldId).value = finalVal; 
                             listEl.style.display = 'none';
                             calcularDistancia(); // Auto-calcula ao selecionar
                         };
@@ -358,7 +386,7 @@
                     listEl.style.display = 'none';
                 }
             } catch (e) { console.error(e); }
-        }, 500); // 500ms delay
+        }, 500); 
 
         // --- FIM LÓGICA LOGÍSTICA ---
 
@@ -370,7 +398,6 @@
         async function salvarPerfil(){const u={nome_loja:document.getElementById('edit-nome-loja').value,razao_social:document.getElementById('edit-razao').value,cnpj:document.getElementById('edit-cnpj').value,whatsapp_loja:document.getElementById('edit-zap-loja').value,endereco:document.getElementById('edit-endereco').value,responsavel:document.getElementById('edit-resp-nome').value,cpf_responsavel:document.getElementById('edit-cpf-resp').value,whatsapp_responsavel:document.getElementById('edit-resp-zap').value};await sbClient.from('profiles').update(u).eq('id',userSession.user.id);alert("Salvo!");carregarPerfil();}
         
         async function fazerLogin(){const e=document.getElementById('log-email').value;const p=document.getElementById('log-senha').value;if(!e||!p)return alert("Preencha tudo.");const b=document.getElementById('btn-log');const t=document.getElementById('txt-log');const s=document.getElementById('load-log');b.disabled=true;t.innerText="";s.classList.remove('hidden');try{const{data, error}=await sbClient.auth.signInWithPassword({email:e,password:p});if(error)throw error;
-            // CHECK DE SEGURANÇA
             const { data: profile, error: profileError } = await sbClient.from('profiles').select('id, nome_loja').eq('id', data.user.id).single();
             if (profileError || !profile || !profile.nome_loja) { await sbClient.auth.signOut(); throw new Error("Acesso negado. Esta conta não é de um Cliente. Acesse o portal de Entregadores."); }
         }catch(err){alert("Erro: "+err.message);b.disabled=false;t.innerText="Entrar";s.classList.add('hidden');}}
@@ -534,10 +561,9 @@
             
             const boxMoto = document.getElementById('box-motoboy');
             const btnAvaliar = document.getElementById('btn-avaliar');
-            const boxCancel = document.getElementById('box-cancelar');
             const btnNovo = document.getElementById('btn-novo-pedido-moto');
+            const boxCancel = document.getElementById('box-cancelar');
             
-            // Motoboy e Lógica de Novo Pedido
             if(p.entregador_id) {
                 const { data: moto } = await sbClient.from('profiles').select('*').eq('id', p.entregador_id).single();
                 if(moto) {
@@ -559,7 +585,7 @@
                 }
             } else { boxMoto.classList.add('hidden'); }
             
-            // Lógica de Cancelamento (Cancelável apenas se NÃO estiver em rota, concluído ou já cancelado)
+            // Lógica de Cancelamento
             if(['em_rota', 'concluido', 'cancelado'].includes(p.status)) {
                 boxCancel.classList.add('hidden');
             } else {
