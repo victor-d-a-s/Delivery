@@ -199,7 +199,7 @@
         const NUMERO_ADMIN = "5584982005039"; 
         const CIDADE_FIXA = "Mossoró, RN"; 
         
-        let APP_CONFIG = { taxa_base: 5.0, preco_km: 1.0, taxa_retorno_tipo: 'percent', taxa_retorno_valor: 20, taxa_app_percent: 10, tempo_inatividade: 120 };
+        let APP_CONFIG = { taxa_base: 5.0, preco_km: 1.0, taxa_retorno_tipo: 'percent', taxa_retorno_valor: 20, taxa_app_percent: 10, tempo_inatividade: 30 };
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let userSession = null, userProfile = null, distanciaFinal = 0, valorFinal = 0, pedidosCache = [];
         let isRegistering = false, currentTab = 'todos', dirDist = 0, dirVal = 0, inactivityTimer;
