@@ -216,16 +216,14 @@
         </div>
     </div>
 
-    <div id="modal-direcionado" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto"><div class="bg-blue-600 p-4 text-white flex justify-between items-center"><h3 class="font-bold text-lg"><i class="fas fa-motorcycle"></i> Enviar para <span id="dir-moto-nome">...</span></h3><button onclick="document.getElementById('modal-direcionado').style.display='none'" class="text-white text-2xl">&times;</button></div><div class="p-5 space-y-4"><input type="hidden" id="dir-moto-id"><div class="bg-blue-50 p-3 rounded-lg border border-blue-100"><p class="text-xs text-blue-500 font-bold uppercase mb-1">Rota</p><input type="text" id="dir-origem" class="w-full bg-white border p-2 text-sm rounded mb-2" readonly><input type="text" id="dir-destino" class="w-full bg-white border p-2 text-sm rounded" placeholder="Endereço de Entrega*"></div><div class="space-y-2"><input type="text" id="dir-nome-dest" class="w-full border p-2 text-sm rounded" placeholder="Nome Cliente*"><input type="tel" id="dir-tel-dest" class="w-full border p-2 text-sm rounded" placeholder="WhatsApp Cliente*"><input type="text" id="dir-ref" class="w-full border p-2 text-sm rounded" placeholder="Referência*"></div><div class="grid grid-cols-2 gap-2"><div><label class="text-[10px] font-bold text-gray-500 uppercase">Entrega</label><select id="dir-pag-entrega" class="w-full border p-2 text-sm rounded bg-white"><option value="PIX">💠 PIX</option><option value="Dinheiro">💵 Dinheiro</option><option value="Carteira">💳 Saldo Conta</option></select></div><div><label class="text-[10px] font-bold text-gray-500 uppercase">Produto</label><select id="dir-pag-produto" class="w-full border p-2 text-sm rounded bg-white"><option value="Pago">✅ Pago</option><option value="Cartão">💳 Cartão</option><option value="PIX">💠 PIX</option><option value="Dinheiro">💵 Dinheiro</option></select></div></div><div class="flex items-center gap-2 border p-2 rounded"><input type="checkbox" id="dir-retorno" onchange="calcDir()"><span class="text-xs font-bold text-gray-500">Com Retorno</span></div><button onclick="calcDir()" id="btn-calc-dir" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg shadow-sm">Calcular</button><div id="res-dir" class="hidden justify-between items-center bg-gray-50 p-3 rounded border"><div><span class="text-xs">Distância</span><br><b id="dir-km">0</b> km</div><div><span class="text-xs">Valor</span><br><b class="text-green-600 text-xl">R$ <span id="dir-val">0,00</span></b></div></div><button onclick="envDir()" id="btn-env-dir" class="hidden w-full bg-green-600 text-white font-bold py-3 rounded-lg shadow-sm">Confirmar Envio</button></div></div></div>
-
     <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[110] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Sucesso!</h2><p class="text-sm text-gray-500 mb-6">Pedido enviado.</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
     <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[110] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl"><h2 class="text-lg font-bold text-gray-800 mb-2">Segurança</h2><p class="text-sm text-gray-500 mb-4">Digite seu PIN de 4 dígitos</p><input type="tel" id="input-confirm-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-4 outline-none focus:ring-2 focus:ring-blue-500"><div class="grid grid-cols-2 gap-3"><button onclick="document.getElementById('modal-pin').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button><button onclick="confirmarPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Confirmar</button></div></div></div>
-    <div id="modal-detalhes" class="hidden fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto"><button onclick="document.getElementById('modal-detalhes').style.display='none'" class="absolute top-2 right-3 text-gray-400 text-2xl z-10">&times;</button><div class="bg-blue-600 p-6 text-white"><h3 class="font-bold text-xl mb-1">Detalhes da Entrega</h3><div class="flex items-center gap-2 mt-1"><p id="det-id-visual" class="text-sm bg-blue-700 px-2 py-0.5 rounded font-mono">#00000</p><p id="det-status" class="text-xs bg-white/20 px-2 py-1 rounded">Carregando...</p></div></div><div class="p-6 space-y-4"><div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100"><div><p class="text-xs text-gray-500 uppercase font-bold">Valor da Entrega</p><p id="det-valor" class="text-2xl font-bold text-green-700">R$ --,--</p></div><div class="text-right"><p class="text-xs text-gray-500 uppercase font-bold">PIN Entrega</p><p id="det-pin" class="text-xl font-mono font-bold text-blue-600">----</p></div></div><div class="space-y-3 border-b pb-4"><div class="flex gap-3"><div class="flex flex-col items-center"><i class="fas fa-circle text-blue-600 text-[10px] mt-1"></i><div class="h-full w-0.5 bg-gray-200 my-1"></div><i class="fas fa-map-marker-alt text-red-500"></i></div><div class="flex-1 space-y-4"><div><p class="text-xs text-gray-400 font-bold">RETIRADA</p><p id="det-origem" class="text-sm font-medium text-gray-700">...</p></div><div><p class="text-xs text-gray-400 font-bold">ENTREGA</p><p id="det-destino" class="text-sm font-medium text-gray-700">...</p></div></div></div></div><div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl border border-blue-100"><p class="text-xs text-blue-500 font-bold uppercase mb-3 flex items-center gap-2"><i class="fas fa-motorcycle"></i> Dados do Entregador</p><div class="flex items-center gap-4 mb-3"><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-blue-600 text-xl"><i class="fas fa-user"></i></div><div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs text-gray-500 font-mono bg-gray-200 px-1 rounded inline-block">PLACA</p></div></div><p id="det-moto-modelo" class="text-xs text-gray-600 mb-3 ml-16 -mt-2">Modelo Moto</p><button id="btn-zap-moto" onclick="" class="w-full bg-green-500 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-green-600 mb-2"><i class="fab fa-whatsapp"></i> Chamar no WhatsApp</button><button id="btn-novo-pedido-moto" class="w-full bg-blue-600 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-blue-700 mb-2 hidden"><i class="fas fa-box"></i> Enviar mais com este Motoboy</button><button id="btn-avaliar" class="w-full bg-yellow-400 text-black py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-yellow-500 mt-2 hidden" onclick="abrirModalAvaliacao()">Avaliar Motoboy</button></div><div id="box-cancelar" class="hidden pt-2"><button id="btn-cancelar-detalhe" onclick="" class="w-full text-red-500 font-bold text-sm border border-red-200 py-3 rounded-xl hover:bg-red-50">Cancelar Pedido</button></div></div></div></div>
+    <div id="modal-detalhes" class="hidden fixed inset-0 bg-black/80 z-[80] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto"><button onclick="document.getElementById('modal-detalhes').style.display='none'" class="absolute top-2 right-3 text-gray-400 text-2xl z-10">&times;</button><div class="bg-blue-600 p-6 text-white"><h3 class="font-bold text-xl mb-1">Detalhes da Entrega</h3><div class="flex items-center gap-2 mt-1"><p id="det-id-visual" class="text-sm bg-blue-700 px-2 py-0.5 rounded font-mono">#00000</p><p id="det-status" class="text-xs bg-white/20 px-2 py-1 rounded">Carregando...</p></div></div><div class="p-6 space-y-4"><div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100"><div><p class="text-xs text-gray-500 uppercase font-bold">Valor da Entrega</p><p id="det-valor" class="text-2xl font-bold text-green-700">R$ --,--</p></div><div class="text-right"><p class="text-xs text-gray-500 uppercase font-bold">PIN Entrega</p><p id="det-pin" class="text-xl font-mono font-bold text-blue-600">----</p></div></div><div class="space-y-3 border-b pb-4"><div class="flex gap-3"><div class="flex flex-col items-center"><i class="fas fa-circle text-blue-600 text-[10px] mt-1"></i><div class="h-full w-0.5 bg-gray-200 my-1"></div><i class="fas fa-map-marker-alt text-red-500"></i></div><div class="flex-1 space-y-4"><div><p class="text-xs text-gray-400 font-bold">RETIRADA</p><p id="det-origem" class="text-sm font-medium text-gray-700">...</p></div><div><p class="text-xs text-gray-400 font-bold">ENTREGA</p><p id="det-destino" class="text-sm font-medium text-gray-700">...</p></div></div></div></div><div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl border border-blue-100"><p class="text-xs text-blue-500 font-bold uppercase mb-3 flex items-center gap-2"><i class="fas fa-motorcycle"></i> Dados do Entregador</p><div class="flex items-center gap-4 mb-3"><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-blue-600 text-xl"><i class="fas fa-user"></i></div><div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs text-gray-500 font-mono bg-gray-200 px-1 rounded inline-block">PLACA</p></div></div><p id="det-moto-modelo" class="text-xs text-gray-600 mb-3 ml-16 -mt-2">Modelo Moto</p><button id="btn-zap-moto" onclick="" class="w-full bg-green-500 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-green-600 mb-2"><i class="fab fa-whatsapp"></i> Chamar no WhatsApp</button><button id="btn-avaliar" class="w-full bg-yellow-400 text-black py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-yellow-500 mt-2 hidden" onclick="abrirModalAvaliacao()">Avaliar Motoboy</button></div><div id="box-cancelar" class="hidden pt-2"><button id="btn-cancelar-detalhe" onclick="" class="w-full text-red-500 font-bold text-sm border border-red-200 py-3 rounded-xl hover:bg-red-50">Cancelar Pedido</button></div></div></div></div>
     <div id="modal-avaliacao" class="hidden fixed inset-0 bg-black/80 z-[90] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-2xl w-full max-w-sm p-6 text-center shadow-2xl relative"><button onclick="document.getElementById('modal-avaliacao').classList.add('hidden')" class="absolute top-2 right-2 text-gray-400 p-2 text-xl">&times;</button><div class="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4 text-yellow-500 text-2xl"><i class="fas fa-star"></i></div><h3 class="text-xl font-bold text-gray-800 mb-1">Avaliar Entrega</h3><p class="text-sm text-gray-500 mb-4">O que achou do serviço?</p><div class="star-rating justify-center mb-4"><input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label><input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label><input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label><input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label><input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label></div><textarea id="av-comentario" class="w-full border rounded-lg p-3 text-sm mb-4 bg-gray-50" placeholder="Deixe um comentário (opcional)..." rows="3"></textarea><button onclick="enviarAvaliacao()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-xl shadow-lg">ENVIAR AVALIAÇÃO</button><input type="hidden" id="av-pedido-id"><input type="hidden" id="av-motoboy-id"></div></div>
     <div id="modal-alterar-senha" class="hidden fixed inset-0 bg-gray-900/90 z-[90] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl"><h2 class="text-lg font-bold text-gray-800 mb-2">Alterar Senha</h2><div class="space-y-3 mb-4"><input type="password" id="input-senha-atual" class="w-full border rounded-lg p-3 text-sm" placeholder="Senha Atual (Obrigatório)"><input type="password" id="input-nova-senha" class="w-full border rounded-lg p-3 text-sm" placeholder="Nova Senha"><input type="password" id="input-conf-senha" class="w-full border rounded-lg p-3 text-sm" placeholder="Confirmar Nova Senha"></div><div class="grid grid-cols-2 gap-3"><button onclick="document.getElementById('modal-alterar-senha').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button><button onclick="salvarNovaSenha()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Alterar</button></div></div></div>
     <div id="modal-gerenciar-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[90] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl"><h2 class="text-lg font-bold text-gray-800 mb-2" id="titulo-modal-pin">Criar PIN</h2><p class="text-xs text-gray-500 mb-4" id="subtitulo-modal-pin">Crie um PIN de 4 dígitos para autorizar transações.</p><div class="box-senha-login-pin mb-3 hidden"><p class="text-xs text-left mb-1 text-gray-600 font-bold">Senha de Login (Segurança)</p><input type="password" id="input-senha-para-pin" class="w-full border rounded-lg p-3 text-sm mb-2" placeholder="Sua senha de entrar no app"></div><input type="tel" id="input-novo-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-2 outline-none focus:ring-2 focus:ring-blue-500" placeholder="PIN"><input type="tel" id="input-conf-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-4 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Confirmar"><div class="grid grid-cols-2 gap-3"><button onclick="document.getElementById('modal-gerenciar-pin').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button><button onclick="salvarNovoPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Salvar</button></div></div></div>
-
     <script>
+        // CONFIGURAÇÕES DO SUPABASE
         const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
         const NUMERO_ADMIN = "5584982005039"; 
@@ -234,30 +232,47 @@
         let APP_CONFIG = { taxa_base: 5.0, preco_km: 1.0, taxa_retorno_tipo: 'percent', taxa_retorno_valor: 20, taxa_app_percent: 10, tempo_inatividade: 30 };
         const sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let userSession = null, userProfile = null, distanciaFinal = 0, valorFinal = 0, pedidosCache = [];
-        let isRegistering = false, currentTab = 'todos', dirDist = 0, dirVal = 0, inactivityTimer;
+        let isRegistering = false, currentTab = 'todos', inactivityTimer;
         let debounceTimer;
 
         function debounce(func, delay) { return function(...args) { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => func.apply(this, args), delay); }; }
+        function cleanMascara(v) { return v ? v.replace(/\D/g, '') : ''; } // Função para limpar máscaras antes de enviar ao banco
 
         window.onload = async function() {
             if(typeof $ !== 'undefined') {
                 $(document).ready(function(){ 
-                    $('#reg-zap-loja, #reg-zap-resp, #tel_dest, #edit-zap-loja, #edit-resp-zap, #dir-tel-dest').mask('(00) 00000-0000');
+                    $('#reg-zap-loja, #reg-zap-resp, #tel_dest, #edit-zap-loja, #edit-resp-zap').mask('(00) 00000-0000');
                     $('#reg-cnpj, #edit-cnpj').mask('00.000.000/0000-00');
                     $('#reg-cpf-resp, #edit-cpf-resp').mask('000.000.000-00');
                 });
             }
             setTimeout(() => { const l=document.getElementById('global-loading'); if(l&&l.style.display!=='none'){if(userSession)showScreen('app');else showScreen('welcome');}},3000);
-            carregarAppConfig();
+            
+            // Carrega configs iniciais
+            await carregarAppConfig();
+            
             const { data: { session } } = await sbClient.auth.getSession();
             if (session) { userSession = session; showScreen('app'); carregarPerfil(true); } 
             else { document.getElementById('global-loading').style.display = 'none'; showScreen('welcome'); }
+            
             sbClient.auth.onAuthStateChange(async (event, session) => { if(isRegistering)return; if(event==='SIGNED_IN'&&session){userSession=session;showScreen('app');carregarPerfil(true);}else if(event==='SIGNED_OUT'){userSession=null;userProfile=null;showScreen('welcome');}});
             setupAutocomplete();
         };
 
-        async function carregarAppConfig() { try{const{data}=await sbClient.from('app_config').select('*').single();if(data){APP_CONFIG={...APP_CONFIG, ...data}; APP_CONFIG.taxa_base=parseFloat(data.taxa_base);APP_CONFIG.preco_km=parseFloat(data.preco_km);APP_CONFIG.taxa_retorno_valor=parseFloat(data.taxa_retorno_valor);APP_CONFIG.taxa_app_percent=parseFloat(data.taxa_app_percent);}}catch(e){} }
+        async function carregarAppConfig() { 
+            try {
+                const{data}=await sbClient.from('app_config').select('*').single();
+                if(data){
+                    APP_CONFIG={...APP_CONFIG, ...data}; 
+                    APP_CONFIG.taxa_base=parseFloat(data.taxa_base);
+                    APP_CONFIG.preco_km=parseFloat(data.preco_km);
+                    APP_CONFIG.taxa_retorno_valor=parseFloat(data.taxa_retorno_valor);
+                    APP_CONFIG.taxa_app_percent=parseFloat(data.taxa_app_percent);
+                }
+            } catch(e){} 
+        }
         
+        // --- UI UTILS ---
         function toggleSidebar() {
             const menu = document.getElementById('sidebar-menu'); const overlay = document.getElementById('sidebar-overlay');
             menu.classList.toggle('open');
@@ -277,7 +292,7 @@
             recalcularTotal();
         }
 
-        function setupAutocomplete() {} 
+        // --- MAPS & AUTOCOMPLETE ---
         const buscarEndereco = debounce(async (query, fieldId) => {
             const listId = `sugestoes-${fieldId}`; const listEl = document.getElementById(listId);
             if (query.includes(',') || query.length < 4) { listEl.style.display = 'none'; return; }
@@ -301,6 +316,106 @@
             } catch (e) { console.error(e); }
         }, 500); 
 
+        // --- CÁLCULO DE FRETE (ESTIMATIVA VISUAL) ---
+        async function calcularDistancia(){
+            const o=document.getElementById('origem').value,d=document.getElementById('destino').value;
+            if(!o||!d)return; 
+            
+            // Antes de calcular, atualiza as taxas do servidor para mostrar o preço correto
+            await carregarAppConfig();
+
+            document.getElementById('loading').style.display='block';
+            document.getElementById('btn-text').innerText="Calculando...";
+            try {
+                const[rA,rB]=await Promise.all([fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(o+', '+CIDADE_FIXA)}&limit=1`),fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(d+', '+CIDADE_FIXA)}&limit=1`)]);
+                const[dA,dB]=await Promise.all([rA.json(),rB.json()]);
+                if(!dA.length||!dB.length)throw new Error("Endereço não encontrado.");
+                
+                // Distância Linear * Fator de Correção
+                distanciaFinal=(getDist(dA[0].lat,dA[0].lon,dB[0].lat,dB[0].lon)*1.3).toFixed(1);
+                if(distanciaFinal<1)distanciaFinal=1;
+                
+                recalcularTotal(); // Apenas visual
+                
+                document.getElementById('loading').style.display='none';
+                document.getElementById('btn-calcular').style.display='none';
+                document.getElementById('resultado-box').style.display='flex';
+                document.getElementById('resultado-box').classList.remove('hidden');
+                document.getElementById('btn-enviar').style.display='flex';
+                document.getElementById('btn-enviar').classList.remove('hidden');
+            } catch(e){
+                console.log(e);
+                document.getElementById('loading').style.display='none';
+                document.getElementById('btn-text').innerText="Calcular Frete";
+            }
+        }
+
+        // Função auxiliar apenas para exibir valor na tela (O cálculo real ocorre no SQL)
+        function recalcularTotal(){
+            let p=APP_CONFIG.taxa_base+(distanciaFinal*APP_CONFIG.preco_km);
+            if(document.getElementById('retorno').checked){
+                if(APP_CONFIG.taxa_retorno_tipo==='percent') p+=(p*(APP_CONFIG.taxa_retorno_valor/100));
+                else p+=APP_CONFIG.taxa_retorno_valor;
+            }
+            valorFinal=p.toFixed(2);
+            document.getElementById('km-display').innerText=distanciaFinal;
+            document.getElementById('valor-display').innerText=valorFinal.replace('.',',');
+        }
+        
+        // --- CRIAÇÃO DE PEDIDO SEGURA (NOVA LÓGICA) ---
+        async function iniciarPedido(){
+            if(!userSession){alert("Faça login.");return;}
+            
+            const nome=document.getElementById('nome_dest').value.trim();
+            const tel=document.getElementById('tel_dest').value.trim();
+            const ref=document.getElementById('referencia').value.trim();
+            
+            if(!nome||!tel||!ref){alert("Preencha Nome, WhatsApp e Referência.");return;}
+
+            const btn = document.getElementById('btn-enviar');
+            btn.innerText = "Processando...";
+            btn.disabled = true;
+
+            try {
+                // Parâmetros para a função segura no banco
+                const params = {
+                    p_user_id: userSession.user.id,
+                    p_origem: document.getElementById('origem').value,
+                    p_destino: document.getElementById('destino').value,
+                    p_distancia_km: parseFloat(distanciaFinal), // O banco usará isso + taxas configuradas
+                    p_forma_pagamento: document.getElementById('pagamento_entrega').value,
+                    p_nome_dest: nome,
+                    p_tel_dest: cleanMascara(tel), // Limpa máscara
+                    p_tipo_logistica: document.getElementById('input-logistica').value,
+                    p_com_retorno: document.getElementById('retorno').checked
+                };
+
+                // Chama a RPC (Remote Procedure Call)
+                const { data, error } = await sbClient.rpc('criar_pedido_seguro', params);
+
+                if(error) throw error;
+
+                // Sucesso
+                document.getElementById('display-pin').innerText = data.pin_gerado;
+                
+                // Atualiza saldo visualmente se usou carteira
+                if(params.p_forma_pagamento === 'Carteira') {
+                    userProfile.saldo = data.novo_saldo_cliente;
+                    document.getElementById('display-saldo').innerText = "R$ "+userProfile.saldo.toFixed(2);
+                    document.getElementById('menu-user-saldo').innerText = "R$ "+userProfile.saldo.toFixed(2);
+                }
+
+                document.getElementById('modal-success').style.display='flex';
+                document.getElementById('modal-success').classList.remove('hidden');
+
+            } catch(e) {
+                alert("Erro ao criar pedido: " + e.message);
+            } finally {
+                btn.innerText = "Confirmar Pedido";
+                btn.disabled = false;
+            }
+        }
+        
         function mudarStatusRetorno(){const c=document.getElementById('retorno').checked;const t=document.getElementById('text-retorno');const i=document.getElementById('icon-retorno');t.innerText=c?"Com Retorno":"Sem Retorno";t.style.color=c?"#1E40AF":"#6B7280";i.className=c?"fas fa-exchange-alt text-blue-700":"fas fa-arrow-right text-gray-400";}
         function showScreen(id){
             ['welcome','register','login','app','pedidos','extrato','perfil'].forEach(s=>{const e=document.getElementById('screen-'+s);if(e){e.style.display='none';e.classList.remove('active');}});
@@ -315,31 +430,63 @@
         }
         function navegar(t, titulo){ localStorage.setItem('lastScreen',t); showScreen(t); if(titulo) document.getElementById('header-title').innerText = titulo; if(t==='perfil')carregarPerfil();if(t==='pedidos')carregarHistoricoPedidos();if(t==='extrato')carregarExtrato();}
         
+        // --- PERFIL & AUTH ---
         function preencherDadosPerfil(d){
             safeText('app-user-name',d.nome_loja||'Minha Loja'); safeText('menu-user-name',d.nome_loja||'Minha Loja');
             safeText('app-user-code',d.codigo_visual||userSession.user.id.slice(0,4).toUpperCase()); safeText('menu-user-code',d.codigo_visual||userSession.user.id.slice(0,4).toUpperCase());
             safeText('display-saldo',"R$ "+(d.saldo||0).toFixed(2)); safeText('menu-user-saldo',"R$ "+(d.saldo||0).toFixed(2)); safeText('extrato-saldo-display',"R$ "+(d.saldo||0).toFixed(2));
-            safeVal('origem',d.endereco||d.nome_loja);safeVal('dir-origem',d.endereco||d.nome_loja);safeVal('edit-nome-loja',d.nome_loja);safeVal('edit-razao',d.razao_social);safeVal('edit-cnpj',d.cnpj);safeVal('edit-zap-loja',d.whatsapp_loja);safeVal('edit-endereco',d.endereco);safeVal('edit-resp-nome',d.responsavel);safeVal('edit-cpf-resp',d.cpf_responsavel);safeVal('edit-resp-zap',d.whatsapp_responsavel);
+            safeVal('origem',d.endereco||d.nome_loja); safeVal('edit-nome-loja',d.nome_loja);safeVal('edit-razao',d.razao_social);safeVal('edit-cnpj',d.cnpj);safeVal('edit-zap-loja',d.whatsapp_loja);safeVal('edit-endereco',d.endereco);safeVal('edit-resp-nome',d.responsavel);safeVal('edit-cpf-resp',d.cpf_responsavel);safeVal('edit-resp-zap',d.whatsapp_responsavel);
             if(d.foto_perfil) { document.getElementById('img-perfil').src = d.foto_perfil; document.getElementById('menu-img-perfil').src = d.foto_perfil; }
         }
         function safeText(i,t){const e=document.getElementById(i);if(e)e.innerText=t;} function safeVal(i,v){const e=document.getElementById(i);if(e)e.value=v||'';}
         
-        async function salvarPerfil(){const u={nome_loja:document.getElementById('edit-nome-loja').value,razao_social:document.getElementById('edit-razao').value,cnpj:document.getElementById('edit-cnpj').value,whatsapp_loja:document.getElementById('edit-zap-loja').value,endereco:document.getElementById('edit-endereco').value,responsavel:document.getElementById('edit-resp-nome').value,cpf_responsavel:document.getElementById('edit-cpf-resp').value,whatsapp_responsavel:document.getElementById('edit-resp-zap').value};await sbClient.from('profiles').update(u).eq('id',userSession.user.id);alert("Salvo!");carregarPerfil();}
-        async function fazerLogin(){const e=document.getElementById('log-email').value;const p=document.getElementById('log-senha').value;if(!e||!p)return alert("Preencha tudo.");const b=document.getElementById('btn-log');const t=document.getElementById('txt-log');const s=document.getElementById('load-log');b.disabled=true;t.innerText="";s.classList.remove('hidden');try{const{data, error}=await sbClient.auth.signInWithPassword({email:e,password:p});if(error)throw error; const { data: profile, error: profileError } = await sbClient.from('profiles').select('id, nome_loja').eq('id', data.user.id).single(); if (profileError || !profile || !profile.nome_loja) { await sbClient.auth.signOut(); throw new Error("Acesso negado. Esta conta não é de um Cliente."); }}catch(err){alert("Erro: "+err.message);b.disabled=false;t.innerText="Entrar";s.classList.add('hidden');}}
-        async function fazerCadastro(){isRegistering=true;const d={razao:document.getElementById('reg-razao').value,fantasia:document.getElementById('reg-nome-loja').value,cnpj:document.getElementById('reg-cnpj').value,zapLoja:document.getElementById('reg-zap-loja').value,endereco:document.getElementById('reg-endereco').value,resp:document.getElementById('reg-nome-resp').value,cpf:document.getElementById('reg-cpf-resp').value,zapResp:document.getElementById('reg-zap-resp').value,email:document.getElementById('reg-email').value,senha:document.getElementById('reg-senha').value,conf:document.getElementById('reg-conf-senha').value};if(Object.values(d).some(v=>!v)){isRegistering=false;return alert("Preencha todos os campos!");}if(d.senha!==d.conf){isRegistering=false;return alert("Senhas não conferem!");}const b=document.getElementById('btn-cad');const t=document.getElementById('txt-cad');const s=document.getElementById('load-cad');b.disabled=true;t.innerText="";s.classList.remove('hidden');try{const{data,error}=await sbClient.auth.signUp({email:d.email,password:d.senha});if(error)throw error;if(data.user){await sbClient.from('profiles').insert([{id:data.user.id,razao_social:d.razao,nome_loja:d.fantasia,cnpj:d.cnpj,whatsapp_loja:d.zapLoja,endereco:d.endereco,responsavel:d.resp,cpf_responsavel:d.cpf,whatsapp_responsavel:d.zapResp,email:d.email}]);alert("Cadastro realizado! Faça login.");showScreen('login');}}catch(e){alert("Erro: "+e.message);}finally{b.disabled=false;t.innerText="Finalizar Cadastro";s.classList.add('hidden');isRegistering=false;}}
-        async function carregarPerfil(l=false){try{if(!userSession)return;const{data}=await sbClient.from('profiles').select('*').eq('id',userSession.user.id).single();if(!data){ alert("Acesso restrito."); await fazerLogout(); return; } if(data){userProfile=data;preencherDadosPerfil(data);setupInactivityListener();if(l)ativarRealtimePedidos();}}catch(e){console.error(e);}}
+        async function salvarPerfil(){
+            const u={
+                nome_loja:document.getElementById('edit-nome-loja').value,
+                razao_social:document.getElementById('edit-razao').value,
+                cnpj:document.getElementById('edit-cnpj').value,
+                whatsapp_loja:cleanMascara(document.getElementById('edit-zap-loja').value), // Limpeza
+                endereco:document.getElementById('edit-endereco').value,
+                responsavel:document.getElementById('edit-resp-nome').value,
+                cpf_responsavel:cleanMascara(document.getElementById('edit-cpf-resp').value), // Limpeza
+                whatsapp_responsavel:cleanMascara(document.getElementById('edit-resp-zap').value) // Limpeza
+            };
+            const {error} = await sbClient.from('profiles').update(u).eq('id',userSession.user.id);
+            if(error) alert("Erro ao salvar: " + error.message);
+            else { alert("Salvo!"); carregarPerfil(); }
+        }
         
+        async function fazerLogin(){const e=document.getElementById('log-email').value;const p=document.getElementById('log-senha').value;if(!e||!p)return alert("Preencha tudo.");const b=document.getElementById('btn-log');const t=document.getElementById('txt-log');const s=document.getElementById('load-log');b.disabled=true;t.innerText="";s.classList.remove('hidden');try{const{data, error}=await sbClient.auth.signInWithPassword({email:e,password:p});if(error)throw error; const { data: profile, error: profileError } = await sbClient.from('profiles').select('id, nome_loja').eq('id', data.user.id).single(); if (profileError || !profile || !profile.nome_loja) { await sbClient.auth.signOut(); throw new Error("Acesso negado. Esta conta não é de um Cliente."); }}catch(err){alert("Erro: "+err.message);b.disabled=false;t.innerText="Entrar";s.classList.add('hidden');}}
+        async function fazerCadastro(){
+            isRegistering=true;
+            const d={
+                razao:document.getElementById('reg-razao').value, fantasia:document.getElementById('reg-nome-loja').value,
+                cnpj:document.getElementById('reg-cnpj').value, zapLoja:cleanMascara(document.getElementById('reg-zap-loja').value),
+                endereco:document.getElementById('reg-endereco').value, resp:document.getElementById('reg-nome-resp').value,
+                cpf:cleanMascara(document.getElementById('reg-cpf-resp').value), zapResp:cleanMascara(document.getElementById('reg-zap-resp').value),
+                email:document.getElementById('reg-email').value, senha:document.getElementById('reg-senha').value, conf:document.getElementById('reg-conf-senha').value
+            };
+            if(Object.values(d).some(v=>!v)){isRegistering=false;return alert("Preencha todos os campos!");}
+            if(d.senha!==d.conf){isRegistering=false;return alert("Senhas não conferem!");}
+            
+            const b=document.getElementById('btn-cad');const t=document.getElementById('txt-cad');const s=document.getElementById('load-cad');b.disabled=true;t.innerText="";s.classList.remove('hidden');
+            try{
+                const{data,error}=await sbClient.auth.signUp({email:d.email,password:d.senha});
+                if(error)throw error;
+                if(data.user){
+                    await sbClient.from('profiles').insert([{
+                        id:data.user.id, razao_social:d.razao, nome_loja:d.fantasia, cnpj:d.cnpj,
+                        whatsapp_loja:d.zapLoja, endereco:d.endereco, responsavel:d.resp,
+                        cpf_responsavel:d.cpf, whatsapp_responsavel:d.zapResp, email:d.email
+                    }]);
+                    alert("Cadastro realizado! Faça login.");showScreen('login');
+                }
+            }catch(e){alert("Erro: "+e.message);}finally{b.disabled=false;t.innerText="Finalizar Cadastro";s.classList.add('hidden');isRegistering=false;}
+        }
+        async function carregarPerfil(l=false){try{if(!userSession)return;const{data}=await sbClient.from('profiles').select('*').eq('id',userSession.user.id).single();if(!data){ alert("Acesso restrito."); await fazerLogout(); return; } if(data){userProfile=data;preencherDadosPerfil(data);setupInactivityListener();if(l)ativarRealtimePedidos();}}catch(e){console.error(e);}}
         async function uploadFoto(){const f=document.getElementById('input-foto').files[0];if(!f)return;const ext=f.name.split('.').pop();const name=`${userSession.user.id}-${Date.now()}.${ext}`;const{error}=await sbClient.storage.from('avatars').upload(name,f);if(error)return alert("Erro upload");const{data}=sbClient.storage.from('avatars').getPublicUrl(name);await sbClient.from('profiles').update({foto_perfil:data.publicUrl}).eq('id',userSession.user.id);carregarPerfil();}
 
-        async function calcularDistancia(){const o=document.getElementById('origem').value,d=document.getElementById('destino').value;if(!o||!d)return; document.getElementById('loading').style.display='block';document.getElementById('btn-text').innerText="Calculando...";try{const[rA,rB]=await Promise.all([fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(o+', '+CIDADE_FIXA)}&limit=1`),fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(d+', '+CIDADE_FIXA)}&limit=1`)]);const[dA,dB]=await Promise.all([rA.json(),rB.json()]);if(!dA.length||!dB.length)throw new Error("Endereço não encontrado.");distanciaFinal=(getDist(dA[0].lat,dA[0].lon,dB[0].lat,dB[0].lon)*1.3).toFixed(1);if(distanciaFinal<1)distanciaFinal=1;recalcularTotal();document.getElementById('loading').style.display='none';document.getElementById('btn-calcular').style.display='none';document.getElementById('resultado-box').style.display='flex';document.getElementById('resultado-box').classList.remove('hidden');document.getElementById('btn-enviar').style.display='flex';document.getElementById('btn-enviar').classList.remove('hidden');}catch(e){console.log(e);document.getElementById('loading').style.display='none';document.getElementById('btn-text').innerText="Calcular Frete";}}
-        function recalcularTotal(){let p=APP_CONFIG.taxa_base+(distanciaFinal*APP_CONFIG.preco_km);if(document.getElementById('retorno').checked){if(APP_CONFIG.taxa_retorno_tipo==='percent')p+=(p*(APP_CONFIG.taxa_retorno_valor/100));else p+=APP_CONFIG.taxa_retorno_valor;}valorFinal=p.toFixed(2);document.getElementById('km-display').innerText=distanciaFinal;document.getElementById('valor-display').innerText=valorFinal.replace('.',',');}
-        
-        async function iniciarPedido(){if(!userSession){alert("Faça login.");return;}let v=parseFloat(valorFinal);const nome=document.getElementById('nome_dest').value.trim();const tel=document.getElementById('tel_dest').value.trim();const ref=document.getElementById('referencia').value.trim();if(!nome||!tel||!ref){alert("Preencha Nome, WhatsApp e Referência.");return;}try{const pg=document.getElementById('pagamento_entrega').value;const tp=document.getElementById('input-logistica').value;if(pg==='Carteira'){if(userProfile.saldo<v)throw new Error("Saldo insuficiente.");const ns=userProfile.saldo-v;await sbClient.from('profiles').update({saldo:ns}).eq('id',userSession.user.id);await sbClient.from('transacoes').insert([{user_id:userSession.user.id,tipo:'debito',valor:v,descricao:'Pagamento Entrega'}]);userProfile.saldo=ns;document.getElementById('display-saldo').innerText="R$ "+ns.toFixed(2);document.getElementById('menu-user-saldo').innerText="R$ "+ns.toFixed(2);}const n={user_id:userSession.user.id,origem:document.getElementById('origem').value,destino:document.getElementById('destino').value,valor_frete:v,forma_pagamento:pg,pin_entrega:Math.floor(1000+Math.random()*9000).toString(),nome_destinatario:nome,telefone_destinatario:tel,status:'solicitado',codigo_visual:'#'+Math.floor(10000+Math.random()*90000),taxa_app_aplicada:APP_CONFIG.taxa_app_percent,tipo_logistica:tp};const{error}=await sbClient.from('pedidos').insert([n]);if(error)throw error;document.getElementById('display-pin').innerText=n.pin_entrega;document.getElementById('modal-success').style.display='flex';document.getElementById('modal-success').classList.remove('hidden');}catch(e){alert(e.message);}}
-        
-        function abrirModalDirecionado(mId, mNome) { document.getElementById('modal-detalhes').style.display='none'; document.getElementById('modal-direcionado').style.display='flex'; document.getElementById('modal-direcionado').classList.remove('hidden'); document.getElementById('dir-moto-nome').innerText=mNome; document.getElementById('dir-moto-id').value=mId; document.getElementById('dir-origem').value=document.getElementById('origem').value; document.getElementById('dir-destino').value=''; document.getElementById('dir-nome-dest').value=''; document.getElementById('dir-tel-dest').value=''; document.getElementById('res-dir').classList.add('hidden'); document.getElementById('btn-env-dir').classList.add('hidden'); document.getElementById('btn-calc-dir').classList.remove('hidden'); }
-        async function calcDir() { const o=document.getElementById('dir-origem').value,d=document.getElementById('dir-destino').value; if(!o||!d)return alert("Preencha o destino."); document.getElementById('btn-calc-dir').innerText="Calculando..."; try{const[rA,rB]=await Promise.all([fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(o+', '+CIDADE_FIXA)}&limit=1`),fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(d+', '+CIDADE_FIXA)}&limit=1`)]);const[dA,dB]=await Promise.all([rA.json(),rB.json()]);if(!dA.length||!dB.length)throw new Error("Endereço não encontrado.");dirDist=(getDist(dA[0].lat,dA[0].lon,dB[0].lat,dB[0].lon)*1.3).toFixed(1);if(dirDist<1)dirDist=1;let p=APP_CONFIG.taxa_base+(dirDist*APP_CONFIG.preco_km);if(document.getElementById('dir-retorno').checked){if(APP_CONFIG.taxa_retorno_tipo==='percent')p+=(p*(APP_CONFIG.taxa_retorno_valor/100));else p+=APP_CONFIG.taxa_retorno_valor;}dirVal=p.toFixed(2);document.getElementById('dir-km').innerText=dirDist;document.getElementById('dir-val').innerText=dirVal.replace('.',',');document.getElementById('btn-calc-dir').classList.add('hidden');document.getElementById('res-dir').classList.remove('hidden');document.getElementById('res-dir').style.display='flex';document.getElementById('btn-env-dir').classList.remove('hidden');}catch(e){alert(e.message);}finally{document.getElementById('btn-calc-dir').innerText="Calcular";}}
-        async function envDir() { let v=parseFloat(dirVal); const pg=document.getElementById('dir-pag-entrega').value; const motoId=document.getElementById('dir-moto-id').value; const nome=document.getElementById('dir-nome-dest').value.trim(); const tel=document.getElementById('dir-tel-dest').value.trim(); const ref=document.getElementById('dir-ref').value.trim(); if(!nome||!tel||!ref){alert("Preencha Nome, WhatsApp e Referência.");return;} try{if(pg==='Carteira'){if(userProfile.saldo<v)throw new Error("Saldo insuficiente.");const ns=userProfile.saldo-v;await sbClient.from('profiles').update({saldo:ns}).eq('id',userSession.user.id);await sbClient.from('transacoes').insert([{user_id:userSession.user.id,tipo:'debito',valor:v,descricao:'Entrega Direcionada'}]);userProfile.saldo=ns;document.getElementById('display-saldo').innerText="R$ "+ns.toFixed(2);document.getElementById('menu-user-saldo').innerText="R$ "+ns.toFixed(2);}const novo={user_id:userSession.user.id,origem:document.getElementById('dir-origem').value,destino:document.getElementById('dir-destino').value,valor_frete:v,forma_pagamento:pg,pin_entrega:Math.floor(1000+Math.random()*9000).toString(),nome_destinatario:nome,telefone_destinatario:tel,status:'pendente',entregador_id:motoId,codigo_visual:'#'+Math.floor(10000+Math.random()*90000),taxa_app_aplicada:APP_CONFIG.taxa_app_percent};const{error}=await sbClient.from('pedidos').insert([novo]);if(error)throw error;document.getElementById('modal-direcionado').style.display='none';document.getElementById('display-pin').innerText=novo.pin_entrega;document.getElementById('modal-success').style.display='flex';document.getElementById('modal-success').classList.remove('hidden');}catch(e){alert(e.message);}}
-
+        // --- MATH & SYSTEM UTILS ---
         function getDist(lat1,lon1,lat2,lon2){var R=6371,dLat=d2r(lat2-lat1),dLon=d2r(lon2-lon1),a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(d2r(lat1))*Math.cos(d2r(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2);return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));} function d2r(deg){return deg*(Math.PI/180);}
         async function fazerLogout(){await sbClient.auth.signOut();location.reload();}
         function ativarRealtimePedidos(){sbClient.channel('cl-pedidos').on('postgres_changes',{event:'*',schema:'public',table:'pedidos'},()=>carregarHistoricoPedidos()).subscribe();}
@@ -363,8 +510,25 @@
             document.getElementById('det-valor').innerText = "R$ " + parseFloat(p.valor_frete).toFixed(2).replace('.',','); document.getElementById('det-pin').innerText = p.pin_entrega;
             document.getElementById('det-id-visual').innerText = p.codigo_visual || '#';
             document.getElementById('det-status').innerText = p.status.toUpperCase();
-            const boxMoto = document.getElementById('box-motoboy'); const btnAvaliar = document.getElementById('btn-avaliar'); const boxCancel = document.getElementById('box-cancelar'); const btnNovo = document.getElementById('btn-novo-pedido-moto');
-            if(p.entregador_id) { const { data: moto } = await sbClient.from('profiles').select('*').eq('id', p.entregador_id).single(); if(moto) { boxMoto.classList.remove('hidden'); document.getElementById('det-moto-nome').innerText = moto.responsavel; document.getElementById('det-moto-placa').innerText = moto.placa_moto; document.getElementById('btn-zap-moto').onclick = function() { window.open(`https://wa.me/${moto.whatsapp_responsavel}`, '_blank'); }; if(['pendente', 'em_rota'].includes(p.status)) { btnNovo.classList.remove('hidden'); btnNovo.onclick = function() { abrirModalDirecionado(p.entregador_id, moto.responsavel); }; } else { btnNovo.classList.add('hidden'); } if(p.status === 'concluido') { btnAvaliar.classList.remove('hidden'); btnAvaliar.onclick = function() { abrirModalAvaliacao(p.id, p.entregador_id); }; } else { btnAvaliar.classList.add('hidden'); } } } else { boxMoto.classList.add('hidden'); }
+            
+            const boxMoto = document.getElementById('box-motoboy'); const btnAvaliar = document.getElementById('btn-avaliar'); const boxCancel = document.getElementById('box-cancelar');
+            
+            // Lógica de Direcionamento REMOVIDA
+            // Apenas exibe dados do motoboy se houver
+            if(p.entregador_id) { 
+                const { data: moto } = await sbClient.from('profiles').select('*').eq('id', p.entregador_id).single(); 
+                if(moto) { 
+                    boxMoto.classList.remove('hidden'); 
+                    document.getElementById('det-moto-nome').innerText = moto.responsavel; 
+                    document.getElementById('det-moto-placa').innerText = moto.placa_moto; 
+                    document.getElementById('btn-zap-moto').onclick = function() { window.open(`https://wa.me/${moto.whatsapp_responsavel}`, '_blank'); }; 
+                    
+                    if(p.status === 'concluido') { 
+                        btnAvaliar.classList.remove('hidden'); btnAvaliar.onclick = function() { abrirModalAvaliacao(p.id, p.entregador_id); }; 
+                    } else { btnAvaliar.classList.add('hidden'); } 
+                } 
+            } else { boxMoto.classList.add('hidden'); }
+            
             if(['em_rota', 'concluido', 'cancelado'].includes(p.status)) { boxCancel.classList.add('hidden'); } else { boxCancel.classList.remove('hidden'); document.getElementById('btn-cancelar-detalhe').onclick = function() { cancelarPedido(id); document.getElementById('modal-detalhes').style.display='none'; }; }
             document.getElementById('modal-detalhes').style.display='flex'; document.getElementById('modal-detalhes').classList.remove('hidden');
         }
