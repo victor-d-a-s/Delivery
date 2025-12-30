@@ -36,23 +36,23 @@
         input:checked + .slider { background-color: #1E40AF; }
         input:checked + .slider:before { transform: translateX(20px); }
         
-        /* HEADER FIXO (Ajustado para não cobrir títulos) */
+        /* HEADER FIXO - Altura ajustada */
         #app-header { 
             position: fixed; top: 0; left: 0; right: 0; 
             background-color: #1E40AF; z-index: 50; 
             display: none; align-items: flex-end; justify-content: space-between; 
-            padding: 0 16px 12px 16px; 
+            padding: 0 16px 15px 16px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             height: 90px; 
             padding-top: max(env(safe-area-inset-top), 25px); 
         }
 
-        /* CONTAINER PRINCIPAL (Aumentado Padding-Top para 140px para evitar cortes) */
+        /* CONTAINER PRINCIPAL - Padding Aumentado para 150px para garantir visibilidade */
         .app-container { 
             width: 100%; min-height: 100vh; 
             background-color: #f8fafc; 
             display: none; overflow-y: auto; 
-            padding-top: 140px; /* <--- AQUI ESTAVA O PROBLEMA DO CORTE */
+            padding-top: 150px; 
             padding-bottom: 80px; 
         }
 
@@ -169,54 +169,40 @@
     <div id="screen-pedidos" class="app-container p-5 fade-in">
         <div class="flex justify-end mb-4">
             <button onclick="atualizarPedidosManual()" class="bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 active:scale-95 transition">
-                <i id="icon-refresh" class="fas fa-sync-alt"></i> Atualizar Lista
+                <i id="icon-refresh" class="fas fa-sync-alt"></i> Atualizar
             </button>
         </div>
-        
         <div class="tab-scroll">
             <button class="tab-btn active" id="tab-todos" onclick="mudarAbaPedidos('todos')">Todos <span id="count-todos">(0)</span></button>
             <button class="tab-btn" id="tab-solicitados" onclick="mudarAbaPedidos('solicitados')">Solicitados <span id="count-solicitados">(0)</span></button>
             <button class="tab-btn" id="tab-andamento" onclick="mudarAbaPedidos('andamento')">Em andamento <span id="count-andamento">(0)</span></button>
             <button class="tab-btn" id="tab-finalizados" onclick="mudarAbaPedidos('finalizados')">Finalizados <span id="count-finalizados">(0)</span></button>
         </div>
-        
         <div id="box-date-filter" class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm mb-4 flex gap-2 items-end">
             <div class="flex-1"><p class="text-[10px] text-gray-500 mb-1 font-bold">DE</p><input type="date" id="filtro-ped-ini" class="date-filter bg-gray-50 w-full rounded-lg text-xs"></div>
             <div class="flex-1"><p class="text-[10px] text-gray-500 mb-1 font-bold">ATÉ</p><input type="date" id="filtro-ped-fim" class="date-filter bg-gray-50 w-full rounded-lg text-xs"></div>
             <button onclick="filtrarPorData('pedidos')" class="bg-blue-600 text-white px-3 py-2 rounded-lg text-xs h-[34px]"><i class="fas fa-search"></i></button>
         </div>
-        
-        <div id="lista-pedidos" class="flex-1 pb-32 space-y-3 min-h-[200px]">
-            <div class="text-center text-gray-400 mt-10">
-                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Carregando histórico...
-            </div>
-        </div>
+        <div id="lista-pedidos" class="flex-1 pb-32 space-y-3 min-h-[200px]"><div class="text-center text-gray-400 mt-10"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Carregando histórico...</div></div>
     </div>
 
     <div id="screen-extrato" class="app-container p-5 fade-in text-center">
         <div class="flex justify-end mb-4">
              <button onclick="atualizarExtratoManual()" class="bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 active:scale-95 transition">
-                <i id="icon-refresh-ext" class="fas fa-sync-alt"></i> Atualizar Extrato
+                <i id="icon-refresh-ext" class="fas fa-sync-alt"></i> Atualizar
              </button>
         </div>
-        
         <div class="bg-blue-600 text-white p-8 rounded-3xl shadow-xl mb-6 text-left relative overflow-hidden">
             <i class="fas fa-wallet text-8xl mb-2 opacity-10 absolute -right-6 -bottom-6"></i>
             <p class="text-sm opacity-80 font-bold uppercase z-10 relative">Saldo Atual</p>
             <h2 class="text-4xl font-bold mt-4 z-10 relative" id="extrato-saldo-display">R$ 0,00</h2>
         </div>
-        
         <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm mb-4 flex gap-2 items-end w-full text-left">
             <div class="flex-1"><p class="text-[10px] text-gray-500 mb-1 font-bold">DE</p><input type="date" id="filtro-ext-ini" class="date-filter bg-gray-50 w-full rounded-lg text-xs"></div>
             <div class="flex-1"><p class="text-[10px] text-gray-500 mb-1 font-bold">ATÉ</p><input type="date" id="filtro-ext-fim" class="date-filter bg-gray-50 w-full rounded-lg text-xs"></div>
             <button onclick="filtrarPorData('extrato')" class="bg-blue-600 text-white px-3 py-2 rounded-lg text-xs h-[34px]"><i class="fas fa-search"></i></button>
         </div>
-        
-        <div id="lista-extrato" class="flex-1 pb-32 space-y-2 w-full min-h-[200px]">
-            <div class="text-center text-gray-400 mt-10">
-                <i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Carregando transações...
-            </div>
-        </div>
+        <div id="lista-extrato" class="flex-1 pb-32 space-y-2 w-full min-h-[200px]"><div class="text-center text-gray-400 mt-10"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Carregando transações...</div></div>
     </div>
 
     <div id="screen-perfil" class="app-container p-5 fade-in">
@@ -274,6 +260,7 @@
             setTimeout(() => { 
                 const l=document.getElementById('global-loading'); 
                 if(l && l.style.display !== 'none'){
+                    // Se tiver sessão, vai pra última tela salva, senão welcome
                     if(userSession) showScreen(localStorage.getItem('lastScreen') || 'app'); else showScreen('welcome');
                 }
             }, 3000);
@@ -284,9 +271,8 @@
             const { data: { session } } = await sbClient.auth.getSession();
             if (session) { 
                 userSession = session; 
-                // AQUI ESTÁ A MÁGICA DA PERSISTÊNCIA:
                 const last = localStorage.getItem('lastScreen') || 'app';
-                showScreen(last); // Vai direto para a última tela
+                showScreen(last); // Restaura a tela
                 carregarPerfil(true); 
                 // Se voltou em pedidos ou extrato, carrega os dados
                 if(last === 'pedidos') carregarHistoricoPedidos();
@@ -331,7 +317,6 @@
             if(t){
                 document.getElementById('global-loading').style.display='none';
                 
-                // Lógica de cabeçalho
                 if(['welcome','login','register'].includes(id)) { 
                     t.style.display='flex'; 
                     document.getElementById('app-header').style.display = 'none'; 
@@ -339,17 +324,15 @@
                     t.style.display='block'; 
                     document.getElementById('app-header').style.display = 'flex'; 
                     
-                    // ATUALIZA TÍTULOS CONFORME PEDIDO
+                    // ATUALIZA TÍTULOS DINÂMICOS
                     let title = 'Início';
                     if(id === 'pedidos') title = 'Pedidos';
                     if(id === 'extrato') title = 'Extrato';
                     if(id === 'perfil') title = 'Meu Perfil';
                     document.getElementById('header-title').innerText = "Drop Entregas | " + title; 
                 }
-                // Não força scroll top se for apenas atualização de aba, mas ok aqui
                 window.scrollTo(0,0);
             }
-            // Fecha menu
             document.getElementById('sidebar-menu').classList.remove('open'); 
             document.getElementById('sidebar-overlay').classList.remove('open'); 
             setTimeout(() => document.getElementById('sidebar-overlay').style.display = 'none', 200);
@@ -374,7 +357,7 @@
 
         async function carregarHistoricoPedidos(){
             const lista = document.getElementById('lista-pedidos');
-            // Só mostra loading se a lista estiver vazia
+            // Só mostra spinner se estiver vazio ou com msg antiga
             if(lista.innerHTML.includes('Carregando') || lista.innerHTML === '') {
                  lista.innerHTML = '<div class="text-center text-gray-400 mt-10"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Buscando pedidos...</div>';
             }
@@ -436,7 +419,7 @@
             }); 
         }
 
-        // --- RESTO DAS FUNÇÕES (Mantidas iguais para garantir funcionamento) ---
+        // --- RESTO DAS FUNÇÕES (Logística, Maps, Auth, etc) ---
         function toggleDropdown(id){const l=document.getElementById(`list-${id}`);document.querySelectorAll('.custom-options').forEach(e=>{if(e.id!==`list-${id}`)e.classList.remove('show');});l.classList.toggle('show');}
         function selectOption(id,v,t){document.getElementById(`pagamento_${id}`).value=v;document.getElementById(`display-${id}`).innerText=t;document.getElementById(`list-${id}`).classList.remove('show');}
         document.addEventListener('click', function(e){if(!e.target.closest('.relative')){document.querySelectorAll('.custom-options').forEach(e=>e.classList.remove('show'));}});
