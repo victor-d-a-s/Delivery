@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Drop Entregas</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,7 +20,7 @@
         .fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* HEADER (Tamanho Normal) */
+        /* HEADER */
         #app-header { 
             position: fixed; top: 0; left: 0; right: 0; 
             background-color: #1E40AF; z-index: 50; 
@@ -43,13 +45,13 @@
         #sidebar-menu.open { transform: translateX(0); }
         #sidebar-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.6); z-index: 55; display: none; backdrop-filter: blur(2px); }
         .menu-item { padding: 16px 24px; font-size: 15px; font-weight: 600; color: #4B5563; border-left: 4px solid transparent; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        
-        /* BOTÕES (Fixados com !important) */
+        .menu-item:active { background-color: #eff6ff; color: #1E40AF; border-left-color: #1E40AF; }
+
+        /* UI ELEMENTS */
         .btn-primary { background-color: #1E40AF !important; color: white !important; transition: 0.1s; border: none; }
         .btn-primary:active { transform: scale(0.98); }
         .btn-outline { background-color: white; color: #1E40AF; border: 2px solid #1E40AF; }
         
-        /* DROPDOWNS & LISTAS */
         .custom-select-btn { width: 100%; text-align: left; padding: 14px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-weight: 700; color: #374151; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .custom-options { display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 12px; margin-top: 6px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); z-index: 100; overflow: hidden; max-height: 250px; overflow-y: auto; }
         .custom-options.show { display: block; animation: fadeIn 0.1s; }
@@ -57,10 +59,9 @@
         .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px; z-index: 70; max-height: 220px; overflow-y: auto; box-shadow: 0 10px 15px rgba(0,0,0,0.1); display: none; }
         .autocomplete-item { padding: 14px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #f3f4f6; color: #374151; }
 
-        /* STATUS & UTILS */
         .tab-scroll { display: flex; overflow-x: auto; gap: 8px; padding: 4px; margin-bottom: 10px; scrollbar-width: none; }
-        .tab-btn { white-space: nowrap; padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 700; color: #6B7280; background: white; border: 1px solid #E5E7EB; }
-        .tab-btn.active { background: #1E40AF; color: white; border-color: #1E40AF; }
+        .tab-btn { white-space: nowrap; padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 700; color: #6B7280; background: white; border: 1px solid #E5E7EB; transition: 0.2s; }
+        .tab-btn.active { background: #1E40AF; color: white; border-color: #1E40AF; box-shadow: 0 4px 6px -1px rgba(30, 64, 175, 0.3); }
         
         .card-historico { background: white; border-radius: 16px; border: 1px solid #F3F4F6; padding: 16px; margin-bottom: 12px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
@@ -72,6 +73,7 @@
 
         .transacao-item { transition: 0.1s; cursor: pointer; }
         .transacao-item:active { background-color: #f3f4f6; transform: scale(0.98); }
+        
         .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -80,7 +82,7 @@
         input:checked + .slider { background-color: #1E40AF; }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        #native-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: white; padding: 12px 24px; border-radius: 50px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.3); opacity: 0; transition: 0.3s; z-index: 200; width: max-content; }
+        #native-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: white; padding: 12px 24px; border-radius: 50px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.3); opacity: 0; transition: 0.3s; z-index: 200; width: max-content; max-width: 90%; text-align: center; }
         #native-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .loader-blue { border: 3px solid #f3f3f3; border-top: 3px solid #1E40AF; border-radius: 50%; width: 32px; height: 32px; animation: spin 0.6s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -88,7 +90,9 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
 
-    <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]"><div class="loader-blue mb-3"></div><p class="text-blue-900 text-xs font-bold tracking-widest animate-pulse">CARREGANDO</p></div>
+    <div id="global-loading" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-[100]">
+        <div class="loader-blue mb-3"></div><p class="text-blue-900 text-xs font-bold tracking-widest animate-pulse">CARREGANDO</p>
+    </div>
     <div id="native-toast"></div>
 
     <div id="app-header">
@@ -104,7 +108,10 @@
                 <h3 id="menu-user-name" class="font-bold text-lg text-center truncate w-full">Carregando...</h3>
                 <p class="text-xs text-blue-200 text-center">ID: <span id="menu-user-code">...</span></p>
             </div>
-            <div class="bg-blue-900/50 rounded-xl p-3 text-center border border-blue-500/30"><p class="text-[10px] uppercase tracking-wider opacity-70 mb-1">Saldo em Carteira</p><p id="menu-user-saldo" class="font-bold text-xl">R$ 0,00</p></div>
+            <div class="bg-blue-900/50 rounded-xl p-3 text-center border border-blue-500/30">
+                <p class="text-[10px] uppercase tracking-wider opacity-70 mb-1">Saldo em Carteira</p>
+                <p id="menu-user-saldo" class="font-bold text-xl">R$ 0,00</p>
+            </div>
         </div>
         <div class="flex-1 overflow-y-auto py-2 space-y-1">
             <div class="menu-item" onclick="navegar('app', 'Início')"><i class="fas fa-home text-blue-600"></i> Início</div>
@@ -112,16 +119,34 @@
             <div class="menu-item" onclick="navegar('extrato', 'Financeiro')"><i class="fas fa-file-invoice-dollar text-green-600"></i> Extrato</div>
             <div class="menu-item" onclick="navegar('perfil', 'Meu Perfil')"><i class="fas fa-user-cog text-gray-500"></i> Perfil</div>
         </div>
-        <div class="p-4 border-t border-gray-100"><button onclick="fazerLogout()" class="w-full flex items-center justify-center gap-2 text-red-500 font-bold py-3 hover:bg-red-50 rounded-xl transition"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
+        <div class="p-4 border-t border-gray-100">
+            <button onclick="fazerLogout()" class="w-full flex items-center justify-center gap-2 text-red-500 font-bold py-3 hover:bg-red-50 rounded-xl transition"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
     </div>
 
-    <div id="screen-welcome" class="fixed inset-0 bg-white z-[30] flex flex-col justify-center p-8 text-center fade-in" style="display:none;"><div class="mb-12"><div class="inline-block p-6 rounded-3xl bg-blue-50 text-blue-700 mb-6 shadow-sm"><i class="fas fa-box-open text-6xl"></i></div><h1 class="text-3xl font-bold text-gray-800 mb-1">Drop Entregas</h1></div><div class="space-y-4 w-full max-w-sm mx-auto"><button onclick="showScreen('register')" class="w-full btn-primary font-bold py-4 rounded-2xl shadow-lg text-lg">Criar Loja</button><button onclick="showScreen('login')" class="w-full btn-outline font-bold py-4 rounded-2xl shadow-sm text-lg">Entrar</button></div></div>
-    <div id="screen-login" class="fixed inset-0 bg-white z-[30] flex flex-col justify-center p-8 fade-in" style="display:none;"><button onclick="showScreen('welcome')" class="absolute top-8 left-6 text-gray-400 p-2"><i class="fas fa-arrow-left text-xl"></i></button><div class="text-center mb-10"><h2 class="text-2xl font-bold text-gray-800">Login</h2></div><div class="space-y-4"><input type="email" id="log-email" class="w-full border-2 bg-gray-50 border-gray-100 rounded-2xl p-4 text-lg outline-none" placeholder="E-mail"><input type="password" id="log-senha" class="w-full border-2 bg-gray-50 border-gray-100 rounded-2xl p-4 text-lg outline-none" placeholder="Senha"><button onclick="fazerLogin()" id="btn-log" class="w-full btn-primary font-bold py-4 rounded-2xl shadow-lg h-14 text-lg">Entrar</button></div></div>
-    <div id="screen-register" class="fixed inset-0 bg-white z-[30] flex flex-col p-6 overflow-y-auto fade-in" style="display:none; padding-top:20px;"><div class="flex items-center mb-6 mt-4"><button onclick="showScreen('welcome')" class="p-2 text-gray-500"><i class="fas fa-arrow-left text-xl"></i></button><h2 class="text-xl font-bold ml-2">Nova Loja</h2></div><div class="space-y-6 pb-20"><input type="text" id="reg-razao" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="Razão Social"><input type="text" id="reg-nome-loja" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="Nome Fantasia"><input type="tel" id="reg-cnpj" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="CNPJ"><input type="tel" id="reg-zap-loja" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="WhatsApp Loja"><input type="text" id="reg-endereco" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="Endereço"><input type="text" id="reg-nome-resp" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="Nome Responsável"><input type="tel" id="reg-cpf-resp" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="CPF"><input type="tel" id="reg-zap-resp" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="WhatsApp Pessoal"><input type="email" id="reg-email" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="E-mail"><input type="password" id="reg-senha" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="Senha"><input type="password" id="reg-conf-senha" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="Confirmar Senha"><button onclick="fazerCadastro()" id="btn-cad" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg mt-4">Cadastrar</button></div></div>
+    <div id="screen-welcome" class="fixed inset-0 bg-white z-[30] flex flex-col justify-center p-8 text-center fade-in" style="display:none;">
+        <div class="mb-12"><div class="inline-block p-6 rounded-3xl bg-blue-50 text-blue-700 mb-6 shadow-sm"><i class="fas fa-box-open text-6xl"></i></div><h1 class="text-3xl font-bold text-gray-800 mb-1">Drop Entregas</h1></div>
+        <div class="space-y-4 w-full max-w-sm mx-auto"><button onclick="showScreen('register')" class="w-full btn-primary font-bold py-4 rounded-2xl shadow-lg text-lg">Criar Loja</button><button onclick="showScreen('login')" class="w-full btn-outline font-bold py-4 rounded-2xl shadow-sm text-lg">Entrar</button></div>
+    </div>
+    
+    <div id="screen-login" class="fixed inset-0 bg-white z-[30] flex flex-col justify-center p-8 fade-in" style="display:none;">
+        <button onclick="showScreen('welcome')" class="absolute top-8 left-6 text-gray-400 p-2"><i class="fas fa-arrow-left text-xl"></i></button>
+        <div class="text-center mb-10"><h2 class="text-2xl font-bold text-gray-800">Login</h2></div>
+        <div class="space-y-4"><input type="email" id="log-email" class="w-full border-2 bg-gray-50 border-gray-100 rounded-2xl p-4 text-lg outline-none" placeholder="E-mail"><input type="password" id="log-senha" class="w-full border-2 bg-gray-50 border-gray-100 rounded-2xl p-4 text-lg outline-none" placeholder="Senha"><button onclick="fazerLogin()" id="btn-log" class="w-full btn-primary font-bold py-4 rounded-2xl shadow-lg h-14 text-lg">Entrar</button></div>
+    </div>
+
+    <div id="screen-register" class="fixed inset-0 bg-white z-[30] flex flex-col p-6 overflow-y-auto fade-in" style="display:none; padding-top:20px;">
+        <div class="flex items-center mb-6 mt-4"><button onclick="showScreen('welcome')" class="p-2 text-gray-500"><i class="fas fa-arrow-left text-xl"></i></button><h2 class="text-xl font-bold ml-2">Nova Loja</h2></div>
+        <div class="space-y-6 pb-20"><input type="text" id="reg-razao" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="Razão Social"><input type="text" id="reg-nome-loja" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="Nome Fantasia"><input type="tel" id="reg-cnpj" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="CNPJ"><input type="tel" id="reg-zap-loja" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="WhatsApp Loja"><input type="text" id="reg-endereco" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="Endereço"><input type="text" id="reg-nome-resp" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="Nome Responsável"><input type="tel" id="reg-cpf-resp" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="CPF"><input type="tel" id="reg-zap-resp" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="WhatsApp Pessoal"><input type="email" id="reg-email" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="E-mail"><input type="password" id="reg-senha" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="Senha"><input type="password" id="reg-conf-senha" class="w-full bg-gray-50 border rounded-xl p-4 text-sm" placeholder="Confirmar Senha"><button onclick="fazerCadastro()" id="btn-cad" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg mt-4">Cadastrar</button></div>
+    </div>
 
     <div id="screen-app" class="app-container fade-in relative">
         <div class="px-5 space-y-5">
-            <div class="bg-gradient-to-br from-blue-800 to-blue-600 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden"><div class="absolute -right-6 -top-6 p-4 opacity-10"><i class="fas fa-wallet text-8xl"></i></div><p class="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">Seu Saldo</p><div class="flex justify-between items-end relative z-10"><h2 class="text-4xl font-bold" id="display-saldo">R$ 0,00</h2><button onclick="verificarPinParaSaldo()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl text-xs font-bold transition backdrop-blur-sm border border-white/10 active:scale-95"><i class="fas fa-plus mr-1"></i> Adicionar</button></div></div>
+            <div class="bg-gradient-to-br from-blue-800 to-blue-600 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute -right-6 -top-6 p-4 opacity-10"><i class="fas fa-wallet text-8xl"></i></div>
+                <p class="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">Seu Saldo</p>
+                <div class="flex justify-between items-end relative z-10"><h2 class="text-4xl font-bold" id="display-saldo">R$ 0,00</h2><button onclick="verificarPinParaSaldo()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl text-xs font-bold transition backdrop-blur-sm border border-white/10 active:scale-95"><i class="fas fa-plus mr-1"></i> Adicionar</button></div>
+            </div>
             
             <div class="relative z-50">
                 <label class="text-[10px] font-bold text-gray-400 uppercase ml-2 mb-1 block">O que vamos entregar?</label>
@@ -156,42 +181,40 @@
             <button type="button" onclick="iniciarPedido()" id="btn-enviar" class="hidden w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-2xl shadow-lg flex justify-center items-center gap-2 text-lg" style="display:none"><i class="fas fa-paper-plane"></i> Confirmar Pedido</button>
         </div>
     </div>
+
+    <div id="screen-pedidos" class="app-container p-5 fade-in">
+        <div class="sticky top-0 z-20 bg-[#f8fafc] pb-2 pt-1 flex justify-end">
+            <button onclick="atualizarPedidosManual()" class="bg-blue-100 text-blue-700 text-xs font-bold px-4 py-2 rounded-full shadow-sm flex items-center gap-2 active:scale-95 transition border border-blue-200"><i id="icon-refresh" class="fas fa-sync-alt"></i> Atualizar Lista</button>
+        </div>
+        <div class="tab-scroll"><button class="tab-btn active" id="tab-todos" onclick="mudarAbaPedidos('todos')">Todos <span id="count-todos">(0)</span></button><button class="tab-btn" id="tab-solicitados" onclick="mudarAbaPedidos('solicitados')">Solicitados</button><button class="tab-btn" id="tab-andamento" onclick="mudarAbaPedidos('andamento')">Em andamento</button><button class="tab-btn" id="tab-finalizados" onclick="mudarAbaPedidos('finalizados')">Finalizados</button></div>
+        <div id="box-date-filter" class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm mb-4 flex gap-2 items-end"><div class="flex-1"><p class="text-[10px] text-gray-500 mb-1 font-bold">DE</p><input type="date" id="filtro-ped-ini" class="date-filter bg-gray-50 w-full rounded-lg text-xs"></div><div class="flex-1"><p class="text-[10px] text-gray-500 mb-1 font-bold">ATÉ</p><input type="date" id="filtro-ped-fim" class="date-filter bg-gray-50 w-full rounded-lg text-xs"></div><button onclick="filtrarPorData('pedidos')" class="bg-blue-600 text-white px-3 py-2 rounded-lg text-xs h-[34px]"><i class="fas fa-search"></i></button></div>
+        <div id="lista-pedidos" class="flex-1 pb-32 space-y-3 min-h-[200px]"><div class="text-center text-gray-400 mt-10"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Carregando histórico...</div></div>
+    </div>
+
+    <div id="screen-extrato" class="app-container p-5 fade-in text-center">
+        <div class="sticky top-0 z-20 bg-[#f8fafc] pb-2 pt-1 flex justify-end">
+             <button onclick="atualizarExtratoManual()" class="bg-blue-100 text-blue-700 text-xs font-bold px-4 py-2 rounded-full shadow-sm flex items-center gap-2 active:scale-95 transition border border-blue-200"><i id="icon-refresh-ext" class="fas fa-sync-alt"></i> Atualizar Extrato</button>
+        </div>
+        <div class="bg-blue-600 text-white p-8 rounded-3xl shadow-xl mb-6 text-left relative overflow-hidden"><i class="fas fa-wallet text-8xl mb-2 opacity-10 absolute -right-6 -bottom-6"></i><p class="text-sm opacity-80 font-bold uppercase z-10 relative">Saldo Atual</p><h2 class="text-4xl font-bold mt-4 z-10 relative" id="extrato-saldo-display">R$ 0,00</h2></div>
+        <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm mb-4 flex gap-2 items-end w-full text-left"><div class="flex-1"><p class="text-[10px] text-gray-500 mb-1 font-bold">DE</p><input type="date" id="filtro-ext-ini" class="date-filter bg-gray-50 w-full rounded-lg text-xs"></div><div class="flex-1"><p class="text-[10px] text-gray-500 mb-1 font-bold">ATÉ</p><input type="date" id="filtro-ext-fim" class="date-filter bg-gray-50 w-full rounded-lg text-xs"></div><button onclick="filtrarPorData('extrato')" class="bg-blue-600 text-white px-3 py-2 rounded-lg text-xs h-[34px]"><i class="fas fa-search"></i></button></div>
+        <div id="lista-extrato" class="flex-1 pb-32 space-y-2 w-full min-h-[200px]"><div class="text-center text-gray-400 mt-10"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Carregando transações...</div></div>
+    </div>
+
+    <div id="screen-perfil" class="app-container p-5 fade-in">
+        <div class="flex flex-col items-center mb-8 mt-4"><div class="relative"><div class="w-32 h-32 rounded-full bg-white p-1 shadow-xl relative"><img id="img-perfil" src="https://via.placeholder.com/150?text=FOTO" class="w-full h-full rounded-full object-cover border border-gray-200 bg-gray-200"></div><button onclick="document.getElementById('input-foto').click()" class="absolute bottom-0 right-0 bg-blue-600 text-white p-3 rounded-full shadow-lg active:scale-95 transition border-2 border-white"><i class="fas fa-camera"></i></button><input type="file" id="input-foto" class="hidden" accept="image/*" onchange="uploadFoto()"></div><p class="text-xs text-gray-400 mt-3 font-bold uppercase tracking-wide">Toque na câmera para alterar</p></div>
+        <div class="space-y-5 pb-32">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4"><p class="text-xs font-bold text-blue-800 uppercase tracking-widest border-b pb-2">Estabelecimento</p><div><label class="text-xs text-gray-400 font-bold">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500 font-medium text-gray-700"></div><div><label class="text-xs text-gray-400 font-bold">Razão Social</label><input type="text" id="edit-razao" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500 font-medium text-gray-700"></div><div><label class="text-xs text-gray-400 font-bold">CNPJ</label><input type="tel" id="edit-cnpj" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500 font-medium text-gray-700"></div><div><label class="text-xs text-gray-400 font-bold">WhatsApp Loja</label><input type="tel" id="edit-zap-loja" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500 font-medium text-gray-700"></div><div><label class="text-xs text-gray-400 font-bold">Endereço de Coleta</label><input type="text" id="edit-endereco" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500 font-medium text-gray-700"></div></div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4"><p class="text-xs font-bold text-gray-600 uppercase tracking-widest border-b pb-2">Responsável</p><div><label class="text-xs text-gray-400 font-bold">Nome Completo</label><input type="text" id="edit-resp-nome" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500 font-medium text-gray-700"></div><div><label class="text-xs text-gray-400 font-bold">CPF</label><input type="tel" id="edit-cpf-resp" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500 font-medium text-gray-700"></div><div><label class="text-xs text-gray-400 font-bold">WhatsApp Pessoal</label><input type="tel" id="edit-resp-zap" class="w-full border-b py-2 text-sm focus:outline-none focus:border-blue-500 font-medium text-gray-700"></div></div>
+            <div class="bg-red-50 p-5 rounded-2xl border border-red-100 space-y-3"><p class="text-xs font-bold text-red-400 uppercase tracking-widest">Segurança</p><button onclick="abrirModalAlterarPin()" class="w-full bg-white border border-red-200 text-red-500 font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-key"></i> Gerenciar PIN de Pagamento</button><button onclick="abrirModalAlterarSenha()" class="w-full bg-white border border-gray-200 text-gray-600 font-bold py-3 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm"><i class="fas fa-lock"></i> Alterar Senha de Login</button></div>
+            <button onclick="salvarPerfil()" id="btn-save-perf" class="w-full btn-primary font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform text-lg">Salvar Alterações</button>
+        </div>
+    </div>
+
     <div id="modal-comprovante" class="hidden fixed inset-0 bg-black/80 z-[200] flex items-center justify-center p-4 fade-in" style="display:none">
-        <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl relative">
-            <button onclick="document.getElementById('modal-comprovante').style.display='none'" class="absolute top-2 right-2 text-gray-400 p-2 text-xl">&times;</button>
-            <div class="bg-gray-50 p-6 text-center border-b border-gray-100">
-                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-600 text-2xl"><i class="fas fa-receipt"></i></div>
-                <h3 class="font-bold text-gray-800 text-lg">Comprovante</h3>
-                <p class="text-xs text-gray-500 uppercase tracking-widest">Transação</p>
-            </div>
-            <div class="p-6 space-y-4">
-                <div class="flex justify-between border-b border-dashed border-gray-200 pb-2"><span class="text-gray-500 text-sm">Valor</span><span id="comp-valor" class="font-bold text-gray-800 text-lg">R$ 0,00</span></div>
-                <div class="flex justify-between border-b border-dashed border-gray-200 pb-2"><span class="text-gray-500 text-sm">Data</span><span id="comp-data" class="font-bold text-gray-700 text-sm">--/--/--</span></div>
-                <div class="flex justify-between border-b border-dashed border-gray-200 pb-2"><span class="text-gray-500 text-sm">Tipo</span><span id="comp-tipo" class="font-bold text-blue-600 text-sm">Crédito</span></div>
-                <div><span class="text-gray-500 text-xs block mb-1">Descrição</span><p id="comp-desc" class="font-medium text-gray-800 text-sm bg-gray-50 p-3 rounded-lg border border-gray-100">...</p></div>
-                <div class="pt-2"><p class="text-[10px] text-gray-400 text-center font-mono">ID: <span id="comp-id">...</span></p></div>
-            </div>
-            <button onclick="document.getElementById('modal-comprovante').style.display='none'" class="w-full bg-blue-600 text-white font-bold py-4 hover:bg-blue-700 transition">FECHAR</button>
-        </div>
+        <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl relative"><button onclick="document.getElementById('modal-comprovante').style.display='none'" class="absolute top-2 right-2 text-gray-400 p-2 text-xl">&times;</button><div class="bg-gray-50 p-6 text-center border-b border-gray-100"><div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 text-blue-600 text-2xl"><i class="fas fa-receipt"></i></div><h3 class="font-bold text-gray-800 text-lg">Comprovante</h3><p class="text-xs text-gray-500 uppercase tracking-widest">Transação</p></div><div class="p-6 space-y-4"><div class="flex justify-between border-b border-dashed border-gray-200 pb-2"><span class="text-gray-500 text-sm">Valor</span><span id="comp-valor" class="font-bold text-gray-800 text-lg">R$ 0,00</span></div><div class="flex justify-between border-b border-dashed border-gray-200 pb-2"><span class="text-gray-500 text-sm">Data</span><span id="comp-data" class="font-bold text-gray-700 text-sm">--/--/--</span></div><div class="flex justify-between border-b border-dashed border-gray-200 pb-2"><span class="text-gray-500 text-sm">Tipo</span><span id="comp-tipo" class="font-bold text-blue-600 text-sm">Crédito</span></div><div><span class="text-gray-500 text-xs block mb-1">Descrição</span><p id="comp-desc" class="font-medium text-gray-800 text-sm bg-gray-50 p-3 rounded-lg border border-gray-100">...</p></div><div class="pt-2"><p class="text-[10px] text-gray-400 text-center font-mono">ID: <span id="comp-id">...</span></p></div></div><button onclick="document.getElementById('modal-comprovante').style.display='none'" class="w-full bg-blue-600 text-white font-bold py-4 hover:bg-blue-700 transition">FECHAR</button></div>
     </div>
-
-    <div id="modal-gerenciar-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[150] flex items-center justify-center p-4 fade-in" style="display:none">
-        <div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl">
-            <h2 class="text-lg font-bold text-gray-800 mb-2">Alterar PIN</h2>
-            <p class="text-xs text-gray-500 mb-4">Defina 4 números para autorizar pedidos.</p>
-            <div class="space-y-3 mb-4">
-                <input type="tel" id="input-novo-pin" maxlength="4" class="w-full border rounded-lg p-3 text-center text-lg font-bold tracking-widest" placeholder="Novo PIN">
-                <input type="tel" id="input-conf-pin" maxlength="4" class="w-full border rounded-lg p-3 text-center text-lg font-bold tracking-widest" placeholder="Confirmar">
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="document.getElementById('modal-gerenciar-pin').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button>
-                <button onclick="salvarNovoPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Salvar</button>
-            </div>
-        </div>
-    </div>
-
+    <div id="modal-gerenciar-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[150] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl"><h2 class="text-lg font-bold text-gray-800 mb-2">Alterar PIN</h2><p class="text-xs text-gray-500 mb-4">Defina 4 números para autorizar pedidos.</p><div class="space-y-3 mb-4"><input type="tel" id="input-novo-pin" maxlength="4" class="w-full border rounded-lg p-3 text-center text-lg font-bold tracking-widest" placeholder="Novo PIN"><input type="tel" id="input-conf-pin" maxlength="4" class="w-full border rounded-lg p-3 text-center text-lg font-bold tracking-widest" placeholder="Confirmar"></div><div class="grid grid-cols-2 gap-3"><button onclick="document.getElementById('modal-gerenciar-pin').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button><button onclick="salvarNovoPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Salvar</button></div></div></div>
     <div id="modal-detalhes" class="hidden fixed inset-0 bg-black/80 z-[150] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto"><button onclick="document.getElementById('modal-detalhes').style.display='none'" class="absolute top-2 right-3 text-gray-400 text-2xl z-10">&times;</button><div class="bg-blue-600 p-6 text-white"><h3 class="font-bold text-xl mb-1">Detalhes da Entrega</h3><div class="flex items-center gap-2 mt-1"><p id="det-id-visual" class="text-sm bg-blue-700 px-2 py-0.5 rounded font-mono">#00000</p><p id="det-status" class="text-xs bg-white/20 px-2 py-1 rounded">Carregando...</p></div></div><div class="p-6 space-y-4"><div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100"><div><p class="text-xs text-gray-500 uppercase font-bold">Valor da Entrega</p><p id="det-valor" class="text-2xl font-bold text-green-700">R$ --,--</p></div><div class="text-right"><p class="text-xs text-gray-500 uppercase font-bold">PIN Entrega</p><p id="det-pin" class="text-xl font-mono font-bold text-blue-600">----</p></div></div><div class="space-y-3 border-b pb-4"><div class="flex gap-3"><div class="flex flex-col items-center"><i class="fas fa-circle text-blue-600 text-[10px] mt-1"></i><div class="h-full w-0.5 bg-gray-200 my-1"></div><i class="fas fa-map-marker-alt text-red-500"></i></div><div class="flex-1 space-y-4"><div><p class="text-xs text-gray-400 font-bold">RETIRADA</p><p id="det-origem" class="text-sm font-medium text-gray-700">...</p></div><div><p class="text-xs text-gray-400 font-bold">ENTREGA</p><p id="det-destino" class="text-sm font-medium text-gray-700">...</p></div></div></div></div><div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl border border-blue-100"><p class="text-xs text-blue-500 font-bold uppercase mb-3 flex items-center gap-2"><i class="fas fa-motorcycle"></i> Dados do Entregador</p><div class="flex items-center gap-4 mb-3"><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-blue-600 text-xl"><i class="fas fa-user"></i></div><div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs text-gray-500 font-mono bg-gray-200 px-1 rounded inline-block">PLACA</p></div></div><p id="det-moto-modelo" class="text-xs text-gray-600 mb-3 ml-16 -mt-2">Modelo Moto</p><button id="btn-zap-moto" onclick="" class="w-full bg-green-500 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-green-600 mb-2"><i class="fab fa-whatsapp"></i> Chamar no WhatsApp</button><button id="btn-avaliar" class="w-full bg-yellow-400 text-black py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-yellow-500 mt-2 hidden" onclick="abrirModalAvaliacao()">Avaliar Motoboy</button></div><div id="box-cancelar" class="hidden pt-2"><button id="btn-cancelar-detalhe" onclick="" class="w-full text-red-500 font-bold text-sm border border-red-200 py-3 rounded-xl hover:bg-red-50">Cancelar Pedido</button></div></div></div></div>
-
     <div id="modal-success" class="hidden fixed inset-0 bg-green-900/90 z-[150] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-8 text-center w-full max-w-xs shadow-2xl"><div class="mx-auto bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mb-4"><i class="fas fa-check text-4xl text-green-600"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-2">Sucesso!</h2><p class="text-sm text-gray-500 mb-6">Pedido enviado.</p><div class="bg-gray-100 p-4 rounded-xl border-2 border-dashed border-gray-300 mb-6"><p class="text-xs text-gray-400 uppercase tracking-widest mb-1">PIN DE SEGURANÇA</p><p id="display-pin" class="text-4xl font-mono font-bold text-blue-600 tracking-widest">0000</p></div><button onclick="location.reload()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-xl">Fechar</button></div></div>
     <div id="modal-pin" class="hidden fixed inset-0 bg-gray-900/90 z-[150] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-3xl p-6 text-center w-full max-w-xs shadow-2xl"><h2 class="text-lg font-bold text-gray-800 mb-2">Segurança</h2><p class="text-sm text-gray-500 mb-4">Digite seu PIN de 4 dígitos</p><input type="tel" id="input-confirm-pin" maxlength="4" class="w-full bg-gray-100 border rounded-xl p-4 text-center text-2xl font-bold tracking-widest mb-4 outline-none focus:ring-2 focus:ring-blue-500"><div class="grid grid-cols-2 gap-3"><button onclick="document.getElementById('modal-pin').style.display='none'" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-xl">Cancelar</button><button onclick="confirmarPin()" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl">Confirmar</button></div></div></div>
     <div id="modal-avaliacao" class="hidden fixed inset-0 bg-black/80 z-[150] flex items-center justify-center p-4 fade-in" style="display:none"><div class="bg-white rounded-2xl w-full max-w-sm p-6 text-center shadow-2xl relative"><button onclick="document.getElementById('modal-avaliacao').classList.add('hidden')" class="absolute top-2 right-2 text-gray-400 p-2 text-xl">&times;</button><div class="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4 text-yellow-500 text-2xl"><i class="fas fa-star"></i></div><h3 class="text-xl font-bold text-gray-800 mb-1">Avaliar Entrega</h3><p class="text-sm text-gray-500 mb-4">O que achou do serviço?</p><div class="star-rating justify-center mb-4"><input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label><input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label><input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label><input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label><input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label></div><textarea id="av-comentario" class="w-full border rounded-lg p-3 text-sm mb-4 bg-gray-50" placeholder="Deixe um comentário (opcional)..." rows="3"></textarea><button onclick="enviarAvaliacao()" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-xl shadow-lg">ENVIAR AVALIAÇÃO</button><input type="hidden" id="av-pedido-id"><input type="hidden" id="av-motoboy-id"></div></div>
@@ -213,19 +236,37 @@
         window.onload = async function() {
             if(typeof $ !== 'undefined') { $(document).ready(function(){ $('#reg-zap-loja, #reg-zap-resp, #tel_dest, #edit-zap-loja, #edit-resp-zap').mask('(00) 00000-0000'); $('#reg-cnpj, #edit-cnpj').mask('00.000.000/0000-00'); $('#reg-cpf-resp, #edit-cpf-resp').mask('000.000.000-00'); }); }
             
-            // Segurança: Timeout para o loading, mas SÓ REDIRECIONA SE NÃO TIVER SESSÃO
+            // TIMEOUT DE SEGURANÇA: Se travar por 5s, libera APENAS SE TIVER SESSÃO
+            // Se não tiver sessão, manda pro Login. Isso evita o loop infinito.
             setTimeout(() => { 
                 const l=document.getElementById('global-loading'); 
                 if(l && l.style.display !== 'none'){
-                    // Se passar 4s e o JS não tiver decidido, vamos verificar a sessão manualmente
-                    checkSessionAndRedirect();
+                    if(!userSession) { showScreen('welcome'); } // Sem login -> Login
+                    else { l.style.display='none'; } // Com login -> Libera (banco demorou mas tá logado)
                 }
-            }, 4000);
+            }, 5000);
             
             try { await carregarAppConfig(); } catch(e) { console.error("Config error:", e); }
             
-            checkSessionAndRedirect();
-
+            // CHECK SESSÃO PRIMEIRO
+            const { data: { session }, error } = await sbClient.auth.getSession();
+            if (session && !error) { 
+                userSession = session; 
+                // Pequeno delay para garantir estabilidade
+                await new Promise(r => setTimeout(r, 100));
+                
+                const last = localStorage.getItem('lastScreen') || 'app';
+                showScreen(last); 
+                carregarPerfil(true); 
+                
+                // Carrega dados da tela APÓS garantir que a tela existe
+                if(last === 'pedidos') carregarHistoricoPedidos(); 
+                if(last === 'extrato') carregarExtrato(); 
+            } else { 
+                document.getElementById('global-loading').style.display = 'none'; 
+                showScreen('welcome'); 
+            }
+            
             sbClient.auth.onAuthStateChange(async (event, session) => { 
                 if(isRegistering) return; 
                 if(event === 'SIGNED_IN' && session){ 
@@ -241,27 +282,27 @@
             setupAutocomplete();
         };
 
-        async function checkSessionAndRedirect() {
-            const { data: { session }, error } = await sbClient.auth.getSession();
-            if (session && !error) { 
-                userSession = session; 
-                showScreen(localStorage.getItem('lastScreen') || 'app'); 
-                carregarPerfil(true); 
-                if(localStorage.getItem('lastScreen') === 'pedidos') carregarHistoricoPedidos(); 
-                if(localStorage.getItem('lastScreen') === 'extrato') carregarExtrato(); 
-            } else { 
-                document.getElementById('global-loading').style.display = 'none'; 
-                showScreen('welcome'); 
-            }
-        }
-
-        async function carregarAppConfig() { const{data}=await sbClient.from('app_config').select('*').single(); if(data){ APP_CONFIG={...APP_CONFIG, ...data}; APP_CONFIG.taxa_base=parseFloat(data.taxa_base); APP_CONFIG.preco_km=parseFloat(data.preco_km); APP_CONFIG.taxa_retorno_valor=parseFloat(data.taxa_retorno_valor); APP_CONFIG.taxa_app_percent=parseFloat(data.taxa_app_percent); } }
+        async function carregarAppConfig() { try{const{data}=await sbClient.from('app_config').select('*').single(); if(data){ APP_CONFIG={...APP_CONFIG, ...data}; APP_CONFIG.taxa_base=parseFloat(data.taxa_base); APP_CONFIG.preco_km=parseFloat(data.preco_km); APP_CONFIG.taxa_retorno_valor=parseFloat(data.taxa_retorno_valor); APP_CONFIG.taxa_app_percent=parseFloat(data.taxa_app_percent); }}catch(e){} }
         function toggleSidebar() { const menu = document.getElementById('sidebar-menu'); const overlay = document.getElementById('sidebar-overlay'); menu.classList.toggle('open'); if (menu.classList.contains('open')) { overlay.style.display = 'block'; } else { overlay.style.display = 'none'; } }
         function showScreen(id){ ['welcome','register','login','app','pedidos','extrato','perfil'].forEach(s=>{ const e=document.getElementById('screen-'+s); if(e){ e.style.display='none'; } }); const t=document.getElementById('screen-'+id); if(t){ document.getElementById('global-loading').style.display='none'; if(['welcome','login','register'].includes(id)) { t.style.display='flex'; document.getElementById('app-header').style.display = 'none'; } else { t.style.display='block'; document.getElementById('app-header').style.display = 'flex'; } window.scrollTo(0,0); } document.getElementById('sidebar-menu').classList.remove('open'); document.getElementById('sidebar-overlay').style.display = 'none'; }
         function navegar(t, titulo){ localStorage.setItem('lastScreen',t); showScreen(t); if(t==='perfil')carregarPerfil(); if(t==='pedidos')carregarHistoricoPedidos(); if(t==='extrato')carregarExtrato(); }
 
         async function atualizarPedidosManual() { const i=document.getElementById('icon-refresh'); if(i) i.classList.add('fa-spin'); await carregarHistoricoPedidos(); if(i) setTimeout(()=>i.classList.remove('fa-spin'),500); }
-        async function carregarHistoricoPedidos(){ const lista = document.getElementById('lista-pedidos'); if(lista.innerHTML.includes('Carregando') || lista.innerHTML === '') { lista.innerHTML = '<div class="text-center text-gray-400 mt-10"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Buscando pedidos...</div>'; } try { const{data, error}=await sbClient.from('pedidos').select('*').eq('user_id',userSession.user.id).order('created_at',{ascending:false}).limit(100); if(error) throw error; if(data){ pedidosCache=data; renderizarLista(data); atualizarContadores(data); } else { lista.innerHTML = '<div class="text-center text-gray-400 mt-10">Sem pedidos.</div>'; } } catch(e) { lista.innerHTML = '<div class="text-center text-red-400 mt-10">Erro ao carregar.<br>Tente sair e voltar.</div>'; console.error(e); }}
+        async function carregarHistoricoPedidos(){ 
+            const lista = document.getElementById('lista-pedidos'); 
+            if(!userSession) return;
+            // Só mostra loading se estiver vazio ou se for a primeira vez
+            if(lista.innerHTML.includes('Carregando') || lista.innerHTML === '') { lista.innerHTML = '<div class="text-center text-gray-400 mt-10"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Buscando pedidos...</div>'; } 
+            try { 
+                const{data, error}=await sbClient.from('pedidos').select('*').eq('user_id',userSession.user.id).order('created_at',{ascending:false}).limit(100); 
+                if(error) throw error; 
+                if(data){ pedidosCache=data; renderizarLista(data); atualizarContadores(data); } 
+                else { lista.innerHTML = '<div class="text-center text-gray-400 mt-10">Sem pedidos.</div>'; } 
+            } catch(e) { 
+                console.error(e);
+                lista.innerHTML = '<div class="text-center mt-10"><p class="text-red-400 mb-2">Erro de conexão</p><button onclick="carregarHistoricoPedidos()" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-bold">Tentar Novamente</button></div>'; 
+            }
+        }
         function renderizarLista(d){ const l=document.getElementById('lista-pedidos'); l.innerHTML=''; let f=d.filter(p=>{if(currentTab==='solicitados')return p.status==='solicitado';if(currentTab==='andamento')return['pendente','em_rota'].includes(p.status);if(currentTab==='finalizados')return['concluido','cancelado'].includes(p.status);return true;}); const i=document.getElementById('filtro-ped-ini').value,m=document.getElementById('filtro-ped-fim').value; if((currentTab==='todos'||currentTab==='finalizados')&&i&&m){const d1=new Date(i),d2=new Date(m);d2.setHours(23,59,59);f=f.filter(p=>{const d=new Date(p.created_at);return d>=d1&&d<=d2;});} if(!f.length){ l.innerHTML='<div class="text-center mt-10 text-gray-400 opacity-60"><i class="fas fa-folder-open text-4xl mb-2"></i><br>Nenhum pedido aqui</div>'; return; } 
             f.forEach(p=>{ 
                 let sClass='st-solicitado'; if(p.status==='pendente')sClass='st-pendente'; else if(p.status==='em_rota')sClass='st-em_rota'; else if(p.status==='concluido')sClass='st-concluido'; else if(p.status==='cancelado')sClass='st-cancelado';
@@ -271,7 +312,25 @@
         }
 
         async function atualizarExtratoManual() { const i=document.getElementById('icon-refresh-ext'); if(i) i.classList.add('fa-spin'); await carregarExtrato(); if(i) setTimeout(()=>i.classList.remove('fa-spin'),500); }
-        async function carregarExtrato() { const l = document.getElementById('lista-extrato'); if(l.innerHTML.includes('Carregando') || l.innerHTML === '') { l.innerHTML = '<div class="text-center mt-10 text-gray-400"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Atualizando...</div>'; } try { const { data, error } = await sbClient.from('transacoes').select('*').eq('user_id', userSession.user.id).order('created_at', {ascending:false}); if(error) throw error; l.innerHTML = ''; if(!data || !data.length) { l.innerHTML = '<div class="text-center mt-10 text-gray-400 opacity-60"><i class="fas fa-file-invoice text-4xl mb-2"></i><br>Sem movimentações</div>'; return; } data.forEach(t => { const isC = t.tipo === 'credito'; const d = t.descricao ? t.descricao.replace(/['"]/g, "") : "Transação"; l.insertAdjacentHTML('beforeend', `<div class="transacao-item px-4 bg-white mx-4 rounded-xl mb-2 py-3 border border-gray-100 shadow-sm flex items-center" onclick="verComprovante('${t.id}', '${d}', '${parseFloat(t.valor).toFixed(2)}', '${t.created_at}', '${t.tipo}')"><div class="w-10 h-10 rounded-full ${isC?'bg-green-100 text-green-600':'bg-red-100 text-red-600'} flex items-center justify-center mr-3"><i class="fas ${isC?'fa-arrow-down':'fa-arrow-up'} text-sm"></i></div><div class="flex-1"><p class="font-bold text-gray-700 text-sm truncate">${t.descricao}</p><p class="text-[10px] text-gray-400">${new Date(t.created_at).toLocaleDateString()}</p></div><div class="text-right ml-2"><p class="transacao-valor ${isC?'text-green-600':'text-red-600'} font-bold text-sm">${isC?'+':'-'} R$ ${parseFloat(t.valor).toFixed(2)}</p></div></div>`); }); } catch(e) { l.innerHTML = '<div class="text-center text-red-400 mt-10">Erro no extrato.</div>'; console.error(e); } }
+        async function carregarExtrato() { 
+            const l = document.getElementById('lista-extrato'); 
+            if(!userSession) return;
+            if(l.innerHTML.includes('Carregando') || l.innerHTML === '') { l.innerHTML = '<div class="text-center mt-10 text-gray-400"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><br>Atualizando...</div>'; } 
+            try { 
+                const { data, error } = await sbClient.from('transacoes').select('*').eq('user_id', userSession.user.id).order('created_at', {ascending:false}); 
+                if(error) throw error; 
+                l.innerHTML = ''; 
+                if(!data || !data.length) { l.innerHTML = '<div class="text-center mt-10 text-gray-400 opacity-60"><i class="fas fa-file-invoice text-4xl mb-2"></i><br>Sem movimentações</div>'; return; } 
+                data.forEach(t => { 
+                    const isC = t.tipo === 'credito'; 
+                    const d = t.descricao ? t.descricao.replace(/['"]/g, "") : "Transação"; 
+                    l.insertAdjacentHTML('beforeend', `<div class="transacao-item px-4 bg-white mx-4 rounded-xl mb-2 py-3 border border-gray-100 shadow-sm flex items-center" onclick="verComprovante('${t.id}', '${d}', '${parseFloat(t.valor).toFixed(2)}', '${t.created_at}', '${t.tipo}')"><div class="w-10 h-10 rounded-full ${isC?'bg-green-100 text-green-600':'bg-red-100 text-red-600'} flex items-center justify-center mr-3"><i class="fas ${isC?'fa-arrow-down':'fa-arrow-up'} text-sm"></i></div><div class="flex-1"><p class="font-bold text-gray-700 text-sm truncate">${t.descricao}</p><p class="text-[10px] text-gray-400">${new Date(t.created_at).toLocaleDateString()}</p></div><div class="text-right ml-2"><p class="transacao-valor ${isC?'text-green-600':'text-red-600'} font-bold text-sm">${isC?'+':'-'} R$ ${parseFloat(t.valor).toFixed(2)}</p></div></div>`); 
+                }); 
+            } catch(e) { 
+                l.innerHTML = '<div class="text-center mt-10"><p class="text-red-400 mb-2">Erro no extrato</p><button onclick="carregarExtrato()" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-bold">Tentar Novamente</button></div>'; 
+                console.error(e); 
+            } 
+        }
         function verComprovante(id, desc, valor, data, tipo) { document.getElementById('comp-id').innerText = id; document.getElementById('comp-desc').innerText = desc; document.getElementById('comp-valor').innerText = "R$ " + valor; document.getElementById('comp-data').innerText = new Date(data).toLocaleString(); const elTipo = document.getElementById('comp-tipo'); elTipo.innerText = tipo === 'credito' ? 'Crédito (Entrada)' : 'Débito (Saída)'; elTipo.className = tipo === 'credito' ? 'font-bold text-green-600 text-sm' : 'font-bold text-red-600 text-sm'; document.getElementById('modal-comprovante').style.display = 'flex'; }
 
         // --- CORE ---
