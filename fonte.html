@@ -19,19 +19,39 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
         /* HEADER AZUL */
-        .portal-header { background-color: #1E40AF; color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 50; }
+        .portal-header { background-color: #1E40AF; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 40; }
         
-        /* INPUTS & LAYOUT */
-        .main-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .input-std { width: 100%; background: #fff; border: 1px solid #e5e7eb; padding: 14px; border-radius: 12px; font-size: 14px; outline: none; transition: 0.2s; }
+        /* SIDEBAR (MENU LATERAL) */
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; backdrop-filter: blur(2px); }
+        .sidebar-menu { position: fixed; top: 0; left: 0; bottom: 0; width: 280px; background: white; z-index: 101; transform: translateX(-100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-menu.open { transform: translateX(0); }
+        
+        .menu-link { padding: 16px 20px; font-weight: 600; color: #374151; display: flex; align-items: center; gap: 12px; border-left: 4px solid transparent; cursor: pointer; transition: 0.2s; }
+        .menu-link:hover, .menu-link.active { background: #eff6ff; color: #1E40AF; border-left-color: #1E40AF; }
+
+        /* INPUTS */
+        .input-std { width: 100%; background: #fff; border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s; }
         .input-std:focus { border-color: #2563EB; ring: 2px solid #bfdbfe; }
         
-        /* DROPDOWNS CUSTOMIZADOS (Estilo Antigo Restaurado) */
-        .custom-select-btn { width: 100%; text-align: left; padding: 14px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-weight: 700; color: #374151; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
-        .custom-select-btn:hover { border-color: #2563EB; }
-        .custom-options { display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 12px; margin-top: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 100; overflow: hidden; max-height: 300px; overflow-y: auto; }
-        .custom-options.show { display: block; animation: fadeIn 0.1s; }
-        .custom-option { padding: 12px 16px; cursor: pointer; font-size: 14px; font-weight: 600; color: #4B5563; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 10px; }
+        /* DROPDOWNS CUSTOMIZADOS (CORRIGIDO TRANSPARÊNCIA) */
+        .custom-select-btn { width: 100%; text-align: left; padding: 14px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-weight: 700; color: #374151; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; position: relative; z-index: 10; }
+        
+        .custom-options { 
+            display: none; 
+            position: absolute; 
+            top: 100%; left: 0; right: 0; 
+            background-color: #ffffff !important; /* Força fundo branco sólido */
+            border: 1px solid #e5e7eb; 
+            border-radius: 12px; 
+            margin-top: 6px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            z-index: 100 !important; /* Z-Index alto */
+            overflow: hidden; 
+            max-height: 250px; 
+            overflow-y: auto; 
+        }
+        
+        .custom-option { padding: 12px 16px; cursor: pointer; font-size: 14px; font-weight: 600; color: #4B5563; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 10px; background: white; }
         .custom-option:hover { background-color: #eff6ff; color: #1E40AF; }
 
         /* SWITCH TOGGLE */
@@ -47,11 +67,14 @@
         .btn-primary { background: #1E40AF; color: white; width: 100%; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 16px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; border: none; }
         .btn-primary:active { transform: scale(0.98); }
 
-        /* LISTAS */
-        .transacao-item, .pedido-item { transition: 0.1s; cursor: pointer; }
-        .transacao-item:hover, .pedido-item:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        /* LISTAS & BADGES */
+        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .bg-solicitado { background: #e5e7eb; color: #374151; }
+        .bg-pendente { background: #fef3c7; color: #d97706; }
+        .bg-em_rota { background: #dbeafe; color: #1e40af; }
+        .bg-concluido { background: #d1fae5; color: #059669; }
+        .bg-cancelado { background: #fee2e2; color: #991b1b; }
 
-        /* MODAIS */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
         @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -92,46 +115,72 @@
         </div>
     </div>
 
+    <div id="menu-overlay" class="sidebar-overlay" onclick="toggleMenu()"></div>
+    <div id="sidebar" class="sidebar-menu">
+        <div class="p-6 bg-blue-700 text-white pt-10">
+            <div class="flex items-center gap-3 mb-2">
+                <img id="menu-img" src="https://via.placeholder.com/150" class="w-14 h-14 rounded-full border-2 border-white bg-gray-200 object-cover">
+                <div>
+                    <p class="font-bold text-lg leading-tight truncate w-32" id="menu-nome">...</p>
+                    <p class="text-xs text-blue-200">Portal Cliente</p>
+                </div>
+            </div>
+        </div>
+        <div class="flex-1 py-4">
+            <div class="menu-link active" onclick="mudarTela('home'); toggleMenu()"><i class="fas fa-plus-circle text-lg"></i> Nova Solicitação</div>
+            <div class="menu-link" onclick="mudarTela('pedidos'); toggleMenu()"><i class="fas fa-list text-lg"></i> Meus Pedidos</div>
+            <div class="menu-link" onclick="mudarTela('extrato'); toggleMenu()"><i class="fas fa-wallet text-lg"></i> Financeiro</div>
+            <div class="menu-link" onclick="mudarTela('perfil'); toggleMenu()"><i class="fas fa-user-cog text-lg"></i> Perfil e Segurança</div>
+        </div>
+        <div class="p-4 border-t">
+            <button onclick="fazerLogout()" class="w-full flex items-center justify-center gap-2 text-red-500 font-bold py-3 hover:bg-red-50 rounded-xl transition"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </div>
+
     <div id="screen-app" class="hidden min-h-screen flex flex-col">
         
         <header class="portal-header">
-            <div class="flex items-center gap-3">
-                <div class="bg-white/20 p-2 rounded-full w-10 h-10 flex items-center justify-center font-bold text-sm" id="avatar-letras">LJ</div>
+            <div class="flex items-center gap-3 cursor-pointer hover:opacity-90 transition" onclick="toggleMenu()">
+                <div class="bg-white/20 p-1 rounded-full border border-white/30">
+                    <div class="bg-white text-blue-800 w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm overflow-hidden" id="header-avatar">
+                        <img id="header-foto" src="" class="w-full h-full object-cover hidden">
+                        <span id="header-iniciais">LJ</span>
+                    </div>
+                </div>
                 <div>
-                    <p class="text-xs opacity-75">Bem-vindo(a)</p>
-                    <p class="font-bold text-sm leading-tight flex items-center gap-2">
-                        ID: <span id="header-id" class="font-mono bg-blue-900 px-2 rounded">...</span>
+                    <p class="text-[10px] opacity-75 uppercase tracking-widest">Menu</p>
+                    <p class="font-bold text-sm flex items-center gap-2">
+                        ID: <span id="header-id" class="font-mono bg-blue-900/50 px-1.5 rounded">...</span>
+                        <i class="fas fa-chevron-down text-[10px] opacity-50"></i>
                     </p>
                 </div>
             </div>
-            <div class="text-right">
-                <h1 class="font-extrabold text-xl tracking-tight">Drop Entregas</h1>
-                <p class="text-[10px] opacity-70 uppercase tracking-widest">Portal do Cliente</p>
+            
+            <div class="flex items-center gap-2">
+                <div class="text-right">
+                    <h1 class="font-extrabold text-lg tracking-tight">Drop Entregas</h1>
+                </div>
+                <div class="bg-white text-blue-700 w-8 h-8 rounded-lg flex items-center justify-center shadow-sm">
+                    <i class="fas fa-box-open"></i>
+                </div>
             </div>
         </header>
 
-        <main class="main-container flex-1 w-full">
+        <main class="main-container flex-1 w-full p-4 md:p-8 max-w-4xl mx-auto">
             
-            <div class="flex gap-2 overflow-x-auto pb-4 no-scrollbar mb-4 border-b border-gray-200">
-                <button onclick="mudarTela('home')" class="nav-tab px-6 py-2 rounded-full font-bold text-sm transition bg-blue-600 text-white" id="nav-home"><i class="fas fa-plus mr-2"></i>Nova Solicitação</button>
-                <button onclick="mudarTela('pedidos')" class="nav-tab px-6 py-2 rounded-full font-bold text-sm transition bg-white text-gray-600 hover:bg-gray-100" id="nav-pedidos"><i class="fas fa-list mr-2"></i>Pedidos</button>
-                <button onclick="mudarTela('extrato')" class="nav-tab px-6 py-2 rounded-full font-bold text-sm transition bg-white text-gray-600 hover:bg-gray-100" id="nav-extrato"><i class="fas fa-wallet mr-2"></i>Financeiro</button>
-                <button onclick="mudarTela('perfil')" class="nav-tab px-6 py-2 rounded-full font-bold text-sm transition bg-white text-gray-600 hover:bg-gray-100" id="nav-perfil"><i class="fas fa-user mr-2"></i>Perfil</button>
-            </div>
-
-            <div id="view-home" class="fade-in max-w-4xl mx-auto">
+            <div id="view-home" class="fade-in">
                 
-                <div class="bg-gradient-to-r from-blue-700 to-blue-500 rounded-2xl p-6 text-white shadow-lg mb-8 relative overflow-hidden flex justify-between items-end">
+                <div class="bg-gradient-to-r from-blue-700 to-blue-600 rounded-2xl p-6 text-white shadow-lg mb-6 relative overflow-hidden flex justify-between items-end">
                     <div>
-                        <p class="text-sm font-bold opacity-80 uppercase tracking-widest mb-1">Saldo Disponível</p>
-                        <h2 class="text-4xl font-extrabold" id="dash-saldo">R$ 0,00</h2>
+                        <p class="text-xs font-bold opacity-80 uppercase tracking-widest mb-1">Saldo Disponível</p>
+                        <h2 class="text-3xl font-extrabold" id="dash-saldo">R$ 0,00</h2>
                     </div>
-                    <button onclick="addSaldo()" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-6 rounded-lg backdrop-blur-sm transition border border-white/30"><i class="fas fa-plus mr-2"></i> Recarregar</button>
+                    <button onclick="addSaldo()" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-4 rounded-lg backdrop-blur-sm transition border border-white/30 text-xs flex items-center gap-2"><i class="fas fa-plus"></i> Adicionar</button>
                     <i class="fas fa-wallet absolute -right-6 -bottom-8 text-9xl opacity-10"></i>
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                    <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2"><i class="fas fa-paper-plane text-blue-600"></i> Criar Solicitação</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2 pb-4 border-b"><i class="fas fa-paper-plane text-blue-600"></i> Nova Solicitação</h3>
 
                     <div class="mb-6 relative z-30">
                         <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">O que vamos entregar?</label>
@@ -151,28 +200,28 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-1 gap-4 mb-6">
                         <div class="relative">
                             <i class="fas fa-store text-blue-600 absolute left-4 top-4"></i>
                             <input type="text" id="origem" class="input-std pl-10 bg-gray-50 font-bold text-gray-600 cursor-not-allowed" readonly placeholder="Retirada (Sua Loja)">
                         </div>
                         <div class="relative">
                             <i class="fas fa-map-marker-alt text-red-500 absolute left-4 top-4"></i>
-                            <input type="text" id="destino" class="input-std pl-10 font-medium" placeholder="Onde vamos entregar? (Rua, Número, Bairro)" oninput="buscarEndereco(this.value)">
+                            <input type="text" id="destino" class="input-std pl-10 font-medium border-blue-100 focus:border-blue-500" placeholder="Onde vamos entregar? (Rua, Número, Bairro)" oninput="buscarEndereco(this.value)">
                             <div id="sugestoes-lista" class="hidden absolute top-full left-0 right-0 bg-white border rounded-xl shadow-xl z-20 mt-1 max-h-48 overflow-y-auto"></div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <input type="text" id="nome_dest" class="input-std" placeholder="Nome do Cliente*">
-                        <input type="tel" id="tel_dest" class="input-std" placeholder="WhatsApp do Cliente*">
-                        <input type="text" id="complemento" class="input-std" placeholder="Complemento (Apto, Bloco)">
-                        <input type="text" id="referencia" class="input-std" placeholder="Ponto de Referência*">
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <input type="text" id="nome_dest" class="input-std" placeholder="Nome Cliente*">
+                        <input type="tel" id="tel_dest" class="input-std" placeholder="WhatsApp*">
+                        <input type="text" id="complemento" class="input-std" placeholder="Complemento">
+                        <input type="text" id="referencia" class="input-std" placeholder="Referência*">
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         <div class="relative z-20">
-                            <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pagamento da Entrega</label>
+                            <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pagamento Entrega</label>
                             <div class="custom-select-btn" onclick="toggleDropdown('entrega')">
                                 <span id="display-entrega">💠 PIX</span>
                                 <i class="fas fa-chevron-down text-gray-400" id="arrow-entrega"></i>
@@ -185,7 +234,7 @@
                             </div>
                         </div>
                         <div class="relative z-20">
-                            <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pagamento do Produto</label>
+                            <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pagamento Produto</label>
                             <div class="custom-select-btn" onclick="toggleDropdown('produto')">
                                 <span id="display-produto">✅ Pago</span>
                                 <i class="fas fa-chevron-down text-gray-400" id="arrow-produto"></i>
@@ -200,7 +249,7 @@
                         </div>
                     </div>
 
-                    <label class="switch-container mb-4">
+                    <label class="switch-container mb-6">
                         <div class="flex items-center gap-3">
                             <div class="p-2 rounded-full bg-gray-100" id="bg-icon-retorno"><i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i></div>
                             <div>
@@ -214,7 +263,7 @@
                         </div>
                     </label>
 
-                    <button onclick="calcularDistancia()" id="btn-calcular" class="btn-primary mt-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    <button onclick="calcularDistancia()" id="btn-calcular" class="btn-primary shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                         Calcular Valor
                     </button>
 
@@ -232,9 +281,9 @@
                 </div>
             </div>
 
-            <div id="view-pedidos" class="hidden fade-in max-w-5xl mx-auto">
+            <div id="view-pedidos" class="hidden fade-in">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="font-bold text-2xl text-gray-800">Histórico de Pedidos</h2>
+                    <h2 class="font-bold text-2xl text-gray-800">Histórico</h2>
                     <button onclick="atualizarPedidosManual()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-gray-50 flex items-center gap-2"><i class="fas fa-sync-alt"></i> Atualizar</button>
                 </div>
 
@@ -248,7 +297,7 @@
                 <div id="lista-pedidos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
-            <div id="view-extrato" class="hidden fade-in max-w-4xl mx-auto">
+            <div id="view-extrato" class="hidden fade-in">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="font-bold text-2xl text-gray-800">Movimentações</h2>
                     <button onclick="atualizarExtratoManual()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-gray-50"><i class="fas fa-sync-alt"></i></button>
@@ -261,21 +310,23 @@
                 <div id="lista-extrato" class="space-y-3"></div>
             </div>
 
-            <div id="view-perfil" class="hidden fade-in max-w-3xl mx-auto">
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-200">
-                    <div class="flex flex-col md:flex-row items-center gap-8 mb-8 pb-8 border-b border-gray-100">
+            <div id="view-perfil" class="hidden fade-in">
+                <h2 class="font-bold text-2xl text-gray-800 mb-6">Meu Perfil</h2>
+                
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-6">
+                    <div class="flex items-center gap-6 pb-6 border-b border-gray-100">
                         <div class="relative group">
-                            <img id="edit-img-perfil" src="https://via.placeholder.com/150" class="w-32 h-32 rounded-full object-cover border-4 border-gray-100 group-hover:border-blue-100 transition">
-                            <button onclick="document.getElementById('input-foto').click()" class="absolute bottom-0 right-0 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition transform hover:scale-110"><i class="fas fa-camera"></i></button>
+                            <img id="edit-img-perfil" src="https://via.placeholder.com/150" class="w-24 h-24 rounded-full object-cover border-4 border-gray-100">
+                            <button onclick="document.getElementById('input-foto').click()" class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700"><i class="fas fa-camera"></i></button>
                             <input type="file" id="input-foto" class="hidden" accept="image/*" onchange="uploadFoto()">
                         </div>
-                        <div class="text-center md:text-left">
-                            <h3 id="edit-display-nome" class="font-bold text-2xl text-gray-800">Minha Loja</h3>
-                            <p class="text-gray-500">Gerencie seus dados e segurança</p>
+                        <div>
+                            <h3 id="edit-display-nome" class="font-bold text-xl text-gray-800">Minha Loja</h3>
+                            <p class="text-gray-500 text-sm">Gerencie seus dados e segurança</p>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div><label class="text-xs font-bold text-gray-400 uppercase">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="input-std mt-1"></div>
                         <div><label class="text-xs font-bold text-gray-400 uppercase">Razão Social</label><input type="text" id="edit-razao" class="input-std mt-1"></div>
                         <div><label class="text-xs font-bold text-gray-400 uppercase">CNPJ</label><input type="tel" id="edit-cnpj" class="input-std mt-1"></div>
@@ -289,7 +340,6 @@
                     </div>
 
                     <button onclick="salvarPerfil()" class="btn-primary mb-4">Salvar Alterações</button>
-                    <button onclick="fazerLogout()" class="w-full text-red-500 font-bold hover:bg-red-50 py-4 rounded-xl transition">Sair da Conta</button>
                 </div>
             </div>
 
@@ -326,7 +376,7 @@
     <div id="modal-comprovante" class="modal-overlay">
         <div class="modal-content text-center p-8">
             <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600 text-3xl"><i class="fas fa-receipt"></i></div>
-            <h3 class="font-bold text-2xl text-gray-800 mb-6">Comprovante</h3>
+            <h3 class="font-bold text-2xl text-gray-800 mb-6">Comprovante de Transação</h3>
             <div class="text-left space-y-4 bg-gray-50 p-6 rounded-2xl border border-gray-100">
                 <div class="flex justify-between border-b border-dashed border-gray-300 pb-3"><span class="text-gray-500 font-medium">Valor</span><span id="comp-valor" class="font-bold text-lg text-gray-900">R$ 0,00</span></div>
                 <div class="flex justify-between border-b border-dashed border-gray-300 pb-3"><span class="text-gray-500 font-medium">Data</span><span id="comp-data" class="font-bold text-gray-700">--/--</span></div>
@@ -342,8 +392,8 @@
             <p class="text-sm text-gray-500 mb-6">Digite 4 números para segurança.</p>
             <input type="tel" id="novo-pin" maxlength="4" class="input-std text-center text-3xl font-bold tracking-[0.5em] mb-6" placeholder="0000">
             <div class="flex gap-4">
-                <button onclick="$('#modal-pin').fadeOut(200)" class="flex-1 bg-gray-100 py-3 rounded-xl font-bold text-gray-600">Cancelar</button>
-                <button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">Salvar</button>
+                <button onclick="$('#modal-pin').fadeOut(200)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
     </div>
@@ -353,8 +403,8 @@
             <h3 class="font-bold text-xl mb-6">Nova Senha</h3>
             <input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres">
             <div class="flex gap-4">
-                <button onclick="$('#modal-senha').fadeOut(200)" class="flex-1 bg-gray-100 py-3 rounded-xl font-bold text-gray-600">Cancelar</button>
-                <button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">Salvar</button>
+                <button onclick="$('#modal-senha').fadeOut(200)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
     </div>
@@ -378,12 +428,10 @@
 
     // --- INICIALIZAÇÃO ---
     $(document).ready(function(){
-        // Máscaras
         $('#reg-zap, #edit-zap-loja, #edit-resp-zap, #tel_dest').mask('(00) 00000-0000');
         $('#edit-cnpj').mask('00.000.000/0000-00');
         $('#edit-cpf-resp').mask('000.000.000-00');
 
-        // Check Session Timeout
         setTimeout(() => {
             if($('#global-loading').is(':visible') && !user) {
                 $('#global-loading').addClass('hidden');
@@ -427,17 +475,17 @@
             $('#header-saldo, #dash-saldo').text(`R$ ${parseFloat(prof.saldo || 0).toFixed(2)}`);
             $('#origem').val(prof.endereco || prof.nome_loja);
             $('#header-id').text(prof.codigo_visual || '...');
+            $('#menu-nome').text(prof.nome_loja);
             
             if(prof.foto_perfil) {
-                $('#header-foto, #edit-img-perfil').attr('src', prof.foto_perfil);
-                $('#avatar-letras').addClass('hidden');
+                $('#header-foto, #edit-img-perfil, #menu-img').attr('src', prof.foto_perfil);
+                $('#header-iniciais').addClass('hidden');
                 $('#header-foto').removeClass('hidden');
             } else {
-                $('#avatar-letras').text(prof.nome_loja.substring(0,2).toUpperCase()).removeClass('hidden');
+                $('#header-iniciais').text(prof.nome_loja.substring(0,2).toUpperCase()).removeClass('hidden');
                 $('#header-foto').addClass('hidden');
             }
             
-            // Edit Form
             $('#edit-nome-loja').val(prof.nome_loja);
             $('#edit-razao').val(prof.razao_social);
             $('#edit-cnpj').val(prof.cnpj);
@@ -449,10 +497,14 @@
         }
     }
 
-    // --- NAVEGAÇÃO ---
+    window.toggleMenu = function() {
+        $('#sidebar').toggleClass('open');
+        $('#menu-overlay').fadeToggle(200);
+    }
+
     window.mudarTela = function(screen) {
-        $('.nav-tab').removeClass('bg-blue-600 text-white').addClass('bg-white text-gray-600 hover:bg-gray-100');
-        $(`#nav-${screen}`).removeClass('bg-white text-gray-600 hover:bg-gray-100').addClass('bg-blue-600 text-white');
+        $('.menu-link').removeClass('active');
+        $(`.menu-link[onclick*="${screen}"]`).addClass('active');
         
         $('#view-home, #view-pedidos, #view-extrato, #view-perfil').addClass('hidden');
         $(`#view-${screen}`).removeClass('hidden').addClass('fade-in');
@@ -468,11 +520,8 @@
 
     // --- DROPDOWNS ---
     window.toggleDropdown = function(id) {
-        // Fecha outros
         $('.custom-options').not(`#list-${id}`).slideUp(100);
         $('.fa-chevron-down').not(`#arrow-${id}`).removeClass('rotate-180');
-        
-        // Toggle atual
         $(`#list-${id}`).slideToggle(150);
         $(`#arrow-${id}`).toggleClass('rotate-180');
     }
@@ -489,7 +538,7 @@
         $('#list-logistica').slideUp(100);
         
         if(val === 'Logística Reversa') {
-            $('#origem').prop('readonly', false).val('').attr('placeholder', 'Onde buscar? (Endereço Livre)').removeClass('cursor-not-allowed bg-gray-50').addClass('bg-white');
+            $('#origem').prop('readonly', false).val('').attr('placeholder', 'Onde buscar?').removeClass('cursor-not-allowed bg-gray-50').addClass('bg-white');
             $('#destino').prop('readonly', true).val(profile.endereco).attr('placeholder', 'Sua Loja').addClass('cursor-not-allowed bg-gray-50');
         } else {
             $('#origem').prop('readonly', true).val(profile.endereco).addClass('cursor-not-allowed bg-gray-50');
@@ -542,7 +591,6 @@
             $('#btn-calcular').show();
             return;
         }
-        
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(async () => {
             const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', ' + CITY_FIX)}&limit=3`);
@@ -717,8 +765,7 @@
         $('#det-pin').text(p.pin_entrega);
         $('#det-origem').text(p.origem);
         $('#det-destino').text(p.destino);
-        $('#det-status').text(p.status.toUpperCase());
-
+        
         if(p.entregador_id) {
             const { data: m } = await sb.from('profiles').select('*').eq('id', p.entregador_id).single();
             if(m) {
@@ -734,7 +781,7 @@
         if(['solicitado', 'pendente'].includes(p.status)) $('#box-cancelar').removeClass('hidden');
         else $('#box-cancelar').addClass('hidden');
 
-        $('#modal-detalhes').css('display', 'flex');
+        $('#modal-detalhes').fadeIn(200);
     }
 
     window.cancelarPedido = async function() {
@@ -782,7 +829,7 @@
         $('#comp-desc').text(desc);
         $('#comp-valor').text(`R$ ${parseFloat(val).toFixed(2)}`);
         $('#comp-data').text(new Date(date).toLocaleString());
-        $('#modal-comprovante').css('display', 'flex');
+        $('#modal-comprovante').fadeIn(200);
     }
 
     // --- PERFIL & UTILS ---
