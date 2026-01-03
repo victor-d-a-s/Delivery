@@ -68,7 +68,7 @@
         .bg-cancelado { background: #fee2e2; color: #991b1b; }
 
         /* MODAIS */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
         @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
@@ -301,7 +301,7 @@
         <div class="modal-content max-w-lg">
             <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
                 <div><h3 class="font-bold text-xl">Detalhes</h3><p id="det-status" class="text-sm opacity-80 font-bold uppercase mt-1">...</p></div>
-                <button onclick="$('#modal-detalhes').addClass('hidden')" class="text-2xl hover:text-gray-200">&times;</button>
+                <button onclick="$('#modal-detalhes').addClass('hidden').css('display', 'none')" class="text-2xl hover:text-gray-200">&times;</button>
             </div>
             <div class="p-6 space-y-6">
                 <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
@@ -333,7 +333,7 @@
                 <div class="flex justify-between border-b border-dashed border-gray-300 pb-3"><span class="text-gray-500 font-medium">Data</span><span id="comp-data" class="font-bold text-gray-700">--/--</span></div>
                 <div><span class="text-gray-500 text-xs font-bold uppercase">Descrição</span><p id="comp-desc" class="font-medium text-gray-800 mt-1">...</p></div>
             </div>
-            <button onclick="$('#modal-comprovante').addClass('hidden')" class="btn-primary mt-6">Fechar</button>
+            <button onclick="$('#modal-comprovante').addClass('hidden').css('display', 'none')" class="btn-primary mt-6">Fechar</button>
         </div>
     </div>
 
@@ -343,7 +343,7 @@
             <p class="text-sm text-gray-500 mb-6">Digite 4 números.</p>
             <input type="tel" id="novo-pin" maxlength="4" class="input-std text-center text-3xl font-bold tracking-[0.5em] mb-6" placeholder="0000">
             <div class="flex gap-4">
-                <button onclick="$('#modal-pin').addClass('hidden')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-pin').addClass('hidden').css('display', 'none')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
@@ -354,7 +354,7 @@
             <h3 class="font-bold text-xl mb-6">Nova Senha</h3>
             <input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres">
             <div class="flex gap-4">
-                <button onclick="$('#modal-senha').addClass('hidden')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-senha').addClass('hidden').css('display', 'none')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
@@ -760,7 +760,7 @@
         });
     }
 
-    // --- AQUI ESTA O AJUSTE SOLICITADO: FORÇAR FLEX NO MODAL ---
+    // --- FORÇA FLEX ---
     window.verDetalhePedido = async function(id) {
         activePedidoId = id;
         const p = pedidosCache.find(x => x.id === id);
@@ -787,7 +787,6 @@
         if(['solicitado', 'pendente'].includes(p.status)) $('#box-cancelar').removeClass('hidden');
         else $('#box-cancelar').addClass('hidden');
 
-        // FORCE DISPLAY FLEX
         $('#modal-detalhes').removeClass('hidden').css('display', 'flex');
     }
 
@@ -882,6 +881,5 @@
         setTimeout(() => t.removeClass('opacity-100').addClass('opacity-0'), 3000);
     }
 </script>
-
 </body>
 </html>
