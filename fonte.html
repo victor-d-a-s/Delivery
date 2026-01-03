@@ -36,28 +36,13 @@
         /* DROPDOWNS CUSTOMIZADOS */
         .custom-select-btn { width: 100%; text-align: left; padding: 14px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-weight: 700; color: #374151; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; position: relative; z-index: 20; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         
-        .custom-options { 
-            display: none; 
-            position: absolute; 
-            top: 100%; left: 0; right: 0; 
-            background-color: #ffffff !important; 
-            border: 1px solid #e5e7eb; 
-            border-radius: 12px; 
-            margin-top: 4px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-            z-index: 50 !important; 
-            overflow: hidden; 
-            max-height: 250px; 
-            overflow-y: auto; 
-        }
-        
+        .custom-options { display: none; position: absolute; top: 100%; left: 0; right: 0; background-color: #ffffff !important; border: 1px solid #e5e7eb; border-radius: 12px; margin-top: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 50 !important; overflow: hidden; max-height: 250px; overflow-y: auto; }
         .custom-option { padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 600; color: #4B5563; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 10px; background: white; }
         .custom-option:hover { background-color: #eff6ff; color: #1E40AF; }
 
         /* SUGESTÕES DE ENDEREÇO */
         .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px; z-index: 60; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.1); display: none; }
         .autocomplete-header { padding: 8px; background: #f3f4f6; color: #6b7280; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; border-bottom: 1px solid #e5e7eb; }
-        .autocomplete-header:hover { background: #e5e7eb; color: #1f2937; }
         .autocomplete-item { padding: 12px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #f3f4f6; color: #374151; }
         .autocomplete-item:hover { background: #eff6ff; color: #1e40af; }
 
@@ -85,6 +70,11 @@
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
         @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* STYLE FILTROS PEDIDOS */
+        .filter-btn { transition: 0.2s; white-space: nowrap; }
+        .filter-btn.active-filter { background-color: #1E40AF !important; color: white !important; border-color: #1E40AF !important; }
+        .filter-btn.inactive-filter { background-color: white !important; color: #4B5563 !important; border: 1px solid #E5E7EB !important; }
 
         /* LOADING */
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #1E40AF; border-radius: 50%; width: 30px; height: 30px; animation: spin 0.8s linear infinite; margin: 0 auto; }
@@ -156,13 +146,11 @@
                         </div>
                     </div>
                 </div>
-                
                 <div class="flex flex-col">
                     <p class="text-[10px] opacity-70 uppercase tracking-widest leading-none mb-0.5">Seu ID</p>
                     <p class="font-extrabold text-xl leading-none tracking-wide" id="header-id">...</p>
                 </div>
             </div>
-            
             <div class="flex items-center gap-2">
                 <div class="text-right">
                     <h1 class="font-extrabold text-lg tracking-tight">Drop Entregas</h1>
@@ -176,7 +164,6 @@
         <main class="main-container flex-1 w-full p-4 md:p-8 max-w-4xl mx-auto">
             
             <div id="view-home" class="fade-in">
-                
                 <div class="bg-gradient-to-r from-blue-700 to-blue-600 rounded-2xl p-6 text-white shadow-lg mb-6 relative overflow-hidden flex justify-between items-end">
                     <div>
                         <p class="text-xs font-bold opacity-80 uppercase tracking-widest mb-1">Saldo Disponível</p>
@@ -292,11 +279,25 @@
                     <button onclick="atualizarPedidosManual()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-gray-50 flex items-center gap-2"><i class="fas fa-sync-alt"></i> Atualizar</button>
                 </div>
 
-                <div class="flex gap-2 overflow-x-auto pb-4 mb-2">
-                    <button onclick="filtrarStatus('todos')" class="filter-btn bg-blue-600 text-white px-6 py-2 rounded-full font-bold text-sm shadow-md transition" data-filter="todos">Todos</button>
-                    <button onclick="filtrarStatus('solicitado')" class="filter-btn bg-white text-gray-600 border px-6 py-2 rounded-full font-bold text-sm hover:bg-gray-50 transition" data-filter="solicitado">Solicitados</button>
-                    <button onclick="filtrarStatus('andamento')" class="filter-btn bg-white text-gray-600 border px-6 py-2 rounded-full font-bold text-sm hover:bg-gray-50 transition" data-filter="andamento">Em Andamento</button>
-                    <button onclick="filtrarStatus('finalizados')" class="filter-btn bg-white text-gray-600 border px-6 py-2 rounded-full font-bold text-sm hover:bg-gray-50 transition" data-filter="finalizados">Finalizados</button>
+                <div id="box-filtro-data" class="hidden bg-blue-50 p-4 rounded-xl mb-4 border border-blue-100 flex items-end gap-2 animate-[fadeIn_0.2s_ease-out]">
+                    <div class="flex-1">
+                        <label class="text-[10px] font-bold text-blue-800 uppercase">Data Início</label>
+                        <input type="date" id="data-ini-ped" class="input-std py-1 px-2 text-xs h-8">
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-[10px] font-bold text-blue-800 uppercase">Data Fim</label>
+                        <input type="date" id="data-fim-ped" class="input-std py-1 px-2 text-xs h-8">
+                    </div>
+                    <button onclick="filtrarPorDataPed()" class="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center shadow hover:bg-blue-700"><i class="fas fa-check"></i></button>
+                    <button onclick="limparFiltroData()" class="bg-gray-300 text-gray-700 w-8 h-8 rounded flex items-center justify-center hover:bg-gray-400"><i class="fas fa-times"></i></button>
+                </div>
+
+                <div class="flex gap-2 overflow-x-auto pb-4 mb-2 no-scrollbar items-center">
+                    <button onclick="filtrarStatus('todos')" class="filter-btn active-filter px-5 py-2 rounded-full font-bold text-sm shadow-sm border" data-filter="todos">Todos</button>
+                    <button onclick="filtrarStatus('solicitado')" class="filter-btn inactive-filter px-5 py-2 rounded-full font-bold text-sm shadow-sm border" data-filter="solicitado">Solicitados</button>
+                    <button onclick="filtrarStatus('andamento')" class="filter-btn inactive-filter px-5 py-2 rounded-full font-bold text-sm shadow-sm border" data-filter="andamento">Em Andamento</button>
+                    <button onclick="filtrarStatus('finalizados')" class="filter-btn inactive-filter px-5 py-2 rounded-full font-bold text-sm shadow-sm border" data-filter="finalizados">Finalizados</button>
+                    <button onclick="toggleFiltroData()" class="bg-white text-gray-500 border w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-50 shadow-sm ml-1"><i class="fas fa-search"></i></button>
                 </div>
 
                 <div id="lista-pedidos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -317,7 +318,6 @@
 
             <div id="view-perfil" class="hidden fade-in max-w-3xl mx-auto">
                 <h2 class="font-bold text-2xl text-gray-800 mb-6">Meu Perfil</h2>
-                
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-6">
                     <div class="flex items-center gap-6 pb-6 border-b border-gray-100">
                         <div class="relative group">
@@ -325,12 +325,8 @@
                             <button onclick="document.getElementById('input-foto').click()" class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition transform hover:scale-110"><i class="fas fa-camera"></i></button>
                             <input type="file" id="input-foto" class="hidden" accept="image/*" onchange="uploadFoto()">
                         </div>
-                        <div>
-                            <h3 id="edit-display-nome" class="font-bold text-xl text-gray-800">Minha Loja</h3>
-                            <p class="text-gray-500 text-sm">Gerencie seus dados e segurança</p>
-                        </div>
+                        <div><h3 id="edit-display-nome" class="font-bold text-xl text-gray-800">Minha Loja</h3><p class="text-gray-500 text-sm">Gerencie seus dados e segurança</p></div>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div><label class="text-xs font-bold text-gray-400 uppercase">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="input-std mt-1"></div>
                         <div><label class="text-xs font-bold text-gray-400 uppercase">Razão Social</label><input type="text" id="edit-razao" class="input-std mt-1"></div>
@@ -338,12 +334,10 @@
                         <div><label class="text-xs font-bold text-gray-400 uppercase">WhatsApp Loja</label><input type="tel" id="edit-zap-loja" class="input-std mt-1"></div>
                         <div class="md:col-span-2"><label class="text-xs font-bold text-gray-400 uppercase">Endereço Completo</label><input type="text" id="edit-endereco" class="input-std mt-1"></div>
                     </div>
-
                     <div class="flex gap-4 mb-8">
                         <button onclick="$('#modal-pin').css('display','flex')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar PIN</button>
                         <button onclick="$('#modal-senha').css('display','flex')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar Senha</button>
                     </div>
-
                     <button onclick="salvarPerfil()" class="btn-primary mb-4">Salvar Alterações</button>
                     <button onclick="fazerLogout()" class="w-full text-red-500 font-bold hover:bg-red-50 py-4 rounded-xl transition">Sair da Conta</button>
                 </div>
@@ -352,7 +346,7 @@
         </main>
     </div>
 
-    <div id="modal-detalhes" class="modal-overlay">
+    <div id="modal-detalhes" class="modal-overlay hidden">
         <div class="modal-content max-w-lg">
             <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
                 <div><h3 class="font-bold text-xl">Detalhes</h3><p id="det-status" class="text-sm opacity-80 font-bold uppercase mt-1">...</p></div>
@@ -379,7 +373,7 @@
         </div>
     </div>
 
-    <div id="modal-comprovante" class="modal-overlay">
+    <div id="modal-comprovante" class="modal-overlay hidden">
         <div class="modal-content text-center p-8">
             <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600 text-3xl"><i class="fas fa-receipt"></i></div>
             <h3 class="font-bold text-2xl text-gray-800 mb-6">Comprovante de Transação</h3>
@@ -392,7 +386,7 @@
         </div>
     </div>
 
-    <div id="modal-pin" class="modal-overlay">
+    <div id="modal-pin" class="modal-overlay hidden">
         <div class="modal-content p-8 text-center">
             <h3 class="font-bold text-xl mb-2">Novo PIN</h3>
             <p class="text-sm text-gray-500 mb-6">Digite 4 números para segurança.</p>
@@ -404,7 +398,7 @@
         </div>
     </div>
 
-    <div id="modal-senha" class="modal-overlay">
+    <div id="modal-senha" class="modal-overlay hidden">
         <div class="modal-content p-8 text-center">
             <h3 class="font-bold text-xl mb-6">Nova Senha</h3>
             <input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres">
@@ -452,7 +446,6 @@
                 $('.custom-options').slideUp(100);
                 $('.fa-chevron-down').removeClass('rotate-180');
             }
-            // Fecha autocomplete se clicar fora
             if (!$(e.target).closest('.relative').length) {
                 $('.autocomplete-list').hide();
             }
@@ -484,7 +477,7 @@
             $('#header-saldo, #dash-saldo').text(`R$ ${parseFloat(prof.saldo || 0).toFixed(2)}`);
             $('#origem').val(prof.endereco || prof.nome_loja);
             
-            // Força a atualização do ID
+            // Força ID
             const visualId = prof.codigo_visual || '---';
             $('#header-id').text(`#${visualId}`);
             
@@ -558,16 +551,14 @@
             $('#destino').prop('readonly', false).val('').attr('placeholder', 'Onde vamos entregar?').removeClass('cursor-not-allowed bg-gray-50').addClass('bg-white');
         }
         
-        // Reset quote when switching logic
         $('#box-resultado, #btn-enviar').addClass('hidden');
         $('#btn-calcular').show();
     }
 
-    // --- LOGÍSTICA & ENDEREÇOS ---
+    // --- LOGÍSTICA ---
     window.buscarEndereco = function(query, fieldId) {
         const listaId = `#sugestoes-lista-${fieldId}`;
         
-        // Reset Quote if user clears text
         if(query.length < 4) {
             $(listaId).hide();
             $('#box-resultado, #btn-enviar').addClass('hidden');
@@ -590,24 +581,17 @@
     }
 
     window.selectEnd = function(address, fieldId) {
-        // Preservar número se digitado
         const currentVal = $(`#${fieldId}`).val();
         const numberMatch = currentVal.match(/\d+/);
         let finalAddress = address;
-        
-        if (numberMatch) {
-            finalAddress += `, ${numberMatch[0]}`;
-        }
+        if (numberMatch) finalAddress += `, ${numberMatch[0]}`;
         
         $(`#${fieldId}`).val(finalAddress);
         $(`#sugestoes-lista-${fieldId}`).hide();
         
-        // Auto-Calc if both filled
         const o = $('#origem').val();
         const d = $('#destino').val();
-        if(o && d && o.length > 5 && d.length > 5) {
-            calcularDistancia();
-        }
+        if(o && d && o.length > 5 && d.length > 5) calcularDistancia();
     }
 
     window.calcularDistancia = async function() {
@@ -732,33 +716,75 @@
         location.reload();
     }
 
-    // --- LISTAS ---
+    // --- LISTAS E FILTROS ---
     window.filtrarStatus = function(status) {
         currentFilter = status;
-        $('.filter-btn').removeClass('bg-blue-600 text-white').addClass('bg-white text-gray-600 border');
-        $(`.filter-btn[data-filter="${status}"]`).removeClass('bg-white text-gray-600 border').addClass('bg-blue-600 text-white');
+        
+        // Atualiza visual botões
+        $('.filter-btn').removeClass('active-filter').addClass('inactive-filter');
+        $(`.filter-btn[data-filter="${status}"]`).removeClass('inactive-filter').addClass('active-filter');
+        
         renderizarPedidos();
     }
 
     window.atualizarPedidosManual = function() { carregarHistoricoPedidos(); }
 
+    // Toggle Filtro Data
+    window.toggleFiltroData = function() {
+        $('#box-filtro-data').toggleClass('hidden');
+    }
+
+    window.limparFiltroData = function() {
+        $('#data-ini-ped, #data-fim-ped').val('');
+        $('#box-filtro-data').addClass('hidden');
+        renderizarPedidos(); // Re-renderiza sem filtro de data
+    }
+
+    window.filtrarPorDataPed = function() {
+        const ini = $('#data-ini-ped').val();
+        const fim = $('#data-fim-ped').val();
+        
+        if(!ini || !fim) return showToast("Selecione ambas as datas");
+        
+        const d1 = new Date(ini);
+        const d2 = new Date(fim);
+        const diffTime = Math.abs(d2 - d1);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+        
+        if(diffDays > 90) return showToast("Período máximo é de 90 dias");
+        if(d1 > d2) return showToast("Data inicial deve ser menor que a final");
+
+        renderizarPedidos(d1, d2);
+        $('#box-filtro-data').addClass('hidden');
+    }
+
     window.carregarHistoricoPedidos = async function() {
         $('#lista-pedidos').html('<div class="col-span-2 text-center py-10"><div class="loader"></div></div>');
-        const { data } = await sb.from('pedidos').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(100);
+        const { data } = await sb.from('pedidos').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(200); // Aumentei limit para busca
         if(!data) { $('#lista-pedidos').html('<div class="col-span-2 text-center text-gray-400">Erro.</div>'); return; }
         pedidosCache = data;
         renderizarPedidos();
     }
 
-    function renderizarPedidos() {
+    function renderizarPedidos(dataIni = null, dataFim = null) {
         const lista = $('#lista-pedidos');
         lista.empty();
 
-        const filtrados = pedidosCache.filter(p => {
-            if(currentFilter === 'todos') return true;
+        let filtrados = pedidosCache.filter(p => {
+            // Filtro Status
             if(currentFilter === 'andamento') return ['pendente', 'em_rota'].includes(p.status);
             if(currentFilter === 'finalizados') return ['concluido', 'cancelado'].includes(p.status);
-            return p.status === currentFilter;
+            if(currentFilter !== 'todos' && p.status !== currentFilter) return false;
+            
+            // Filtro Data
+            if(dataIni && dataFim) {
+                const d = new Date(p.created_at);
+                // Ajuste data final para fim do dia
+                const fimAjustado = new Date(dataFim);
+                fimAjustado.setHours(23,59,59);
+                return d >= dataIni && d <= fimAjustado;
+            }
+            return true;
         });
 
         if(filtrados.length === 0) {
