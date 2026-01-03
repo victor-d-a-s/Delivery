@@ -25,7 +25,6 @@
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; backdrop-filter: blur(2px); }
         .sidebar-menu { position: fixed; top: 0; left: 0; bottom: 0; width: 280px; background: white; z-index: 101; transform: translateX(-100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         .sidebar-menu.open { transform: translateX(0); }
-        
         .menu-link { padding: 16px 20px; font-weight: 600; color: #374151; display: flex; align-items: center; gap: 12px; border-left: 4px solid transparent; cursor: pointer; transition: 0.2s; }
         .menu-link:hover, .menu-link.active { background: #eff6ff; color: #1E40AF; border-left-color: #1E40AF; }
 
@@ -66,13 +65,12 @@
         .bg-concluido { background: #d1fae5; color: #059669; }
         .bg-cancelado { background: #fee2e2; color: #991b1b; }
 
-        /* MODAIS - CORRIGIDO */
+        /* MODAIS - CORRIGIDO (Removido display:none daqui) */
         .modal-overlay { 
             position: fixed; 
             inset: 0; 
             background: rgba(0,0,0,0.7); 
             z-index: 9999; 
-            /* Removido display: none daqui para controlar via classe hidden */
             align-items: center; 
             justify-content: center; 
             padding: 20px; 
@@ -297,7 +295,7 @@
         <div class="modal-content max-w-lg">
             <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
                 <div><h3 class="font-bold text-xl">Detalhes</h3><p id="det-status" class="text-sm opacity-80 font-bold uppercase mt-1">...</p></div>
-                <button onclick="$('#modal-detalhes').addClass('hidden').css('display', 'none')" class="text-2xl hover:text-gray-200">&times;</button>
+                <button onclick="$('#modal-detalhes').addClass('hidden')" class="text-2xl hover:text-gray-200">&times;</button>
             </div>
             <div class="p-6 space-y-6">
                 <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
@@ -329,7 +327,7 @@
                 <div class="flex justify-between border-b border-dashed border-gray-300 pb-3"><span class="text-gray-500 font-medium">Data</span><span id="comp-data" class="font-bold text-gray-700">--/--</span></div>
                 <div><span class="text-gray-500 text-xs font-bold uppercase">Descrição</span><p id="comp-desc" class="font-medium text-gray-800 mt-1">...</p></div>
             </div>
-            <button onclick="$('#modal-comprovante').addClass('hidden').css('display', 'none')" class="btn-primary mt-6">Fechar</button>
+            <button onclick="$('#modal-comprovante').addClass('hidden')" class="btn-primary mt-6">Fechar</button>
         </div>
     </div>
 
@@ -339,7 +337,7 @@
             <p class="text-sm text-gray-500 mb-6">Digite 4 números.</p>
             <input type="tel" id="novo-pin" maxlength="4" class="input-std text-center text-3xl font-bold tracking-[0.5em] mb-6" placeholder="0000">
             <div class="flex gap-4">
-                <button onclick="$('#modal-pin').addClass('hidden').css('display', 'none')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-pin').addClass('hidden')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
@@ -350,7 +348,7 @@
             <h3 class="font-bold text-xl mb-6">Nova Senha</h3>
             <input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres">
             <div class="flex gap-4">
-                <button onclick="$('#modal-senha').addClass('hidden').css('display', 'none')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-senha').addClass('hidden')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
@@ -423,8 +421,11 @@
             profile = prof;
             $('#header-saldo, #dash-saldo').text(`R$ ${parseFloat(prof.saldo || 0).toFixed(2)}`);
             $('#origem').val(prof.endereco || prof.nome_loja);
-            $('#header-id').text(`#${prof.codigo_visual || '---'}`);
+            
+            const visualId = prof.codigo_visual || '---';
+            $('#header-id').text(`#${visualId}`);
             $('#menu-nome').text(prof.nome_loja);
+            
             if(prof.foto_perfil) {
                 $('#header-foto, #edit-img-perfil, #menu-img').attr('src', prof.foto_perfil);
                 $('#header-iniciais').addClass('hidden');
@@ -717,7 +718,7 @@
         });
     }
 
-    // --- FIX MODAL: FORCE DISPLAY FLEX ---
+    // --- FIX DEFINITIVO MODAL ---
     window.verDetalhePedido = async function(id) {
         activePedidoId = id;
         const p = pedidosCache.find(x => x.id === id);
@@ -741,7 +742,7 @@
         if(['solicitado', 'pendente'].includes(p.status)) $('#box-cancelar').removeClass('hidden');
         else $('#box-cancelar').addClass('hidden');
         
-        // Remove 'hidden' and set display:flex explicitly
+        // Remove a classe hidden e força o display flex
         $('#modal-detalhes').removeClass('hidden').css('display', 'flex');
     }
 
@@ -828,5 +829,6 @@
         setTimeout(() => t.removeClass('opacity-100').addClass('opacity-0'), 3000);
     }
 </script>
+
 </body>
 </html>
