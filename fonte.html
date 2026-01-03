@@ -140,18 +140,19 @@
     <div id="screen-app" class="hidden min-h-screen flex flex-col">
         
         <header class="portal-header">
-            <div class="flex items-center gap-3 cursor-pointer hover:opacity-90 transition" onclick="toggleMenu()">
-                <div class="bg-white/20 p-1 rounded-full border border-white/30">
-                    <div class="bg-white text-blue-800 w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm overflow-hidden" id="header-avatar">
-                        <img id="header-foto" src="" class="w-full h-full object-cover hidden">
-                        <span id="header-iniciais">LJ</span>
+            <div class="flex items-center gap-4">
+                <div class="cursor-pointer hover:opacity-90 transition" onclick="toggleMenu()">
+                    <div class="bg-white/20 p-1 rounded-full border border-white/30">
+                        <div class="bg-white text-blue-800 w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm overflow-hidden" id="header-avatar">
+                            <img id="header-foto" src="" class="w-full h-full object-cover hidden">
+                            <span id="header-iniciais">LJ</span>
+                        </div>
                     </div>
                 </div>
-                <div class="flex flex-col justify-center">
-                    <p class="font-bold text-sm flex items-center gap-2">
-                        ID: <span id="header-id" class="font-mono bg-blue-900/50 px-1.5 rounded">...</span>
-                        <i class="fas fa-chevron-down text-[10px] opacity-50"></i>
-                    </p>
+                
+                <div class="flex flex-col">
+                    <p class="text-[10px] opacity-70 uppercase tracking-widest leading-none mb-0.5">Seu ID</p>
+                    <p class="font-extrabold text-xl leading-none tracking-wide" id="header-id">...</p>
                 </div>
             </div>
             
@@ -251,10 +252,7 @@
                     <label class="switch-container mb-6">
                         <div class="flex items-center gap-3">
                             <div class="p-2 rounded-full bg-gray-100" id="bg-icon-retorno"><i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i></div>
-                            <div>
-                                <p id="text-retorno" class="font-bold text-gray-500 text-sm">Sem Retorno</p>
-                                <p class="text-[10px] text-gray-400">O motoboy vai apenas entregar.</p>
-                            </div>
+                            <p id="text-retorno" class="font-bold text-gray-500 text-sm">Sem Retorno</p>
                         </div>
                         <div class="switch">
                             <input type="checkbox" id="retorno" onchange="recalcularTotal()">
@@ -428,7 +426,6 @@
 
     // --- INICIALIZAÇÃO ---
     $(document).ready(function(){
-        // Máscaras
         $('#reg-zap, #edit-zap-loja, #edit-resp-zap, #tel_dest').mask('(00) 00000-0000');
         $('#edit-cnpj').mask('00.000.000/0000-00');
         $('#edit-cpf-resp').mask('000.000.000-00');
@@ -475,7 +472,7 @@
             profile = prof;
             $('#header-saldo, #dash-saldo').text(`R$ ${parseFloat(prof.saldo || 0).toFixed(2)}`);
             $('#origem').val(prof.endereco || prof.nome_loja);
-            $('#header-id').text(prof.codigo_visual || '...');
+            $('#header-id').text(`#${prof.codigo_visual || 'ND'}`);
             $('#menu-nome').text(prof.nome_loja);
             
             if(prof.foto_perfil) {
