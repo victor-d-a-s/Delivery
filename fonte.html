@@ -54,6 +54,13 @@
         .custom-option { padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 600; color: #4B5563; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 10px; background: white; }
         .custom-option:hover { background-color: #eff6ff; color: #1E40AF; }
 
+        /* SUGESTÕES DE ENDEREÇO */
+        .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px; z-index: 60; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.1); display: none; }
+        .autocomplete-header { padding: 8px; background: #f3f4f6; color: #6b7280; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; border-bottom: 1px solid #e5e7eb; }
+        .autocomplete-header:hover { background: #e5e7eb; color: #1f2937; }
+        .autocomplete-item { padding: 12px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #f3f4f6; color: #374151; }
+        .autocomplete-item:hover { background: #eff6ff; color: #1e40af; }
+
         /* SWITCH TOGGLE */
         .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
@@ -203,12 +210,13 @@
                     <div class="grid grid-cols-1 gap-4 mb-6">
                         <div class="relative">
                             <i class="fas fa-store text-blue-600 absolute left-4 top-4"></i>
-                            <input type="text" id="origem" class="input-std pl-10 bg-gray-50 font-bold text-gray-600 cursor-not-allowed" readonly placeholder="Retirada (Sua Loja)">
+                            <input type="text" id="origem" class="input-std pl-10 bg-gray-50 font-bold text-gray-600 cursor-not-allowed" readonly placeholder="Retirada (Sua Loja)" oninput="buscarEndereco(this.value, 'origem')">
+                            <div id="sugestoes-lista-origem" class="autocomplete-list"></div>
                         </div>
                         <div class="relative">
                             <i class="fas fa-map-marker-alt text-red-500 absolute left-4 top-4"></i>
-                            <input type="text" id="destino" class="input-std pl-10 font-medium border-blue-100 focus:border-blue-500" placeholder="Onde vamos entregar? (Rua, Número, Bairro)" oninput="buscarEndereco(this.value)">
-                            <div id="sugestoes-lista" class="hidden absolute top-full left-0 right-0 bg-white border rounded-xl shadow-xl z-20 mt-1 max-h-48 overflow-y-auto"></div>
+                            <input type="text" id="destino" class="input-std pl-10 font-medium border-blue-100 focus:border-blue-500" placeholder="Onde vamos entregar? (Rua, Número, Bairro)" oninput="buscarEndereco(this.value, 'destino')">
+                            <div id="sugestoes-lista-destino" class="autocomplete-list"></div>
                         </div>
                     </div>
 
@@ -439,11 +447,14 @@
 
         initSession();
         
-        // Fechar Dropdowns ao clicar fora
         $(document).click(function(e) {
             if (!$(e.target).closest('.custom-select-btn').length && !$(e.target).closest('.custom-options').length) {
                 $('.custom-options').slideUp(100);
                 $('.fa-chevron-down').removeClass('rotate-180');
+            }
+            // Fecha autocomplete se clicar fora
+            if (!$(e.target).closest('.relative').length) {
+                $('.autocomplete-list').hide();
             }
         });
     });
@@ -472,7 +483,11 @@
             profile = prof;
             $('#header-saldo, #dash-saldo').text(`R$ ${parseFloat(prof.saldo || 0).toFixed(2)}`);
             $('#origem').val(prof.endereco || prof.nome_loja);
-            $('#header-id').text(`#${prof.codigo_visual || 'ND'}`);
+            
+            // Força a atualização do ID
+            const visualId = prof.codigo_visual || '---';
+            $('#header-id').text(`#${visualId}`);
+            
             $('#menu-nome').text(prof.nome_loja);
             
             if(prof.foto_perfil) {
@@ -542,6 +557,142 @@
             $('#origem').prop('readonly', true).val(profile.endereco).addClass('cursor-not-allowed bg-gray-50');
             $('#destino').prop('readonly', false).val('').attr('placeholder', 'Onde vamos entregar?').removeClass('cursor-not-allowed bg-gray-50').addClass('bg-white');
         }
+        
+        // Reset quote when switching logic
+        $('#box-resultado, #btn-enviar').addClass('hidden');
+        $('#btn-calcular').show();
+    }
+
+    // --- LOGÍSTICA & ENDEREÇOS ---
+    window.buscarEndereco = function(query, fieldId) {
+        const listaId = `#sugestoes-lista-${fieldId}`;
+        
+        // Reset Quote if user clears text
+        if(query.length < 4) {
+            $(listaId).hide();
+            $('#box-resultado, #btn-enviar').addClass('hidden');
+            $('#btn-calcular').show();
+            return;
+        }
+        
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(async () => {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', ' + CITY_FIX)}&limit=3`);
+            const data = await res.json();
+            
+            let html = `<div class="autocomplete-header" onclick="$('${listaId}').hide()">🔼 Fechar Sugestões</div>`;
+            data.forEach(item => {
+                const clean = item.display_name.split(',')[0] + ', ' + (item.display_name.split(',')[1] || '');
+                html += `<div class="autocomplete-item" onclick="selectEnd('${clean}', '${fieldId}')">${clean}</div>`;
+            });
+            $(listaId).html(html).show();
+        }, 500);
+    }
+
+    window.selectEnd = function(address, fieldId) {
+        // Preservar número se digitado
+        const currentVal = $(`#${fieldId}`).val();
+        const numberMatch = currentVal.match(/\d+/);
+        let finalAddress = address;
+        
+        if (numberMatch) {
+            finalAddress += `, ${numberMatch[0]}`;
+        }
+        
+        $(`#${fieldId}`).val(finalAddress);
+        $(`#sugestoes-lista-${fieldId}`).hide();
+        
+        // Auto-Calc if both filled
+        const o = $('#origem').val();
+        const d = $('#destino').val();
+        if(o && d && o.length > 5 && d.length > 5) {
+            calcularDistancia();
+        }
+    }
+
+    window.calcularDistancia = async function() {
+        const o = $('#origem').val();
+        const d = $('#destino').val();
+        if(!o || !d) return showToast("Preencha os endereços");
+
+        $('#btn-calcular').text("Calculando...").prop('disabled', true);
+        try {
+            const [resO, resD] = await Promise.all([
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(o + ', ' + CITY_FIX)}&limit=1`),
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(d + ', ' + CITY_FIX)}&limit=1`)
+            ]);
+            const [dataO, dataD] = await Promise.all([resO.json(), resD.json()]);
+            
+            if(!dataO[0] || !dataD[0]) throw new Error("Endereço não encontrado");
+
+            const lat1 = dataO[0].lat, lon1 = dataO[0].lon, lat2 = dataD[0].lat, lon2 = dataD[0].lon;
+            const R = 6371; 
+            const dLat = (lat2-lat1) * Math.PI/180;
+            const dLon = (lon2-lon1) * Math.PI/180; 
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            tempDist = (R * c * 1.3).toFixed(1); 
+            if(tempDist < 1) tempDist = 1;
+
+            recalcularTotal();
+            $('#btn-calcular').hide();
+            $('#box-resultado').removeClass('hidden').addClass('flex');
+            $('#btn-enviar').removeClass('hidden');
+            
+        } catch(e) {
+            showToast("Endereço não encontrado.");
+        } finally {
+            $('#btn-calcular').text("Calcular Valor").prop('disabled', false);
+        }
+    }
+
+    window.recalcularTotal = function() {
+        let total = config.taxa + (tempDist * config.km);
+        const temRetorno = $('#retorno').is(':checked');
+        
+        $('#text-retorno').text(temRetorno ? "Com Retorno" : "Sem Retorno").toggleClass('text-blue-600', temRetorno);
+        $('#bg-icon-retorno').toggleClass('bg-blue-100', temRetorno);
+        $('#icon-retorno').attr('class', temRetorno ? 'fas fa-exchange-alt text-blue-600' : 'fas fa-arrow-right text-gray-400');
+        
+        if(temRetorno) total += (total * (config.retorno / 100));
+        
+        $('#valor-display').text(total.toFixed(2).replace('.',','));
+        $('#km-display').text(tempDist);
+    }
+
+    window.iniciarPedido = async function() {
+        const nome = $('#nome_dest').val();
+        const tel = $('#tel_dest').val();
+        const ref = $('#referencia').val();
+        if(!nome || !tel || !ref) return showToast("Preencha Nome, WhatsApp e Referência");
+
+        $('#btn-enviar').text('Enviando...').prop('disabled', true);
+        
+        const destFull = `${$('#destino').val()} - ${$('#complemento').val() || ''} (${ref})`;
+
+        const { error } = await sb.rpc('criar_pedido_seguro', {
+            p_user_id: user.id,
+            p_origem: $('#origem').val(),
+            p_destino: destFull,
+            p_distancia_km: parseFloat(tempDist),
+            p_forma_pagamento: $('#pagamento_entrega').val(),
+            p_nome_dest: nome,
+            p_tel_dest: tel.replace(/\D/g,''),
+            p_tipo_logistica: $('#input-logistica').val(),
+            p_com_retorno: $('#retorno').is(':checked')
+        });
+
+        if(error) {
+            showToast("Erro: " + error.message);
+            $('#btn-enviar').text('Confirmar Solicitação').prop('disabled', false);
+        } else {
+            showToast("Pedido Criado com Sucesso!");
+            $('#destino, #nome_dest, #tel_dest, #complemento, #referencia').val('');
+            $('#box-resultado, #btn-enviar').addClass('hidden');
+            $('#btn-calcular').show();
+            loadData();
+            mudarTela('pedidos');
+        }
     }
 
     // --- AUTH ---
@@ -579,120 +730,6 @@
     window.fazerLogout = async function() {
         await sb.auth.signOut();
         location.reload();
-    }
-
-    // --- LOGÍSTICA ---
-    window.buscarEndereco = function(query) {
-        if(query.length < 4) {
-            $('#sugestoes-lista').addClass('hidden');
-            $('#box-resultado, #btn-enviar').addClass('hidden');
-            $('#btn-calcular').show();
-            return;
-        }
-        
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(async () => {
-            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', ' + CITY_FIX)}&limit=3`);
-            const data = await res.json();
-            let html = '';
-            data.forEach(item => {
-                const clean = item.display_name.split(',')[0] + ', ' + (item.display_name.split(',')[1] || '');
-                html += `<div class="p-3 border-b text-sm cursor-pointer hover:bg-gray-50 font-medium text-gray-700" onclick="selectEnd('${clean}')">${clean}</div>`;
-            });
-            $('#sugestoes-lista').html(html).removeClass('hidden');
-        }, 500);
-    }
-
-    window.selectEnd = function(end) {
-        $('#destino').val(end);
-        $('#sugestoes-lista').addClass('hidden');
-        calcularDistancia();
-    }
-
-    window.calcularDistancia = async function() {
-        const o = $('#origem').val();
-        const d = $('#destino').val();
-        if(!o || !d) return showToast("Preencha os endereços");
-
-        $('#btn-calcular').text("Calculando...").prop('disabled', true);
-        try {
-            const [resO, resD] = await Promise.all([
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(o + ', ' + CITY_FIX)}&limit=1`),
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(d + ', ' + CITY_FIX)}&limit=1`)
-            ]);
-            const [dataO, dataD] = await Promise.all([resO.json(), resD.json()]);
-            
-            if(!dataO[0] || !dataD[0]) throw new Error("Endereço não encontrado");
-
-            const lat1 = dataO[0].lat, lon1 = dataO[0].lon, lat2 = dataD[0].lat, lon2 = dataD[0].lon;
-            const R = 6371; 
-            const dLat = (lat2-lat1) * Math.PI/180;
-            const dLon = (lon2-lon1) * Math.PI/180; 
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2); 
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-            tempDist = (R * c * 1.3).toFixed(1); 
-            if(tempDist < 1) tempDist = 1;
-
-            recalcularTotal();
-            $('#btn-calcular').hide();
-            $('#box-resultado').removeClass('hidden').addClass('flex');
-            $('#btn-enviar').removeClass('hidden');
-            
-        } catch(e) {
-            showToast("Endereço não encontrado. Tente simplificar.");
-        } finally {
-            $('#btn-calcular').text("Calcular Valor").prop('disabled', false);
-        }
-    }
-
-    window.recalcularTotal = function() {
-        let total = config.taxa + (tempDist * config.km);
-        const temRetorno = $('#retorno').is(':checked');
-        
-        $('#text-retorno').text(temRetorno ? "Com Retorno" : "Sem Retorno").toggleClass('text-blue-600', temRetorno);
-        $('#bg-icon-retorno').toggleClass('bg-blue-100', temRetorno);
-        $('#icon-retorno').attr('class', temRetorno ? 'fas fa-exchange-alt text-blue-600' : 'fas fa-arrow-right text-gray-400');
-        
-        if(temRetorno) total += (total * (config.retorno / 100));
-        
-        $('#valor-display').text(total.toFixed(2).replace('.',','));
-        $('#km-display').text(tempDist);
-    }
-
-    window.iniciarPedido = async function() {
-        const nome = $('#nome_dest').val();
-        const tel = $('#tel_dest').val();
-        const ref = $('#referencia').val();
-        if(!nome || !tel || !ref) return showToast("Preencha Nome, WhatsApp e Referência");
-
-        $('#btn-enviar').text('Enviando...').prop('disabled', true);
-        
-        // Constrói string endereço completo
-        const destFull = `${$('#destino').val()} - ${$('#complemento').val() || ''} (${ref})`;
-
-        const { error } = await sb.rpc('criar_pedido_seguro', {
-            p_user_id: user.id,
-            p_origem: $('#origem').val(),
-            p_destino: destFull,
-            p_distancia_km: parseFloat(tempDist),
-            p_forma_pagamento: $('#pagamento_entrega').val(),
-            p_nome_dest: nome,
-            p_tel_dest: tel.replace(/\D/g,''),
-            p_tipo_logistica: $('#input-logistica').val(),
-            p_com_retorno: $('#retorno').is(':checked')
-        });
-
-        if(error) {
-            showToast("Erro: " + error.message);
-            $('#btn-enviar').text('Confirmar Solicitação').prop('disabled', false);
-        } else {
-            showToast("Pedido Criado com Sucesso!");
-            $('#destino, #nome_dest, #tel_dest, #complemento, #referencia').val('');
-            $('#box-resultado, #btn-enviar').addClass('hidden');
-            $('#btn-calcular').show();
-            loadData();
-            mudarTela('pedidos');
-        }
     }
 
     // --- LISTAS ---
