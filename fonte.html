@@ -67,11 +67,12 @@
         .bg-concluido { background: #d1fae5; color: #059669; }
         .bg-cancelado { background: #fee2e2; color: #991b1b; }
 
+        /* MODAIS */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
         @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* STYLE FILTROS PEDIDOS */
+        /* FILTROS PEDIDOS */
         .filter-btn { transition: 0.2s; white-space: nowrap; }
         .filter-btn.active-filter { background-color: #1E40AF !important; color: white !important; border-color: #1E40AF !important; }
         .filter-btn.inactive-filter { background-color: white !important; color: #4B5563 !important; border: 1px solid #E5E7EB !important; }
@@ -93,14 +94,12 @@
         <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md text-center">
             <div class="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-700 text-4xl"><i class="fas fa-box-open"></i></div>
             <h1 class="text-2xl font-bold text-gray-800 mb-6">Drop Entregas</h1>
-            
             <div id="box-login">
                 <input type="email" id="log-email" class="input-std mb-3" placeholder="E-mail">
                 <input type="password" id="log-senha" class="input-std mb-4" placeholder="Senha">
                 <button onclick="fazerLogin()" id="btn-login" class="btn-primary">Entrar</button>
                 <p class="text-gray-500 text-xs mt-4 cursor-pointer hover:text-blue-600" onclick="toggleAuth()">Criar Conta</p>
             </div>
-
             <div id="box-register" class="hidden text-left space-y-3">
                 <input type="text" id="reg-nome" class="input-std" placeholder="Nome Fantasia">
                 <input type="tel" id="reg-zap" class="input-std" placeholder="WhatsApp">
@@ -117,10 +116,7 @@
         <div class="p-6 bg-blue-700 text-white pt-10">
             <div class="flex items-center gap-3 mb-2">
                 <img id="menu-img" src="https://via.placeholder.com/150" class="w-14 h-14 rounded-full border-2 border-white bg-gray-200 object-cover">
-                <div>
-                    <p class="font-bold text-lg leading-tight truncate w-32" id="menu-nome">...</p>
-                    <p class="text-xs text-blue-200">Portal Cliente</p>
-                </div>
+                <div><p class="font-bold text-lg leading-tight truncate w-32" id="menu-nome">...</p><p class="text-xs text-blue-200">Portal Cliente</p></div>
             </div>
         </div>
         <div class="flex-1 py-4">
@@ -152,12 +148,8 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <div class="text-right">
-                    <h1 class="font-extrabold text-lg tracking-tight">Drop Entregas</h1>
-                </div>
-                <div class="bg-white text-blue-700 w-8 h-8 rounded-lg flex items-center justify-center shadow-sm">
-                    <i class="fas fa-box-open"></i>
-                </div>
+                <div class="text-right"><h1 class="font-extrabold text-lg tracking-tight">Drop Entregas</h1></div>
+                <div class="bg-white text-blue-700 w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"><i class="fas fa-box-open"></i></div>
             </div>
         </header>
 
@@ -165,10 +157,7 @@
             
             <div id="view-home" class="fade-in">
                 <div class="bg-gradient-to-r from-blue-700 to-blue-600 rounded-2xl p-6 text-white shadow-lg mb-6 relative overflow-hidden flex justify-between items-end">
-                    <div>
-                        <p class="text-xs font-bold opacity-80 uppercase tracking-widest mb-1">Saldo Disponível</p>
-                        <h2 class="text-3xl font-extrabold" id="dash-saldo">R$ 0,00</h2>
-                    </div>
+                    <div><p class="text-xs font-bold opacity-80 uppercase tracking-widest mb-1">Saldo Disponível</p><h2 class="text-3xl font-extrabold" id="dash-saldo">R$ 0,00</h2></div>
                     <button onclick="addSaldo()" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-4 rounded-lg backdrop-blur-sm transition border border-white/30 text-xs flex items-center gap-2"><i class="fas fa-plus"></i> Adicionar</button>
                     <i class="fas fa-wallet absolute -right-6 -bottom-8 text-9xl opacity-10"></i>
                 </div>
@@ -178,10 +167,7 @@
 
                     <div class="mb-6 relative z-30">
                         <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">O que vamos entregar?</label>
-                        <div class="custom-select-btn" onclick="toggleDropdown('logistica')">
-                            <span id="display-logistica"><i class="fas fa-box text-blue-500 mr-2"></i> Pequenas Encomendas</span>
-                            <i class="fas fa-chevron-down text-gray-400" id="arrow-logistica"></i>
-                        </div>
+                        <div class="custom-select-btn" onclick="toggleDropdown('logistica')"><span id="display-logistica"><i class="fas fa-box text-blue-500 mr-2"></i> Pequenas Encomendas</span><i class="fas fa-chevron-down text-gray-400" id="arrow-logistica"></i></div>
                         <input type="hidden" id="input-logistica" value="Pequenas Encomendas">
                         <div id="list-logistica" class="custom-options">
                             <div class="custom-option" onclick="selectLogistica('Pequenas Encomendas', 'fa-box')"><i class="fas fa-box text-blue-500"></i> Pequenas Encomendas</div>
@@ -195,16 +181,8 @@
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 mb-6">
-                        <div class="relative">
-                            <i class="fas fa-store text-blue-600 absolute left-4 top-4"></i>
-                            <input type="text" id="origem" class="input-std pl-10 bg-gray-50 font-bold text-gray-600 cursor-not-allowed" readonly placeholder="Retirada (Sua Loja)" oninput="buscarEndereco(this.value, 'origem')">
-                            <div id="sugestoes-lista-origem" class="autocomplete-list"></div>
-                        </div>
-                        <div class="relative">
-                            <i class="fas fa-map-marker-alt text-red-500 absolute left-4 top-4"></i>
-                            <input type="text" id="destino" class="input-std pl-10 font-medium border-blue-100 focus:border-blue-500" placeholder="Onde vamos entregar? (Rua, Número, Bairro)" oninput="buscarEndereco(this.value, 'destino')">
-                            <div id="sugestoes-lista-destino" class="autocomplete-list"></div>
-                        </div>
+                        <div class="relative"><i class="fas fa-store text-blue-600 absolute left-4 top-4"></i><input type="text" id="origem" class="input-std pl-10 bg-gray-50 font-bold text-gray-600 cursor-not-allowed" readonly placeholder="Retirada (Sua Loja)" oninput="buscarEndereco(this.value, 'origem')"><div id="sugestoes-lista-origem" class="autocomplete-list"></div></div>
+                        <div class="relative"><i class="fas fa-map-marker-alt text-red-500 absolute left-4 top-4"></i><input type="text" id="destino" class="input-std pl-10 font-medium border-blue-100 focus:border-blue-500" placeholder="Onde vamos entregar? (Rua, Número, Bairro)" oninput="buscarEndereco(this.value, 'destino')"><div id="sugestoes-lista-destino" class="autocomplete-list"></div></div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 mb-6">
@@ -217,10 +195,7 @@
                     <div class="grid grid-cols-2 gap-4 mb-6">
                         <div class="relative z-20">
                             <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pgto. Entrega</label>
-                            <div class="custom-select-btn" onclick="toggleDropdown('entrega')">
-                                <span id="display-entrega">💠 PIX</span>
-                                <i class="fas fa-chevron-down text-gray-400" id="arrow-entrega"></i>
-                            </div>
+                            <div class="custom-select-btn" onclick="toggleDropdown('entrega')"><span id="display-entrega">💠 PIX</span><i class="fas fa-chevron-down text-gray-400" id="arrow-entrega"></i></div>
                             <input type="hidden" id="pagamento_entrega" value="PIX">
                             <div id="list-entrega" class="custom-options">
                                 <div class="custom-option" onclick="selectOption('entrega', 'PIX', '💠 PIX')"><i class="fas fa-qrcode text-blue-500"></i> PIX</div>
@@ -230,10 +205,7 @@
                         </div>
                         <div class="relative z-20">
                             <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pgto. Produto</label>
-                            <div class="custom-select-btn" onclick="toggleDropdown('produto')">
-                                <span id="display-produto">✅ Pago</span>
-                                <i class="fas fa-chevron-down text-gray-400" id="arrow-produto"></i>
-                            </div>
+                            <div class="custom-select-btn" onclick="toggleDropdown('produto')"><span id="display-produto">✅ Pago</span><i class="fas fa-chevron-down text-gray-400" id="arrow-produto"></i></div>
                             <input type="hidden" id="pagamento_produto" value="Pago">
                             <div id="list-produto" class="custom-options">
                                 <div class="custom-option" onclick="selectOption('produto', 'Pago', '✅ Pago')"><i class="fas fa-check-circle text-green-600"></i> Pago</div>
@@ -245,29 +217,14 @@
                     </div>
 
                     <label class="switch-container mb-6">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 rounded-full bg-gray-100" id="bg-icon-retorno"><i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i></div>
-                            <p id="text-retorno" class="font-bold text-gray-500 text-sm">Sem Retorno</p>
-                        </div>
-                        <div class="switch">
-                            <input type="checkbox" id="retorno" onchange="recalcularTotal()">
-                            <span class="slider"></span>
-                        </div>
+                        <div class="flex items-center gap-3"><div class="p-2 rounded-full bg-gray-100" id="bg-icon-retorno"><i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i></div><p id="text-retorno" class="font-bold text-gray-500 text-sm">Sem Retorno</p></div>
+                        <div class="switch"><input type="checkbox" id="retorno" onchange="recalcularTotal()"><span class="slider"></span></div>
                     </label>
 
-                    <button onclick="calcularDistancia()" id="btn-calcular" class="btn-primary mt-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                        Calcular Valor
-                    </button>
-
+                    <button onclick="calcularDistancia()" id="btn-calcular" class="btn-primary mt-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1">Calcular Valor</button>
                     <div id="box-resultado" class="hidden bg-blue-50 border border-blue-200 p-6 rounded-2xl mt-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div class="text-center md:text-left">
-                            <p class="text-xs text-blue-600 font-bold uppercase mb-1">Distância Estimada</p>
-                            <p class="font-bold text-gray-800 text-lg"><span id="km-display">0</span> km</p>
-                        </div>
-                        <div class="text-center md:text-right">
-                            <p class="text-xs text-blue-600 font-bold uppercase mb-1">Valor Total</p>
-                            <p class="font-extrabold text-4xl text-blue-800">R$ <span id="valor-display">0,00</span></p>
-                        </div>
+                        <div class="text-center md:text-left"><p class="text-xs text-blue-600 font-bold uppercase mb-1">Distância Estimada</p><p class="font-bold text-gray-800 text-lg"><span id="km-display">0</span> km</p></div>
+                        <div class="text-center md:text-right"><p class="text-xs text-blue-600 font-bold uppercase mb-1">Valor Total</p><p class="font-extrabold text-4xl text-blue-800">R$ <span id="valor-display">0,00</span></p></div>
                     </div>
                     <button onclick="iniciarPedido()" id="btn-enviar" class="hidden btn-primary bg-green-600 hover:bg-green-700 mt-4 shadow-lg">Confirmar Solicitação</button>
                 </div>
@@ -280,14 +237,8 @@
                 </div>
 
                 <div id="box-filtro-data" class="hidden bg-blue-50 p-4 rounded-xl mb-4 border border-blue-100 flex items-end gap-2 animate-[fadeIn_0.2s_ease-out]">
-                    <div class="flex-1">
-                        <label class="text-[10px] font-bold text-blue-800 uppercase">Data Início</label>
-                        <input type="date" id="data-ini-ped" class="input-std py-1 px-2 text-xs h-8">
-                    </div>
-                    <div class="flex-1">
-                        <label class="text-[10px] font-bold text-blue-800 uppercase">Data Fim</label>
-                        <input type="date" id="data-fim-ped" class="input-std py-1 px-2 text-xs h-8">
-                    </div>
+                    <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Início</label><input type="date" id="data-ini-ped" class="input-std py-1 px-2 text-xs h-8"></div>
+                    <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Fim</label><input type="date" id="data-fim-ped" class="input-std py-1 px-2 text-xs h-8"></div>
                     <button onclick="filtrarPorDataPed()" class="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center shadow hover:bg-blue-700"><i class="fas fa-check"></i></button>
                     <button onclick="limparFiltroData()" class="bg-gray-300 text-gray-700 w-8 h-8 rounded flex items-center justify-center hover:bg-gray-400"><i class="fas fa-times"></i></button>
                 </div>
@@ -335,8 +286,8 @@
                         <div class="md:col-span-2"><label class="text-xs font-bold text-gray-400 uppercase">Endereço Completo</label><input type="text" id="edit-endereco" class="input-std mt-1"></div>
                     </div>
                     <div class="flex gap-4 mb-8">
-                        <button onclick="$('#modal-pin').css('display','flex')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar PIN</button>
-                        <button onclick="$('#modal-senha').css('display','flex')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar Senha</button>
+                        <button onclick="$('#modal-pin').removeClass('hidden').css('display','flex')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar PIN</button>
+                        <button onclick="$('#modal-senha').removeClass('hidden').css('display','flex')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar Senha</button>
                     </div>
                     <button onclick="salvarPerfil()" class="btn-primary mb-4">Salvar Alterações</button>
                     <button onclick="fazerLogout()" class="w-full text-red-500 font-bold hover:bg-red-50 py-4 rounded-xl transition">Sair da Conta</button>
@@ -350,7 +301,7 @@
         <div class="modal-content max-w-lg">
             <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
                 <div><h3 class="font-bold text-xl">Detalhes</h3><p id="det-status" class="text-sm opacity-80 font-bold uppercase mt-1">...</p></div>
-                <button onclick="$('#modal-detalhes').fadeOut(200)" class="text-2xl hover:text-gray-200">&times;</button>
+                <button onclick="$('#modal-detalhes').addClass('hidden')" class="text-2xl hover:text-gray-200">&times;</button>
             </div>
             <div class="p-6 space-y-6">
                 <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
@@ -376,23 +327,23 @@
     <div id="modal-comprovante" class="modal-overlay hidden">
         <div class="modal-content text-center p-8">
             <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600 text-3xl"><i class="fas fa-receipt"></i></div>
-            <h3 class="font-bold text-2xl text-gray-800 mb-6">Comprovante de Transação</h3>
+            <h3 class="font-bold text-2xl text-gray-800 mb-6">Comprovante</h3>
             <div class="text-left space-y-4 bg-gray-50 p-6 rounded-2xl border border-gray-100">
                 <div class="flex justify-between border-b border-dashed border-gray-300 pb-3"><span class="text-gray-500 font-medium">Valor</span><span id="comp-valor" class="font-bold text-lg text-gray-900">R$ 0,00</span></div>
                 <div class="flex justify-between border-b border-dashed border-gray-300 pb-3"><span class="text-gray-500 font-medium">Data</span><span id="comp-data" class="font-bold text-gray-700">--/--</span></div>
                 <div><span class="text-gray-500 text-xs font-bold uppercase">Descrição</span><p id="comp-desc" class="font-medium text-gray-800 mt-1">...</p></div>
             </div>
-            <button onclick="$('#modal-comprovante').fadeOut(200)" class="btn-primary mt-6">Fechar</button>
+            <button onclick="$('#modal-comprovante').addClass('hidden')" class="btn-primary mt-6">Fechar</button>
         </div>
     </div>
 
     <div id="modal-pin" class="modal-overlay hidden">
         <div class="modal-content p-8 text-center">
             <h3 class="font-bold text-xl mb-2">Novo PIN</h3>
-            <p class="text-sm text-gray-500 mb-6">Digite 4 números para segurança.</p>
+            <p class="text-sm text-gray-500 mb-6">Digite 4 números.</p>
             <input type="tel" id="novo-pin" maxlength="4" class="input-std text-center text-3xl font-bold tracking-[0.5em] mb-6" placeholder="0000">
             <div class="flex gap-4">
-                <button onclick="$('#modal-pin').fadeOut(200)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-pin').addClass('hidden')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
@@ -403,7 +354,7 @@
             <h3 class="font-bold text-xl mb-6">Nova Senha</h3>
             <input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres">
             <div class="flex gap-4">
-                <button onclick="$('#modal-senha').fadeOut(200)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-senha').addClass('hidden')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
@@ -477,10 +428,8 @@
             $('#header-saldo, #dash-saldo').text(`R$ ${parseFloat(prof.saldo || 0).toFixed(2)}`);
             $('#origem').val(prof.endereco || prof.nome_loja);
             
-            // Força ID
             const visualId = prof.codigo_visual || '---';
             $('#header-id').text(`#${visualId}`);
-            
             $('#menu-nome').text(prof.nome_loja);
             
             if(prof.foto_perfil) {
@@ -719,17 +668,13 @@
     // --- LISTAS E FILTROS ---
     window.filtrarStatus = function(status) {
         currentFilter = status;
-        
-        // Atualiza visual botões
         $('.filter-btn').removeClass('active-filter').addClass('inactive-filter');
         $(`.filter-btn[data-filter="${status}"]`).removeClass('inactive-filter').addClass('active-filter');
-        
         renderizarPedidos();
     }
 
     window.atualizarPedidosManual = function() { carregarHistoricoPedidos(); }
 
-    // Toggle Filtro Data
     window.toggleFiltroData = function() {
         $('#box-filtro-data').toggleClass('hidden');
     }
@@ -737,7 +682,7 @@
     window.limparFiltroData = function() {
         $('#data-ini-ped, #data-fim-ped').val('');
         $('#box-filtro-data').addClass('hidden');
-        renderizarPedidos(); // Re-renderiza sem filtro de data
+        renderizarPedidos();
     }
 
     window.filtrarPorDataPed = function() {
@@ -760,7 +705,7 @@
 
     window.carregarHistoricoPedidos = async function() {
         $('#lista-pedidos').html('<div class="col-span-2 text-center py-10"><div class="loader"></div></div>');
-        const { data } = await sb.from('pedidos').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(200); // Aumentei limit para busca
+        const { data } = await sb.from('pedidos').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(200); 
         if(!data) { $('#lista-pedidos').html('<div class="col-span-2 text-center text-gray-400">Erro.</div>'); return; }
         pedidosCache = data;
         renderizarPedidos();
@@ -771,15 +716,12 @@
         lista.empty();
 
         let filtrados = pedidosCache.filter(p => {
-            // Filtro Status
             if(currentFilter === 'andamento') return ['pendente', 'em_rota'].includes(p.status);
             if(currentFilter === 'finalizados') return ['concluido', 'cancelado'].includes(p.status);
             if(currentFilter !== 'todos' && p.status !== currentFilter) return false;
             
-            // Filtro Data
             if(dataIni && dataFim) {
                 const d = new Date(p.created_at);
-                // Ajuste data final para fim do dia
                 const fimAjustado = new Date(dataFim);
                 fimAjustado.setHours(23,59,59);
                 return d >= dataIni && d <= fimAjustado;
@@ -818,6 +760,7 @@
         });
     }
 
+    // --- AQUI ESTA O AJUSTE SOLICITADO: FORÇAR FLEX NO MODAL ---
     window.verDetalhePedido = async function(id) {
         activePedidoId = id;
         const p = pedidosCache.find(x => x.id === id);
@@ -844,7 +787,8 @@
         if(['solicitado', 'pendente'].includes(p.status)) $('#box-cancelar').removeClass('hidden');
         else $('#box-cancelar').addClass('hidden');
 
-        $('#modal-detalhes').fadeIn(200);
+        // FORCE DISPLAY FLEX
+        $('#modal-detalhes').removeClass('hidden').css('display', 'flex');
     }
 
     window.cancelarPedido = async function() {
@@ -852,7 +796,7 @@
         const { error } = await sb.from('pedidos').update({status: 'cancelado'}).eq('id', activePedidoId);
         if(error) showToast("Erro ao cancelar");
         else {
-            $('#modal-detalhes').fadeOut(200);
+            $('#modal-detalhes').addClass('hidden').css('display', 'none');
             carregarHistoricoPedidos();
             showToast("Pedido Cancelado");
         }
@@ -892,7 +836,7 @@
         $('#comp-desc').text(desc);
         $('#comp-valor').text(`R$ ${parseFloat(val).toFixed(2)}`);
         $('#comp-data').text(new Date(date).toLocaleString());
-        $('#modal-comprovante').fadeIn(200);
+        $('#modal-comprovante').removeClass('hidden').css('display', 'flex');
     }
 
     // --- PERFIL & UTILS ---
@@ -906,7 +850,7 @@
         const pin = $('#novo-pin').val();
         if(pin.length !== 4) return showToast("O PIN deve ter 4 dígitos");
         await sb.from('profiles').update({pin_carteira: pin}).eq('id', user.id);
-        $('#modal-pin').fadeOut(200);
+        $('#modal-pin').addClass('hidden').css('display', 'none');
         showToast("PIN Alterado!");
     }
 
@@ -914,7 +858,7 @@
         const senha = $('#nova-senha').val();
         if(senha.length < 6) return showToast("Mínimo 6 caracteres");
         const { error } = await sb.auth.updateUser({ password: senha });
-        if(error) showToast("Erro: " + error.message); else { $('#modal-senha').fadeOut(200); showToast("Senha Alterada!"); }
+        if(error) showToast("Erro: " + error.message); else { $('#modal-senha').addClass('hidden').css('display', 'none'); showToast("Senha Alterada!"); }
     }
 
     window.uploadFoto = async function() {
