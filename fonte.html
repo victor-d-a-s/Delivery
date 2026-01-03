@@ -33,25 +33,25 @@
         .input-std { width: 100%; background: #fff; border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s; }
         .input-std:focus { border-color: #2563EB; ring: 2px solid #bfdbfe; }
         
-        /* DROPDOWNS CUSTOMIZADOS (CORRIGIDO TRANSPARÊNCIA) */
-        .custom-select-btn { width: 100%; text-align: left; padding: 14px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-weight: 700; color: #374151; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; position: relative; z-index: 10; }
+        /* DROPDOWNS CUSTOMIZADOS */
+        .custom-select-btn { width: 100%; text-align: left; padding: 14px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-weight: 700; color: #374151; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; position: relative; z-index: 20; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         
         .custom-options { 
             display: none; 
             position: absolute; 
             top: 100%; left: 0; right: 0; 
-            background-color: #ffffff !important; /* Força fundo branco sólido */
+            background-color: #ffffff !important; 
             border: 1px solid #e5e7eb; 
             border-radius: 12px; 
-            margin-top: 6px; 
+            margin-top: 4px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-            z-index: 100 !important; /* Z-Index alto */
+            z-index: 50 !important; 
             overflow: hidden; 
             max-height: 250px; 
             overflow-y: auto; 
         }
         
-        .custom-option { padding: 12px 16px; cursor: pointer; font-size: 14px; font-weight: 600; color: #4B5563; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 10px; background: white; }
+        .custom-option { padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 600; color: #4B5563; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 10px; background: white; }
         .custom-option:hover { background-color: #eff6ff; color: #1E40AF; }
 
         /* SWITCH TOGGLE */
@@ -147,8 +147,7 @@
                         <span id="header-iniciais">LJ</span>
                     </div>
                 </div>
-                <div>
-                    <p class="text-[10px] opacity-75 uppercase tracking-widest">Menu</p>
+                <div class="flex flex-col justify-center">
                     <p class="font-bold text-sm flex items-center gap-2">
                         ID: <span id="header-id" class="font-mono bg-blue-900/50 px-1.5 rounded">...</span>
                         <i class="fas fa-chevron-down text-[10px] opacity-50"></i>
@@ -219,9 +218,9 @@
                         <input type="text" id="referencia" class="input-std" placeholder="Referência*">
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="grid grid-cols-2 gap-4 mb-6">
                         <div class="relative z-20">
-                            <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pagamento Entrega</label>
+                            <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pgto. Entrega</label>
                             <div class="custom-select-btn" onclick="toggleDropdown('entrega')">
                                 <span id="display-entrega">💠 PIX</span>
                                 <i class="fas fa-chevron-down text-gray-400" id="arrow-entrega"></i>
@@ -234,7 +233,7 @@
                             </div>
                         </div>
                         <div class="relative z-20">
-                            <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pagamento Produto</label>
+                            <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pgto. Produto</label>
                             <div class="custom-select-btn" onclick="toggleDropdown('produto')">
                                 <span id="display-produto">✅ Pago</span>
                                 <i class="fas fa-chevron-down text-gray-400" id="arrow-produto"></i>
@@ -263,7 +262,7 @@
                         </div>
                     </label>
 
-                    <button onclick="calcularDistancia()" id="btn-calcular" class="btn-primary shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    <button onclick="calcularDistancia()" id="btn-calcular" class="btn-primary mt-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                         Calcular Valor
                     </button>
 
@@ -281,7 +280,7 @@
                 </div>
             </div>
 
-            <div id="view-pedidos" class="hidden fade-in">
+            <div id="view-pedidos" class="hidden fade-in max-w-5xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="font-bold text-2xl text-gray-800">Histórico</h2>
                     <button onclick="atualizarPedidosManual()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-gray-50 flex items-center gap-2"><i class="fas fa-sync-alt"></i> Atualizar</button>
@@ -297,7 +296,7 @@
                 <div id="lista-pedidos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
-            <div id="view-extrato" class="hidden fade-in">
+            <div id="view-extrato" class="hidden fade-in max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="font-bold text-2xl text-gray-800">Movimentações</h2>
                     <button onclick="atualizarExtratoManual()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-gray-50"><i class="fas fa-sync-alt"></i></button>
@@ -310,14 +309,14 @@
                 <div id="lista-extrato" class="space-y-3"></div>
             </div>
 
-            <div id="view-perfil" class="hidden fade-in">
+            <div id="view-perfil" class="hidden fade-in max-w-3xl mx-auto">
                 <h2 class="font-bold text-2xl text-gray-800 mb-6">Meu Perfil</h2>
                 
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-6">
                     <div class="flex items-center gap-6 pb-6 border-b border-gray-100">
                         <div class="relative group">
-                            <img id="edit-img-perfil" src="https://via.placeholder.com/150" class="w-24 h-24 rounded-full object-cover border-4 border-gray-100">
-                            <button onclick="document.getElementById('input-foto').click()" class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700"><i class="fas fa-camera"></i></button>
+                            <img id="edit-img-perfil" src="https://via.placeholder.com/150" class="w-24 h-24 rounded-full object-cover border-4 border-gray-100 group-hover:border-blue-100 transition">
+                            <button onclick="document.getElementById('input-foto').click()" class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition transform hover:scale-110"><i class="fas fa-camera"></i></button>
                             <input type="file" id="input-foto" class="hidden" accept="image/*" onchange="uploadFoto()">
                         </div>
                         <div>
@@ -340,6 +339,7 @@
                     </div>
 
                     <button onclick="salvarPerfil()" class="btn-primary mb-4">Salvar Alterações</button>
+                    <button onclick="fazerLogout()" class="w-full text-red-500 font-bold hover:bg-red-50 py-4 rounded-xl transition">Sair da Conta</button>
                 </div>
             </div>
 
@@ -428,6 +428,7 @@
 
     // --- INICIALIZAÇÃO ---
     $(document).ready(function(){
+        // Máscaras
         $('#reg-zap, #edit-zap-loja, #edit-resp-zap, #tel_dest').mask('(00) 00000-0000');
         $('#edit-cnpj').mask('00.000.000/0000-00');
         $('#edit-cpf-resp').mask('000.000.000-00');
@@ -591,6 +592,7 @@
             $('#btn-calcular').show();
             return;
         }
+        
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(async () => {
             const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', ' + CITY_FIX)}&limit=3`);
@@ -650,7 +652,7 @@
         let total = config.taxa + (tempDist * config.km);
         const temRetorno = $('#retorno').is(':checked');
         
-        $('#text-retorno').text(temRetorno ? "Com Retorno (+20%)" : "Sem Retorno").toggleClass('text-blue-600', temRetorno);
+        $('#text-retorno').text(temRetorno ? "Com Retorno" : "Sem Retorno").toggleClass('text-blue-600', temRetorno);
         $('#bg-icon-retorno').toggleClass('bg-blue-100', temRetorno);
         $('#icon-retorno').attr('class', temRetorno ? 'fas fa-exchange-alt text-blue-600' : 'fas fa-arrow-right text-gray-400');
         
@@ -765,7 +767,8 @@
         $('#det-pin').text(p.pin_entrega);
         $('#det-origem').text(p.origem);
         $('#det-destino').text(p.destino);
-        
+        $('#det-status').text(p.status.toUpperCase());
+
         if(p.entregador_id) {
             const { data: m } = await sb.from('profiles').select('*').eq('id', p.entregador_id).single();
             if(m) {
