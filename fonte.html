@@ -54,17 +54,14 @@
         .btn-primary { background: #1E40AF; color: white; width: 100%; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 16px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; border: none; }
         .btn-primary:active { transform: scale(0.98); }
 
-        /* MODAIS (Força Bruta) */
+        /* MODAIS */
         .modal-overlay { 
-            display: none; /* Padrão: oculto */
-            position: fixed; 
-            inset: 0; 
+            display: none; 
+            position: fixed; inset: 0; 
             background: rgba(0,0,0,0.7); 
             z-index: 9999; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 20px; 
-            backdrop-filter: blur(2px); 
+            align-items: center; justify-content: center; 
+            padding: 20px; backdrop-filter: blur(2px); 
         }
         .modal-ativo { display: flex !important; }
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
@@ -75,7 +72,7 @@
         .filter-btn.active-filter { background-color: #1E40AF !important; color: white !important; border-color: #1E40AF !important; }
         .filter-btn.inactive-filter { background-color: white !important; color: #4B5563 !important; border: 1px solid #E5E7EB !important; }
 
-        /* STATUS BADGES */
+        /* STATUS */
         .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .bg-solicitado { background: #e5e7eb; color: #374151; }
         .bg-pendente { background: #fef3c7; color: #d97706; }
@@ -250,13 +247,19 @@
             <div id="view-extrato" class="hidden fade-in max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="font-bold text-2xl text-gray-800">Movimentações</h2>
-                    <button onclick="atualizarExtratoManual()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-gray-50"><i class="fas fa-sync-alt"></i></button>
+                    <div class="flex gap-2">
+                        <button onclick="toggleFiltroExtrato()" class="bg-white border border-gray-200 text-gray-500 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-gray-50 shadow-sm"><i class="fas fa-search"></i></button>
+                        <button onclick="atualizarExtratoManual()" class="bg-white border border-gray-200 text-gray-600 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-gray-50"><i class="fas fa-sync-alt"></i></button>
+                    </div>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 mb-6 flex flex-col md:flex-row gap-4 items-end">
-                    <div class="w-full"><label class="text-xs font-bold text-gray-400">Início</label><input type="date" id="filtro-ext-ini" class="input-std mt-1"></div>
-                    <div class="w-full"><label class="text-xs font-bold text-gray-400">Fim</label><input type="date" id="filtro-ext-fim" class="input-std mt-1"></div>
-                    <button onclick="carregarExtrato()" class="bg-blue-600 text-white h-[50px] px-6 rounded-xl font-bold w-full md:w-auto"><i class="fas fa-search"></i></button>
+                
+                <div id="box-filtro-extrato" class="hidden bg-blue-50 p-4 rounded-xl mb-4 border border-blue-100 flex items-end gap-2">
+                    <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Início</label><input type="date" id="filtro-ext-ini" class="input-std py-1 px-2 text-xs h-8"></div>
+                    <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Fim</label><input type="date" id="filtro-ext-fim" class="input-std py-1 px-2 text-xs h-8"></div>
+                    <button onclick="filtrarPorDataExt()" class="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center shadow hover:bg-blue-700"><i class="fas fa-check"></i></button>
+                    <button onclick="limparFiltroExtrato()" class="bg-gray-300 text-gray-700 w-8 h-8 rounded flex items-center justify-center hover:bg-gray-400"><i class="fas fa-times"></i></button>
                 </div>
+
                 <div id="lista-extrato" class="space-y-3"></div>
             </div>
 
@@ -297,21 +300,38 @@
             </div>
             <div class="p-6 space-y-6">
                 <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <div><p class="text-xs text-gray-400 font-bold uppercase">Valor Total</p><p id="det-valor" class="text-3xl font-extrabold text-green-600">R$ 0,00</p></div>
-                    <div class="text-right"><p class="text-xs text-gray-400 font-bold uppercase">PIN Entrega</p><p id="det-pin" class="text-2xl font-mono font-bold text-blue-700">----</p></div>
+                    <div>
+                        <p class="text-xs text-gray-400 font-bold uppercase">Valor Total</p>
+                        <p id="det-valor" class="text-3xl font-extrabold text-green-600">R$ 0,00</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-gray-400 font-bold uppercase">PIN Entrega</p>
+                        <p id="det-pin" class="text-2xl font-mono font-bold text-blue-700">----</p>
+                    </div>
                 </div>
                 <div class="space-y-4">
-                    <div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Retirada</p><p id="det-origem" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div>
-                    <div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Entrega</p><p id="det-destino" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase mb-1">Retirada</p>
+                        <p id="det-origem" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase mb-1">Entrega</p>
+                        <p id="det-destino" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p>
+                    </div>
                 </div>
                 <div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl flex items-center justify-between border border-blue-100">
                     <div class="flex items-center gap-3">
                         <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 text-xl shadow-sm"><i class="fas fa-motorcycle"></i></div>
-                        <div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-500">PLACA</p></div>
+                        <div>
+                            <p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p>
+                            <p id="det-moto-placa" class="text-xs font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-500">PLACA</p>
+                        </div>
                     </div>
                     <button id="btn-zap-moto" class="bg-green-500 hover:bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition"><i class="fab fa-whatsapp text-xl"></i></button>
                 </div>
-                <div id="box-cancelar" class="hidden"><button onclick="cancelarPedido()" class="w-full border-2 border-red-100 text-red-500 font-bold py-3 rounded-xl hover:bg-red-50 transition">Cancelar Pedido</button></div>
+                <div id="box-cancelar" class="hidden">
+                    <button onclick="cancelarPedido()" class="w-full border-2 border-red-100 text-red-500 font-bold py-3 rounded-xl hover:bg-red-50 transition">Cancelar Pedido</button>
+                </div>
             </div>
         </div>
     </div>
@@ -404,9 +424,9 @@
             $('#screen-auth').addClass('hidden');
             $('#screen-app').removeClass('hidden');
             
-            // LÓGICA DE PERSISTÊNCIA DE TELA
-            const lastScreen = localStorage.getItem('app_screen') || 'home';
-            mudarTela(lastScreen);
+            // PERSISTÊNCIA DE TELA
+            const savedScreen = localStorage.getItem('app_screen') || 'home';
+            mudarTela(savedScreen);
         } else {
             $('#global-loading').addClass('hidden');
             $('#screen-auth').removeClass('hidden');
@@ -451,7 +471,7 @@
     }
 
     window.mudarTela = function(screen) {
-        // SALVA TELA ATUAL
+        // Salva estado
         localStorage.setItem('app_screen', screen);
 
         $('.menu-link').removeClass('active');
@@ -634,10 +654,9 @@
         }
     }
 
-    // --- LOGOUT CORRIGIDO ---
     window.fazerLogout = async function() {
         await sb.auth.signOut();
-        localStorage.clear(); // Limpa estado da tela
+        localStorage.clear(); // Limpeza total
         location.reload();
     }
 
@@ -723,20 +742,15 @@
         });
     }
 
-    // --- MODAL CORRIGIDO (DADOS + VISIBILIDADE) ---
     window.verDetalhePedido = async function(id) {
         activePedidoId = id;
-        const p = pedidosCache.find(x => x.id == id); // Usa '==' para garantir match entre string/number
+        const p = pedidosCache.find(x => x.id == id);
         if(!p) return;
-        
-        // Preenchimento dos dados
         $('#det-valor').text(`R$ ${parseFloat(p.valor_frete).toFixed(2)}`);
         $('#det-pin').text(p.pin_entrega);
         $('#det-origem').text(p.origem);
         $('#det-destino').text(p.destino);
         $('#det-status').text(p.status.toUpperCase());
-        
-        // Lógica do Motoboy
         if(p.entregador_id) {
             const { data: m } = await sb.from('profiles').select('*').eq('id', p.entregador_id).single();
             if(m) {
@@ -748,12 +762,9 @@
         } else {
             $('#box-motoboy').addClass('hidden').removeClass('flex');
         }
-        
-        // Lógica Botão Cancelar
         if(['solicitado', 'pendente'].includes(p.status)) $('#box-cancelar').removeClass('hidden');
         else $('#box-cancelar').addClass('hidden');
         
-        // Abrir Modal
         $('#modal-detalhes').addClass('modal-ativo');
     }
 
@@ -768,11 +779,43 @@
         }
     }
 
+    // --- FUNÇÕES EXTRATO ---
+    window.toggleFiltroExtrato = function() { $('#box-filtro-extrato').toggleClass('hidden'); }
+
+    window.limparFiltroExtrato = function() {
+        $('#filtro-ext-ini, #filtro-ext-fim').val('');
+        $('#box-filtro-extrato').addClass('hidden');
+        carregarExtrato();
+    }
+
+    window.filtrarPorDataExt = function() {
+        const ini = $('#filtro-ext-ini').val();
+        const fim = $('#filtro-ext-fim').val();
+        if(!ini || !fim) return showToast("Selecione ambas as datas");
+        const d1 = new Date(ini);
+        const d2 = new Date(fim);
+        if(d1 > d2) return showToast("Data inicial deve ser menor que final");
+        if(Math.ceil(Math.abs(d2 - d1) / (1000 * 60 * 60 * 24)) > 90) return showToast("Período máximo é de 90 dias");
+        carregarExtrato(ini, fim);
+        $('#box-filtro-extrato').addClass('hidden');
+    }
+
     window.atualizarExtratoManual = function() { carregarExtrato(); }
 
-    window.carregarExtrato = async function() {
+    window.carregarExtrato = async function(dataIni = null, dataFim = null) {
         $('#lista-extrato').html('<div class="text-center py-10"><div class="loader"></div></div>');
-        const { data } = await sb.from('transacoes').select('*').eq('user_id', user.id).order('created_at', {ascending: false});
+        let query = sb.from('transacoes').select('*').eq('user_id', user.id).order('created_at', {ascending: false});
+        
+        if(dataIni && dataFim) {
+            const dFim = new Date(dataFim);
+            dFim.setHours(23,59,59);
+            query = query.gte('created_at', dataIni).lte('created_at', dFim.toISOString());
+        } else {
+            query = query.limit(50);
+        }
+
+        const { data } = await query;
+        
         if(!data || !data.length) { $('#lista-extrato').html('<div class="text-center py-10 text-gray-400">Sem movimentações.</div>'); return; }
         let html = '';
         data.forEach(t => {
