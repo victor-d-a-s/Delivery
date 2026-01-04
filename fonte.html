@@ -18,18 +18,20 @@
         .fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* HEADER */
+        /* HEADER AZUL */
         .portal-header { background-color: #1E40AF; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 40; }
         
         /* SIDEBAR */
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; backdrop-filter: blur(2px); }
         .sidebar-menu { position: fixed; top: 0; left: 0; bottom: 0; width: 280px; background: white; z-index: 101; transform: translateX(-100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         .sidebar-menu.open { transform: translateX(0); }
+        
         .menu-link { padding: 16px 20px; font-weight: 600; color: #374151; display: flex; align-items: center; gap: 12px; border-left: 4px solid transparent; cursor: pointer; transition: 0.2s; }
         .menu-link:hover, .menu-link.active { background: #eff6ff; color: #1E40AF; border-left-color: #1E40AF; }
 
         /* INPUTS */
         .input-std { width: 100%; background: #fff; border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s; }
+        .input-std:focus { border-color: #2563EB; ring: 2px solid #bfdbfe; }
         
         /* DROPDOWNS */
         .custom-select-btn { width: 100%; text-align: left; padding: 14px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-weight: 700; color: #374151; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; position: relative; z-index: 20; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
@@ -56,32 +58,33 @@
         .btn-primary { background: #1E40AF; color: white; width: 100%; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 16px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; border: none; }
         .btn-primary:active { transform: scale(0.98); }
 
-        /* MODAIS - CORREÇÃO INFALÍVEL */
+        /* MODAL SYSTEM (CORRIGIDO) */
         .modal-overlay { 
-            display: none; /* Padrão: oculto */
-            position: fixed; 
-            inset: 0; 
+            position: fixed; inset: 0; 
             background: rgba(0,0,0,0.7); 
-            z-index: 9999; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 20px; 
-            backdrop-filter: blur(2px); 
+            z-index: 10000; /* Z-Index muito alto */
+            display: none; /* Padrão: invisível */
+            align-items: center; justify-content: center; 
+            padding: 20px; backdrop-filter: blur(2px); 
         }
         
-        /* Esta classe força a exibição quando adicionada via JS */
-        .modal-ativo {
-            display: flex !important;
+        /* Classe que ativa o modal (sobrepõe o display: none) */
+        .modal-overlay.active { 
+            display: flex !important; 
         }
 
-        .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
-        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-content { 
+            background: white; width: 100%; max-width: 450px; 
+            border-radius: 20px; overflow: hidden; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3); 
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* FILTERS */
+        /* FILTERS & STATUS */
         .filter-btn { transition: 0.2s; white-space: nowrap; }
         .filter-btn.active-filter { background-color: #1E40AF !important; color: white !important; border-color: #1E40AF !important; }
         .filter-btn.inactive-filter { background-color: white !important; color: #4B5563 !important; border: 1px solid #E5E7EB !important; }
-
         .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .bg-solicitado { background: #e5e7eb; color: #374151; }
         .bg-pendente { background: #fef3c7; color: #d97706; }
@@ -89,6 +92,7 @@
         .bg-concluido { background: #d1fae5; color: #059669; }
         .bg-cancelado { background: #fee2e2; color: #991b1b; }
 
+        /* LOADING */
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #1E40AF; border-radius: 50%; width: 30px; height: 30px; animation: spin 0.8s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -98,7 +102,6 @@
     <div id="global-loading" class="fixed inset-0 bg-white z-[300] flex flex-col items-center justify-center">
         <div class="loader mb-3"></div><p class="text-blue-900 text-xs font-bold tracking-widest animate-pulse">CARREGANDO</p>
     </div>
-
     <div id="native-toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-xl opacity-0 transition z-[300] text-sm font-bold pointer-events-none"></div>
 
     <div id="screen-auth" class="min-h-screen flex items-center justify-center bg-gray-100 hidden p-4">
@@ -285,8 +288,8 @@
                         <div class="md:col-span-2"><label class="text-xs font-bold text-gray-400 uppercase">Endereço Completo</label><input type="text" id="edit-endereco" class="input-std mt-1"></div>
                     </div>
                     <div class="flex gap-4 mb-8">
-                        <button onclick="$('#modal-pin').addClass('modal-ativo')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar PIN</button>
-                        <button onclick="$('#modal-senha').addClass('modal-ativo')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar Senha</button>
+                        <button onclick="$('#modal-pin').addClass('active')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar PIN</button>
+                        <button onclick="$('#modal-senha').addClass('active')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar Senha</button>
                     </div>
                     <button onclick="salvarPerfil()" class="btn-primary mb-4">Salvar Alterações</button>
                     <button onclick="fazerLogout()" class="w-full text-red-500 font-bold hover:bg-red-50 py-4 rounded-xl transition">Sair da Conta</button>
@@ -299,25 +302,42 @@
         <div class="modal-content max-w-lg">
             <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
                 <div><h3 class="font-bold text-xl">Detalhes</h3><p id="det-status" class="text-sm opacity-80 font-bold uppercase mt-1">...</p></div>
-                <button onclick="$('#modal-detalhes').removeClass('modal-ativo')" class="text-2xl hover:text-gray-200">&times;</button>
+                <button onclick="$('#modal-detalhes').removeClass('active')" class="text-2xl hover:text-gray-200">&times;</button>
             </div>
             <div class="p-6 space-y-6">
                 <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <div><p class="text-xs text-gray-400 font-bold uppercase">Valor Total</p><p id="det-valor" class="text-3xl font-extrabold text-green-600">R$ 0,00</p></div>
-                    <div class="text-right"><p class="text-xs text-gray-400 font-bold uppercase">PIN Entrega</p><p id="det-pin" class="text-2xl font-mono font-bold text-blue-700">----</p></div>
+                    <div>
+                        <p class="text-xs text-gray-400 font-bold uppercase">Valor Total</p>
+                        <p id="det-valor" class="text-3xl font-extrabold text-green-600">R$ 0,00</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-gray-400 font-bold uppercase">PIN Entrega</p>
+                        <p id="det-pin" class="text-2xl font-mono font-bold text-blue-700">----</p>
+                    </div>
                 </div>
                 <div class="space-y-4">
-                    <div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Retirada</p><p id="det-origem" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div>
-                    <div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Entrega</p><p id="det-destino" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase mb-1">Retirada</p>
+                        <p id="det-origem" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase mb-1">Entrega</p>
+                        <p id="det-destino" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p>
+                    </div>
                 </div>
                 <div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl flex items-center justify-between border border-blue-100">
                     <div class="flex items-center gap-3">
                         <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 text-xl shadow-sm"><i class="fas fa-motorcycle"></i></div>
-                        <div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-500">PLACA</p></div>
+                        <div>
+                            <p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p>
+                            <p id="det-moto-placa" class="text-xs font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-500">PLACA</p>
+                        </div>
                     </div>
                     <button id="btn-zap-moto" class="bg-green-500 hover:bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition"><i class="fab fa-whatsapp text-xl"></i></button>
                 </div>
-                <div id="box-cancelar" class="hidden"><button onclick="cancelarPedido()" class="w-full border-2 border-red-100 text-red-500 font-bold py-3 rounded-xl hover:bg-red-50 transition">Cancelar Pedido</button></div>
+                <div id="box-cancelar" class="hidden">
+                    <button onclick="cancelarPedido()" class="w-full border-2 border-red-100 text-red-500 font-bold py-3 rounded-xl hover:bg-red-50 transition">Cancelar Pedido</button>
+                </div>
             </div>
         </div>
     </div>
@@ -331,7 +351,7 @@
                 <div class="flex justify-between border-b border-dashed border-gray-300 pb-3"><span class="text-gray-500 font-medium">Data</span><span id="comp-data" class="font-bold text-gray-700">--/--</span></div>
                 <div><span class="text-gray-500 text-xs font-bold uppercase">Descrição</span><p id="comp-desc" class="font-medium text-gray-800 mt-1">...</p></div>
             </div>
-            <button onclick="$('#modal-comprovante').removeClass('modal-ativo')" class="btn-primary mt-6">Fechar</button>
+            <button onclick="$('#modal-comprovante').removeClass('active')" class="btn-primary mt-6">Fechar</button>
         </div>
     </div>
 
@@ -341,7 +361,7 @@
             <p class="text-sm text-gray-500 mb-6">Digite 4 números.</p>
             <input type="tel" id="novo-pin" maxlength="4" class="input-std text-center text-3xl font-bold tracking-[0.5em] mb-6" placeholder="0000">
             <div class="flex gap-4">
-                <button onclick="$('#modal-pin').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-pin').removeClass('active')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
@@ -352,7 +372,7 @@
             <h3 class="font-bold text-xl mb-6">Nova Senha</h3>
             <input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres">
             <div class="flex gap-4">
-                <button onclick="$('#modal-senha').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-senha').removeClass('active')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
@@ -450,7 +470,7 @@
 
     window.toggleMenu = function() {
         $('#sidebar').toggleClass('open');
-        $('#menu-overlay').toggleClass('modal-ativo');
+        $('#menu-overlay').toggleClass('active');
     }
 
     window.mudarTela = function(screen) {
@@ -721,10 +741,10 @@
         });
     }
 
-    // --- FIX MODAL DEFINITIVO (CLASS TOGGLE) ---
+    // --- MODAL SEM ERRO DE VISIBILIDADE ---
     window.verDetalhePedido = async function(id) {
         activePedidoId = id;
-        const p = pedidosCache.find(x => x.id == id); // Loose equality
+        const p = pedidosCache.find(x => x.id == id);
         if(!p) return;
         
         $('#det-valor').text(`R$ ${parseFloat(p.valor_frete).toFixed(2)}`);
@@ -748,8 +768,7 @@
         if(['solicitado', 'pendente'].includes(p.status)) $('#box-cancelar').removeClass('hidden');
         else $('#box-cancelar').addClass('hidden');
         
-        // ADICIONA A CLASSE QUE FORÇA DISPLAY FLEX
-        $('#modal-detalhes').addClass('modal-ativo');
+        $('#modal-detalhes').addClass('active');
     }
 
     window.cancelarPedido = async function() {
@@ -757,7 +776,7 @@
         const { error } = await sb.from('pedidos').update({status: 'cancelado'}).eq('id', activePedidoId);
         if(error) showToast("Erro ao cancelar");
         else {
-            $('#modal-detalhes').removeClass('modal-ativo');
+            $('#modal-detalhes').removeClass('active');
             carregarHistoricoPedidos();
             showToast("Pedido Cancelado");
         }
@@ -790,7 +809,7 @@
         $('#comp-desc').text(desc);
         $('#comp-valor').text(`R$ ${parseFloat(val).toFixed(2)}`);
         $('#comp-data').text(new Date(date).toLocaleString());
-        $('#modal-comprovante').addClass('modal-ativo');
+        $('#modal-comprovante').addClass('active');
     }
 
     window.salvarPerfil = async function() {
@@ -803,7 +822,7 @@
         const pin = $('#novo-pin').val();
         if(pin.length !== 4) return showToast("O PIN deve ter 4 dígitos");
         await sb.from('profiles').update({pin_carteira: pin}).eq('id', user.id);
-        $('#modal-pin').removeClass('modal-ativo');
+        $('#modal-pin').removeClass('active');
         showToast("PIN Alterado!");
     }
 
@@ -811,7 +830,7 @@
         const senha = $('#nova-senha').val();
         if(senha.length < 6) return showToast("Mínimo 6 caracteres");
         const { error } = await sb.auth.updateUser({ password: senha });
-        if(error) showToast("Erro: " + error.message); else { $('#modal-senha').removeClass('modal-ativo'); showToast("Senha Alterada!"); }
+        if(error) showToast("Erro: " + error.message); else { $('#modal-senha').removeClass('active'); showToast("Senha Alterada!"); }
     }
 
     window.uploadFoto = async function() {
