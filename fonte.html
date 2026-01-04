@@ -83,23 +83,29 @@
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #1E40AF; border-radius: 50%; width: 30px; height: 30px; animation: spin 0.8s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* IMPRESSÃO (NOVO) */
+        /* IMPRESSÃO (CORRIGIDO PARA 1 PÁGINA) */
         @media print {
+            @page { size: auto; margin: 0mm; }
+            body, html { height: auto; overflow: visible; background: white; margin: 0; padding: 0; }
             body * { visibility: hidden; }
             #modal-comprovante, #modal-comprovante * { visibility: visible; }
             #modal-comprovante { 
-                position: fixed; 
-                left: 0; top: 0; width: 100%; height: 100%; 
-                margin: 0; padding: 0; 
+                position: absolute; 
+                left: 0; top: 0; width: 100%; height: auto;
+                margin: 0; padding: 20px; 
                 background: white; 
-                display: flex !important;
-                align-items: flex-start; justify-content: center;
+                display: block !important;
+                box-shadow: none;
+                backdrop-filter: none;
             }
             .modal-content { 
-                box-shadow: none; 
+                box-shadow: none !important; 
                 border: 2px solid #000; 
-                margin-top: 20px;
-                width: 100%; max-width: 100%;
+                margin: 0 auto;
+                width: 100% !important;
+                max-width: 100% !important;
+                transform: none !important;
+                animation: none !important;
             }
             .no-print { display: none !important; }
         }
@@ -355,6 +361,9 @@
                     <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Loja</span><span id="comp-loja" class="font-bold text-gray-800 text-sm text-right truncate w-32">...</span></div>
                     <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Tipo</span><span id="comp-tipo" class="font-bold text-blue-600 text-sm">...</span></div>
                     <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">ID</span><span id="comp-id" class="font-mono text-xs text-gray-500">...</span></div>
+                    
+                    <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Pagamento</span><span id="comp-pgto" class="font-bold text-gray-800 text-sm">...</span></div>
+                    
                     <div class="border-t border-dashed border-gray-300 my-2"></div>
                     <div class="flex justify-between items-center">
                         <span class="text-xs font-bold text-gray-400 uppercase">Valor Total</span>
@@ -446,7 +455,6 @@
             $('#screen-auth').addClass('hidden');
             $('#screen-app').removeClass('hidden');
             
-            // PERSISTÊNCIA TELA
             const saved = localStorage.getItem('app_screen') || 'home';
             mudarTela(saved);
         } else {
@@ -800,7 +808,6 @@
         }
     }
 
-    // --- EXTRATO & COMPROVANTE ---
     window.toggleFiltroExtrato = function() { $('#box-filtro-extrato').toggleClass('hidden'); }
 
     window.limparFiltroExtrato = function() {
@@ -826,17 +833,13 @@
     window.carregarExtrato = async function(dataIni = null, dataFim = null) {
         $('#lista-extrato').html('<div class="text-center py-10"><div class="loader"></div></div>');
         let query = sb.from('transacoes').select('*').eq('user_id', user.id).order('created_at', {ascending: false});
-        
         if(dataIni && dataFim) {
-            const dFim = new Date(dataFim);
-            dFim.setHours(23,59,59);
+            const dFim = new Date(dataFim); dFim.setHours(23,59,59);
             query = query.gte('created_at', dataIni).lte('created_at', dFim.toISOString());
         } else {
             query = query.limit(50);
         }
-
         const { data } = await query;
-        
         if(!data || !data.length) { $('#lista-extrato').html('<div class="text-center py-10 text-gray-400">Sem movimentações.</div>'); return; }
         let html = '';
         data.forEach(t => {
@@ -855,8 +858,8 @@
         $('#lista-extrato').html(html);
     }
 
-    // --- NOVO COMPROVANTE ---
-    window.verComprovante = function(id, desc, val, date, tipo) {
+    // --- COMPROVANTE INTELIGENTE ---
+    window.verComprovante = async function(id, desc, val, date, tipo) {
         const d = new Date(date);
         const dataFormatada = `${d.toLocaleDateString()} às ${d.toLocaleTimeString().slice(0,5)}`;
         
@@ -867,6 +870,27 @@
         $('#comp-valor').text(`R$ ${parseFloat(val).toFixed(2)}`);
         $('#comp-desc').text(desc);
         
+        // Lógica de Pagamento
+        let pgto = "Saldo em Conta"; // Padrão para débito
+        if(tipo === 'credito') pgto = "Transferência / Pix";
+        
+        // Tenta buscar o pedido se a descrição contiver "Pedido"
+        if(tipo === 'debito' && desc.includes('Pedido')) {
+            const match = desc.match(/#(\w+)/);
+            if(match && match[1]) {
+                // Tenta achar no cache primeiro
+                let p = pedidosCache.find(x => x.codigo_visual == match[1]);
+                if(!p) {
+                    // Busca no banco se não tiver no cache
+                    const { data } = await sb.from('pedidos').select('forma_pagamento').eq('codigo_visual', match[1]).single();
+                    if(data) pgto = data.forma_pagamento;
+                } else {
+                    pgto = p.forma_pagamento;
+                }
+            }
+        }
+        
+        $('#comp-pgto').text(pgto);
         $('#modal-comprovante').addClass('modal-ativo');
     }
 
