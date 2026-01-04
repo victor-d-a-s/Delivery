@@ -18,7 +18,7 @@
         .fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* HEADER AZUL */
+        /* HEADER */
         .portal-header { background-color: #1E40AF; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 40; }
         
         /* SIDEBAR */
@@ -30,7 +30,6 @@
 
         /* INPUTS */
         .input-std { width: 100%; background: #fff; border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s; }
-        .input-std:focus { border-color: #2563EB; ring: 2px solid #bfdbfe; }
         
         /* DROPDOWNS */
         .custom-select-btn { width: 100%; text-align: left; padding: 14px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-weight: 700; color: #374151; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; position: relative; z-index: 20; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
@@ -57,26 +56,24 @@
         .btn-primary { background: #1E40AF; color: white; width: 100%; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 16px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; border: none; }
         .btn-primary:active { transform: scale(0.98); }
 
-        /* BADGES */
-        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .bg-solicitado { background: #e5e7eb; color: #374151; }
-        .bg-pendente { background: #fef3c7; color: #d97706; }
-        .bg-em_rota { background: #dbeafe; color: #1e40af; }
-        .bg-concluido { background: #d1fae5; color: #059669; }
-        .bg-cancelado { background: #fee2e2; color: #991b1b; }
-
-        /* MODAIS - FIXED */
+        /* MODAIS - CORREÇÃO INFALÍVEL */
         .modal-overlay { 
+            display: none; /* Padrão: oculto */
             position: fixed; 
             inset: 0; 
             background: rgba(0,0,0,0.7); 
-            z-index: 99999; /* Z-INDEX ALTÍSSIMO */
-            display: none; /* COMEÇA OCULTO */
+            z-index: 9999; 
             align-items: center; 
             justify-content: center; 
             padding: 20px; 
             backdrop-filter: blur(2px); 
         }
+        
+        /* Esta classe força a exibição quando adicionada via JS */
+        .modal-ativo {
+            display: flex !important;
+        }
+
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
         @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
@@ -85,7 +82,13 @@
         .filter-btn.active-filter { background-color: #1E40AF !important; color: white !important; border-color: #1E40AF !important; }
         .filter-btn.inactive-filter { background-color: white !important; color: #4B5563 !important; border: 1px solid #E5E7EB !important; }
 
-        /* LOADING */
+        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .bg-solicitado { background: #e5e7eb; color: #374151; }
+        .bg-pendente { background: #fef3c7; color: #d97706; }
+        .bg-em_rota { background: #dbeafe; color: #1e40af; }
+        .bg-concluido { background: #d1fae5; color: #059669; }
+        .bg-cancelado { background: #fee2e2; color: #991b1b; }
+
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #1E40AF; border-radius: 50%; width: 30px; height: 30px; animation: spin 0.8s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -282,8 +285,8 @@
                         <div class="md:col-span-2"><label class="text-xs font-bold text-gray-400 uppercase">Endereço Completo</label><input type="text" id="edit-endereco" class="input-std mt-1"></div>
                     </div>
                     <div class="flex gap-4 mb-8">
-                        <button onclick="$('#modal-pin').css('display','flex')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar PIN</button>
-                        <button onclick="$('#modal-senha').css('display','flex')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar Senha</button>
+                        <button onclick="$('#modal-pin').addClass('modal-ativo')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar PIN</button>
+                        <button onclick="$('#modal-senha').addClass('modal-ativo')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar Senha</button>
                     </div>
                     <button onclick="salvarPerfil()" class="btn-primary mb-4">Salvar Alterações</button>
                     <button onclick="fazerLogout()" class="w-full text-red-500 font-bold hover:bg-red-50 py-4 rounded-xl transition">Sair da Conta</button>
@@ -296,7 +299,7 @@
         <div class="modal-content max-w-lg">
             <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
                 <div><h3 class="font-bold text-xl">Detalhes</h3><p id="det-status" class="text-sm opacity-80 font-bold uppercase mt-1">...</p></div>
-                <button onclick="$('#modal-detalhes').css('display','none')" class="text-2xl hover:text-gray-200">&times;</button>
+                <button onclick="$('#modal-detalhes').removeClass('modal-ativo')" class="text-2xl hover:text-gray-200">&times;</button>
             </div>
             <div class="p-6 space-y-6">
                 <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
@@ -328,7 +331,7 @@
                 <div class="flex justify-between border-b border-dashed border-gray-300 pb-3"><span class="text-gray-500 font-medium">Data</span><span id="comp-data" class="font-bold text-gray-700">--/--</span></div>
                 <div><span class="text-gray-500 text-xs font-bold uppercase">Descrição</span><p id="comp-desc" class="font-medium text-gray-800 mt-1">...</p></div>
             </div>
-            <button onclick="$('#modal-comprovante').css('display','none')" class="btn-primary mt-6">Fechar</button>
+            <button onclick="$('#modal-comprovante').removeClass('modal-ativo')" class="btn-primary mt-6">Fechar</button>
         </div>
     </div>
 
@@ -338,7 +341,7 @@
             <p class="text-sm text-gray-500 mb-6">Digite 4 números.</p>
             <input type="tel" id="novo-pin" maxlength="4" class="input-std text-center text-3xl font-bold tracking-[0.5em] mb-6" placeholder="0000">
             <div class="flex gap-4">
-                <button onclick="$('#modal-pin').css('display','none')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-pin').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
@@ -349,7 +352,7 @@
             <h3 class="font-bold text-xl mb-6">Nova Senha</h3>
             <input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres">
             <div class="flex gap-4">
-                <button onclick="$('#modal-senha').css('display','none')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-senha').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
@@ -447,7 +450,7 @@
 
     window.toggleMenu = function() {
         $('#sidebar').toggleClass('open');
-        $('#menu-overlay').toggleClass('hidden').css('display', $('#sidebar').hasClass('open') ? 'block' : 'none');
+        $('#menu-overlay').toggleClass('modal-ativo');
     }
 
     window.mudarTela = function(screen) {
@@ -718,16 +721,18 @@
         });
     }
 
-    // --- FIX MODAL DEFINITIVO (DIRECT CSS) ---
+    // --- FIX MODAL DEFINITIVO (CLASS TOGGLE) ---
     window.verDetalhePedido = async function(id) {
         activePedidoId = id;
-        const p = pedidosCache.find(x => x.id === id);
+        const p = pedidosCache.find(x => x.id == id); // Loose equality
         if(!p) return;
+        
         $('#det-valor').text(`R$ ${parseFloat(p.valor_frete).toFixed(2)}`);
         $('#det-pin').text(p.pin_entrega);
         $('#det-origem').text(p.origem);
         $('#det-destino').text(p.destino);
         $('#det-status').text(p.status.toUpperCase());
+        
         if(p.entregador_id) {
             const { data: m } = await sb.from('profiles').select('*').eq('id', p.entregador_id).single();
             if(m) {
@@ -739,11 +744,12 @@
         } else {
             $('#box-motoboy').addClass('hidden').removeClass('flex');
         }
+        
         if(['solicitado', 'pendente'].includes(p.status)) $('#box-cancelar').removeClass('hidden');
         else $('#box-cancelar').addClass('hidden');
         
-        // FORÇA DISPLAY FLEX DIRETAMENTE
-        $('#modal-detalhes').css('display', 'flex');
+        // ADICIONA A CLASSE QUE FORÇA DISPLAY FLEX
+        $('#modal-detalhes').addClass('modal-ativo');
     }
 
     window.cancelarPedido = async function() {
@@ -751,7 +757,7 @@
         const { error } = await sb.from('pedidos').update({status: 'cancelado'}).eq('id', activePedidoId);
         if(error) showToast("Erro ao cancelar");
         else {
-            $('#modal-detalhes').css('display', 'none');
+            $('#modal-detalhes').removeClass('modal-ativo');
             carregarHistoricoPedidos();
             showToast("Pedido Cancelado");
         }
@@ -784,7 +790,7 @@
         $('#comp-desc').text(desc);
         $('#comp-valor').text(`R$ ${parseFloat(val).toFixed(2)}`);
         $('#comp-data').text(new Date(date).toLocaleString());
-        $('#modal-comprovante').css('display', 'flex');
+        $('#modal-comprovante').addClass('modal-ativo');
     }
 
     window.salvarPerfil = async function() {
@@ -797,7 +803,7 @@
         const pin = $('#novo-pin').val();
         if(pin.length !== 4) return showToast("O PIN deve ter 4 dígitos");
         await sb.from('profiles').update({pin_carteira: pin}).eq('id', user.id);
-        $('#modal-pin').css('display', 'none');
+        $('#modal-pin').removeClass('modal-ativo');
         showToast("PIN Alterado!");
     }
 
@@ -805,7 +811,7 @@
         const senha = $('#nova-senha').val();
         if(senha.length < 6) return showToast("Mínimo 6 caracteres");
         const { error } = await sb.auth.updateUser({ password: senha });
-        if(error) showToast("Erro: " + error.message); else { $('#modal-senha').css('display', 'none'); showToast("Senha Alterada!"); }
+        if(error) showToast("Erro: " + error.message); else { $('#modal-senha').removeClass('modal-ativo'); showToast("Senha Alterada!"); }
     }
 
     window.uploadFoto = async function() {
