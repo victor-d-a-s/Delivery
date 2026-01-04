@@ -14,7 +14,7 @@
     <style>
         /* CORE */
         body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; }
-        .hidden { display: none !important; } /* CLASSE QUE CONTROLA VISIBILIDADE */
+        .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -25,6 +25,7 @@
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; backdrop-filter: blur(2px); }
         .sidebar-menu { position: fixed; top: 0; left: 0; bottom: 0; width: 280px; background: white; z-index: 101; transform: translateX(-100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         .sidebar-menu.open { transform: translateX(0); }
+        
         .menu-link { padding: 16px 20px; font-weight: 600; color: #374151; display: flex; align-items: center; gap: 12px; border-left: 4px solid transparent; cursor: pointer; transition: 0.2s; }
         .menu-link:hover, .menu-link.active { background: #eff6ff; color: #1E40AF; border-left-color: #1E40AF; }
 
@@ -65,20 +66,18 @@
         .bg-concluido { background: #d1fae5; color: #059669; }
         .bg-cancelado { background: #fee2e2; color: #991b1b; }
 
-        /* MODAIS */
+        /* MODAIS (Estilo Ajustado) */
         .modal-overlay { 
-            position: fixed; 
-            inset: 0; 
+            position: fixed; inset: 0; 
             background: rgba(0,0,0,0.7); 
-            z-index: 9999; 
-            display: flex; /* PADRÃO FLEX PARA CENTRALIZAR */
+            z-index: 1000; /* Z-Index alto */
+            display: flex; /* Flex padrão para centralizar */
             align-items: center; 
             justify-content: center; 
             padding: 20px; 
-            backdrop-filter: blur(2px); 
+            backdrop-filter: blur(2px);
+            /* Visibilidade controlada via inline style */
         }
-        /* QUANDO TIVER A CLASSE 'HIDDEN', O DISPLAY:NONE SOBRESCREVE O FLEX */
-        
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
         @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
@@ -121,7 +120,7 @@
         </div>
     </div>
 
-    <div id="menu-overlay" class="sidebar-overlay hidden" onclick="toggleMenu()"></div>
+    <div id="menu-overlay" class="sidebar-overlay" style="display: none;" onclick="toggleMenu()"></div>
     <div id="sidebar" class="sidebar-menu">
         <div class="p-6 bg-blue-700 text-white pt-10">
             <div class="flex items-center gap-3 mb-2">
@@ -284,8 +283,8 @@
                         <div class="md:col-span-2"><label class="text-xs font-bold text-gray-400 uppercase">Endereço Completo</label><input type="text" id="edit-endereco" class="input-std mt-1"></div>
                     </div>
                     <div class="flex gap-4 mb-8">
-                        <button onclick="$('#modal-pin').removeClass('hidden')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar PIN</button>
-                        <button onclick="$('#modal-senha').removeClass('hidden')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar Senha</button>
+                        <button onclick="$('#modal-pin').css('display','flex')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar PIN</button>
+                        <button onclick="$('#modal-senha').css('display','flex')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar Senha</button>
                     </div>
                     <button onclick="salvarPerfil()" class="btn-primary mb-4">Salvar Alterações</button>
                     <button onclick="fazerLogout()" class="w-full text-red-500 font-bold hover:bg-red-50 py-4 rounded-xl transition">Sair da Conta</button>
@@ -294,11 +293,11 @@
         </main>
     </div>
 
-    <div id="modal-detalhes" class="modal-overlay hidden">
+    <div id="modal-detalhes" class="modal-overlay" style="display: none;">
         <div class="modal-content max-w-lg">
             <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
                 <div><h3 class="font-bold text-xl">Detalhes</h3><p id="det-status" class="text-sm opacity-80 font-bold uppercase mt-1">...</p></div>
-                <button onclick="$('#modal-detalhes').addClass('hidden')" class="text-2xl hover:text-gray-200">&times;</button>
+                <button onclick="$('#modal-detalhes').hide()" class="text-2xl hover:text-gray-200">&times;</button>
             </div>
             <div class="p-6 space-y-6">
                 <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
@@ -321,7 +320,7 @@
         </div>
     </div>
 
-    <div id="modal-comprovante" class="modal-overlay hidden">
+    <div id="modal-comprovante" class="modal-overlay" style="display: none;">
         <div class="modal-content text-center p-8">
             <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600 text-3xl"><i class="fas fa-receipt"></i></div>
             <h3 class="font-bold text-2xl text-gray-800 mb-6">Comprovante</h3>
@@ -330,28 +329,28 @@
                 <div class="flex justify-between border-b border-dashed border-gray-300 pb-3"><span class="text-gray-500 font-medium">Data</span><span id="comp-data" class="font-bold text-gray-700">--/--</span></div>
                 <div><span class="text-gray-500 text-xs font-bold uppercase">Descrição</span><p id="comp-desc" class="font-medium text-gray-800 mt-1">...</p></div>
             </div>
-            <button onclick="$('#modal-comprovante').addClass('hidden')" class="btn-primary mt-6">Fechar</button>
+            <button onclick="$('#modal-comprovante').hide()" class="btn-primary mt-6">Fechar</button>
         </div>
     </div>
 
-    <div id="modal-pin" class="modal-overlay hidden">
+    <div id="modal-pin" class="modal-overlay" style="display: none;">
         <div class="modal-content p-8 text-center">
             <h3 class="font-bold text-xl mb-2">Novo PIN</h3>
             <p class="text-sm text-gray-500 mb-6">Digite 4 números.</p>
             <input type="tel" id="novo-pin" maxlength="4" class="input-std text-center text-3xl font-bold tracking-[0.5em] mb-6" placeholder="0000">
             <div class="flex gap-4">
-                <button onclick="$('#modal-pin').addClass('hidden')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-pin').hide()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-senha" class="modal-overlay hidden">
+    <div id="modal-senha" class="modal-overlay" style="display: none;">
         <div class="modal-content p-8 text-center">
             <h3 class="font-bold text-xl mb-6">Nova Senha</h3>
             <input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres">
             <div class="flex gap-4">
-                <button onclick="$('#modal-senha').addClass('hidden')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-senha').hide()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
@@ -721,7 +720,7 @@
         });
     }
 
-    // --- FIX MODAL FINAL: REMOVE HIDDEN CLASS ---
+    // --- FIX MODAL FINAL: FORCE FLEX DISPLAY ---
     window.verDetalhePedido = async function(id) {
         activePedidoId = id;
         const p = pedidosCache.find(x => x.id === id);
@@ -745,8 +744,8 @@
         if(['solicitado', 'pendente'].includes(p.status)) $('#box-cancelar').removeClass('hidden');
         else $('#box-cancelar').addClass('hidden');
         
-        // Remove a classe hidden para que o display:flex do CSS funcione
-        $('#modal-detalhes').removeClass('hidden');
+        // Remove 'hidden' class just in case (though it shouldn't be there) AND force display:flex
+        $('#modal-detalhes').removeClass('hidden').css('display', 'flex');
     }
 
     window.cancelarPedido = async function() {
@@ -754,7 +753,7 @@
         const { error } = await sb.from('pedidos').update({status: 'cancelado'}).eq('id', activePedidoId);
         if(error) showToast("Erro ao cancelar");
         else {
-            $('#modal-detalhes').addClass('hidden');
+            $('#modal-detalhes').hide();
             carregarHistoricoPedidos();
             showToast("Pedido Cancelado");
         }
@@ -787,7 +786,7 @@
         $('#comp-desc').text(desc);
         $('#comp-valor').text(`R$ ${parseFloat(val).toFixed(2)}`);
         $('#comp-data').text(new Date(date).toLocaleString());
-        $('#modal-comprovante').removeClass('hidden');
+        $('#modal-comprovante').css('display', 'flex');
     }
 
     window.salvarPerfil = async function() {
@@ -800,7 +799,7 @@
         const pin = $('#novo-pin').val();
         if(pin.length !== 4) return showToast("O PIN deve ter 4 dígitos");
         await sb.from('profiles').update({pin_carteira: pin}).eq('id', user.id);
-        $('#modal-pin').addClass('hidden');
+        $('#modal-pin').hide();
         showToast("PIN Alterado!");
     }
 
@@ -808,7 +807,7 @@
         const senha = $('#nova-senha').val();
         if(senha.length < 6) return showToast("Mínimo 6 caracteres");
         const { error } = await sb.auth.updateUser({ password: senha });
-        if(error) showToast("Erro: " + error.message); else { $('#modal-senha').addClass('hidden'); showToast("Senha Alterada!"); }
+        if(error) showToast("Erro: " + error.message); else { $('#modal-senha').hide(); showToast("Senha Alterada!"); }
     }
 
     window.uploadFoto = async function() {
