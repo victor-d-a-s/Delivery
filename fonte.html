@@ -82,6 +82,27 @@
 
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #1E40AF; border-radius: 50%; width: 30px; height: 30px; animation: spin 0.8s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* IMPRESSÃO (NOVO) */
+        @media print {
+            body * { visibility: hidden; }
+            #modal-comprovante, #modal-comprovante * { visibility: visible; }
+            #modal-comprovante { 
+                position: fixed; 
+                left: 0; top: 0; width: 100%; height: 100%; 
+                margin: 0; padding: 0; 
+                background: white; 
+                display: flex !important;
+                align-items: flex-start; justify-content: center;
+            }
+            .modal-content { 
+                box-shadow: none; 
+                border: 2px solid #000; 
+                margin-top: 20px;
+                width: 100%; max-width: 100%;
+            }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -133,7 +154,7 @@
     </div>
 
     <div id="screen-app" class="hidden min-h-screen flex flex-col">
-        <header class="portal-header">
+        <header class="portal-header no-print">
             <div class="flex items-center gap-4">
                 <div class="cursor-pointer hover:opacity-90 transition" onclick="toggleMenu()">
                     <div class="bg-white/20 p-1 rounded-full border border-white/30">
@@ -300,52 +321,53 @@
             </div>
             <div class="p-6 space-y-6">
                 <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <div>
-                        <p class="text-xs text-gray-400 font-bold uppercase">Valor Total</p>
-                        <p id="det-valor" class="text-3xl font-extrabold text-green-600">R$ 0,00</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs text-gray-400 font-bold uppercase">PIN Entrega</p>
-                        <p id="det-pin" class="text-2xl font-mono font-bold text-blue-700">----</p>
-                    </div>
+                    <div><p class="text-xs text-gray-400 font-bold uppercase">Valor Total</p><p id="det-valor" class="text-3xl font-extrabold text-green-600">R$ 0,00</p></div>
+                    <div class="text-right"><p class="text-xs text-gray-400 font-bold uppercase">PIN Entrega</p><p id="det-pin" class="text-2xl font-mono font-bold text-blue-700">----</p></div>
                 </div>
                 <div class="space-y-4">
-                    <div>
-                        <p class="text-xs font-bold text-gray-400 uppercase mb-1">Retirada</p>
-                        <p id="det-origem" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-gray-400 uppercase mb-1">Entrega</p>
-                        <p id="det-destino" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p>
-                    </div>
+                    <div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Retirada</p><p id="det-origem" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div>
+                    <div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Entrega</p><p id="det-destino" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div>
                 </div>
                 <div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl flex items-center justify-between border border-blue-100">
                     <div class="flex items-center gap-3">
                         <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 text-xl shadow-sm"><i class="fas fa-motorcycle"></i></div>
-                        <div>
-                            <p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p>
-                            <p id="det-moto-placa" class="text-xs font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-500">PLACA</p>
-                        </div>
+                        <div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-500">PLACA</p></div>
                     </div>
                     <button id="btn-zap-moto" class="bg-green-500 hover:bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition"><i class="fab fa-whatsapp text-xl"></i></button>
                 </div>
-                <div id="box-cancelar" class="hidden">
-                    <button onclick="cancelarPedido()" class="w-full border-2 border-red-100 text-red-500 font-bold py-3 rounded-xl hover:bg-red-50 transition">Cancelar Pedido</button>
-                </div>
+                <div id="box-cancelar" class="hidden"><button onclick="cancelarPedido()" class="w-full border-2 border-red-100 text-red-500 font-bold py-3 rounded-xl hover:bg-red-50 transition">Cancelar Pedido</button></div>
             </div>
         </div>
     </div>
 
     <div id="modal-comprovante" class="modal-overlay">
-        <div class="modal-content text-center p-8">
-            <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600 text-3xl"><i class="fas fa-receipt"></i></div>
-            <h3 class="font-bold text-2xl text-gray-800 mb-6">Comprovante</h3>
-            <div class="text-left space-y-4 bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                <div class="flex justify-between border-b border-dashed border-gray-300 pb-3"><span class="text-gray-500 font-medium">Valor</span><span id="comp-valor" class="font-bold text-lg text-gray-900">R$ 0,00</span></div>
-                <div class="flex justify-between border-b border-dashed border-gray-300 pb-3"><span class="text-gray-500 font-medium">Data</span><span id="comp-data" class="font-bold text-gray-700">--/--</span></div>
-                <div><span class="text-gray-500 text-xs font-bold uppercase">Descrição</span><p id="comp-desc" class="font-medium text-gray-800 mt-1">...</p></div>
+        <div class="modal-content text-center p-0">
+            <div class="bg-gray-100 p-6 border-b border-gray-200 flex justify-between items-center no-print">
+                <h3 class="font-bold text-gray-700">Comprovante</h3>
+                <button onclick="$('#modal-comprovante').removeClass('modal-ativo')" class="text-gray-500 hover:text-gray-800 text-xl">&times;</button>
             </div>
-            <button onclick="$('#modal-comprovante').removeClass('modal-ativo')" class="btn-primary mt-6">Fechar</button>
+            <div class="p-8">
+                <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 text-2xl"><i class="fas fa-check"></i></div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-1">Transação Concluída</h2>
+                <p class="text-sm text-gray-500 mb-6" id="comp-data-hora">--/--/-- às --:--</p>
+                
+                <div class="text-left space-y-3 bg-gray-50 p-5 rounded-xl border border-gray-200 mb-6">
+                    <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Loja</span><span id="comp-loja" class="font-bold text-gray-800 text-sm text-right truncate w-32">...</span></div>
+                    <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Tipo</span><span id="comp-tipo" class="font-bold text-blue-600 text-sm">...</span></div>
+                    <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">ID</span><span id="comp-id" class="font-mono text-xs text-gray-500">...</span></div>
+                    <div class="border-t border-dashed border-gray-300 my-2"></div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-gray-400 uppercase">Valor Total</span>
+                        <span id="comp-valor" class="font-extrabold text-2xl text-gray-900">R$ 0,00</span>
+                    </div>
+                </div>
+                <div class="text-left mb-6">
+                    <p class="text-xs font-bold text-gray-400 uppercase mb-1">Descrição</p>
+                    <p id="comp-desc" class="text-sm text-gray-600 leading-snug">...</p>
+                </div>
+
+                <button onclick="window.print()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 no-print transition"><i class="fas fa-print"></i> Imprimir / Salvar PDF</button>
+            </div>
         </div>
     </div>
 
@@ -424,9 +446,9 @@
             $('#screen-auth').addClass('hidden');
             $('#screen-app').removeClass('hidden');
             
-            // PERSISTÊNCIA DE TELA
-            const savedScreen = localStorage.getItem('app_screen') || 'home';
-            mudarTela(savedScreen);
+            // PERSISTÊNCIA TELA
+            const saved = localStorage.getItem('app_screen') || 'home';
+            mudarTela(saved);
         } else {
             $('#global-loading').addClass('hidden');
             $('#screen-auth').removeClass('hidden');
@@ -471,9 +493,7 @@
     }
 
     window.mudarTela = function(screen) {
-        // Salva estado
         localStorage.setItem('app_screen', screen);
-
         $('.menu-link').removeClass('active');
         $(`.menu-link[onclick*="${screen}"]`).addClass('active');
         
@@ -656,7 +676,7 @@
 
     window.fazerLogout = async function() {
         await sb.auth.signOut();
-        localStorage.clear(); // Limpeza total
+        localStorage.clear();
         location.reload();
     }
 
@@ -742,6 +762,7 @@
         });
     }
 
+    // --- FIX MODAL DEFINITIVO ---
     window.verDetalhePedido = async function(id) {
         activePedidoId = id;
         const p = pedidosCache.find(x => x.id == id);
@@ -779,7 +800,7 @@
         }
     }
 
-    // --- FUNÇÕES EXTRATO ---
+    // --- EXTRATO & COMPROVANTE ---
     window.toggleFiltroExtrato = function() { $('#box-filtro-extrato').toggleClass('hidden'); }
 
     window.limparFiltroExtrato = function() {
@@ -834,10 +855,18 @@
         $('#lista-extrato').html(html);
     }
 
+    // --- NOVO COMPROVANTE ---
     window.verComprovante = function(id, desc, val, date, tipo) {
-        $('#comp-desc').text(desc);
+        const d = new Date(date);
+        const dataFormatada = `${d.toLocaleDateString()} às ${d.toLocaleTimeString().slice(0,5)}`;
+        
+        $('#comp-data-hora').text(dataFormatada);
+        $('#comp-loja').text(profile.nome_loja);
+        $('#comp-tipo').text(tipo === 'credito' ? 'Crédito' : 'Débito');
+        $('#comp-id').text(id.split('-')[0] || id);
         $('#comp-valor').text(`R$ ${parseFloat(val).toFixed(2)}`);
-        $('#comp-data').text(new Date(date).toLocaleString());
+        $('#comp-desc').text(desc);
+        
         $('#modal-comprovante').addClass('modal-ativo');
     }
 
