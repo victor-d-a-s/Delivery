@@ -65,24 +65,18 @@
         .bg-concluido { background: #d1fae5; color: #059669; }
         .bg-cancelado { background: #fee2e2; color: #991b1b; }
 
-        /* MODAIS - CORREÇÃO INFALÍVEL */
+        /* MODAIS - FIXED */
         .modal-overlay { 
             position: fixed; 
             inset: 0; 
             background: rgba(0,0,0,0.7); 
-            z-index: 9999; 
-            display: none; /* Padrão: oculto */
+            z-index: 99999; /* Z-INDEX ALTÍSSIMO */
+            display: none; /* COMEÇA OCULTO */
             align-items: center; 
             justify-content: center; 
             padding: 20px; 
             backdrop-filter: blur(2px); 
         }
-        
-        /* Essa classe força a exibição flex, ignorando o display: none acima */
-        .show-modal {
-            display: flex !important;
-        }
-
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
         @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
@@ -288,8 +282,8 @@
                         <div class="md:col-span-2"><label class="text-xs font-bold text-gray-400 uppercase">Endereço Completo</label><input type="text" id="edit-endereco" class="input-std mt-1"></div>
                     </div>
                     <div class="flex gap-4 mb-8">
-                        <button onclick="$('#modal-pin').addClass('show-modal')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar PIN</button>
-                        <button onclick="$('#modal-senha').addClass('show-modal')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar Senha</button>
+                        <button onclick="$('#modal-pin').css('display','flex')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar PIN</button>
+                        <button onclick="$('#modal-senha').css('display','flex')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar Senha</button>
                     </div>
                     <button onclick="salvarPerfil()" class="btn-primary mb-4">Salvar Alterações</button>
                     <button onclick="fazerLogout()" class="w-full text-red-500 font-bold hover:bg-red-50 py-4 rounded-xl transition">Sair da Conta</button>
@@ -302,7 +296,7 @@
         <div class="modal-content max-w-lg">
             <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
                 <div><h3 class="font-bold text-xl">Detalhes</h3><p id="det-status" class="text-sm opacity-80 font-bold uppercase mt-1">...</p></div>
-                <button onclick="$('#modal-detalhes').removeClass('show-modal')" class="text-2xl hover:text-gray-200">&times;</button>
+                <button onclick="$('#modal-detalhes').css('display','none')" class="text-2xl hover:text-gray-200">&times;</button>
             </div>
             <div class="p-6 space-y-6">
                 <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
@@ -334,7 +328,7 @@
                 <div class="flex justify-between border-b border-dashed border-gray-300 pb-3"><span class="text-gray-500 font-medium">Data</span><span id="comp-data" class="font-bold text-gray-700">--/--</span></div>
                 <div><span class="text-gray-500 text-xs font-bold uppercase">Descrição</span><p id="comp-desc" class="font-medium text-gray-800 mt-1">...</p></div>
             </div>
-            <button onclick="$('#modal-comprovante').removeClass('show-modal')" class="btn-primary mt-6">Fechar</button>
+            <button onclick="$('#modal-comprovante').css('display','none')" class="btn-primary mt-6">Fechar</button>
         </div>
     </div>
 
@@ -344,7 +338,7 @@
             <p class="text-sm text-gray-500 mb-6">Digite 4 números.</p>
             <input type="tel" id="novo-pin" maxlength="4" class="input-std text-center text-3xl font-bold tracking-[0.5em] mb-6" placeholder="0000">
             <div class="flex gap-4">
-                <button onclick="$('#modal-pin').removeClass('show-modal')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-pin').css('display','none')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
@@ -355,7 +349,7 @@
             <h3 class="font-bold text-xl mb-6">Nova Senha</h3>
             <input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres">
             <div class="flex gap-4">
-                <button onclick="$('#modal-senha').removeClass('show-modal')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
+                <button onclick="$('#modal-senha').css('display','none')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
                 <button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
             </div>
         </div>
@@ -453,7 +447,7 @@
 
     window.toggleMenu = function() {
         $('#sidebar').toggleClass('open');
-        $('#menu-overlay').toggleClass('show-modal');
+        $('#menu-overlay').toggleClass('hidden').css('display', $('#sidebar').hasClass('open') ? 'block' : 'none');
     }
 
     window.mudarTela = function(screen) {
@@ -724,7 +718,7 @@
         });
     }
 
-    // --- FIX MODAL DEFINITIVO ---
+    // --- FIX MODAL DEFINITIVO (DIRECT CSS) ---
     window.verDetalhePedido = async function(id) {
         activePedidoId = id;
         const p = pedidosCache.find(x => x.id === id);
@@ -748,8 +742,8 @@
         if(['solicitado', 'pendente'].includes(p.status)) $('#box-cancelar').removeClass('hidden');
         else $('#box-cancelar').addClass('hidden');
         
-        // USA A CLASSE SHOW-MODAL PARA FORÇAR O DISPLAY FLEX
-        $('#modal-detalhes').addClass('show-modal');
+        // FORÇA DISPLAY FLEX DIRETAMENTE
+        $('#modal-detalhes').css('display', 'flex');
     }
 
     window.cancelarPedido = async function() {
@@ -757,7 +751,7 @@
         const { error } = await sb.from('pedidos').update({status: 'cancelado'}).eq('id', activePedidoId);
         if(error) showToast("Erro ao cancelar");
         else {
-            $('#modal-detalhes').removeClass('show-modal');
+            $('#modal-detalhes').css('display', 'none');
             carregarHistoricoPedidos();
             showToast("Pedido Cancelado");
         }
@@ -790,7 +784,7 @@
         $('#comp-desc').text(desc);
         $('#comp-valor').text(`R$ ${parseFloat(val).toFixed(2)}`);
         $('#comp-data').text(new Date(date).toLocaleString());
-        $('#modal-comprovante').addClass('show-modal');
+        $('#modal-comprovante').css('display', 'flex');
     }
 
     window.salvarPerfil = async function() {
@@ -803,7 +797,7 @@
         const pin = $('#novo-pin').val();
         if(pin.length !== 4) return showToast("O PIN deve ter 4 dígitos");
         await sb.from('profiles').update({pin_carteira: pin}).eq('id', user.id);
-        $('#modal-pin').removeClass('show-modal');
+        $('#modal-pin').css('display', 'none');
         showToast("PIN Alterado!");
     }
 
@@ -811,7 +805,7 @@
         const senha = $('#nova-senha').val();
         if(senha.length < 6) return showToast("Mínimo 6 caracteres");
         const { error } = await sb.auth.updateUser({ password: senha });
-        if(error) showToast("Erro: " + error.message); else { $('#modal-senha').removeClass('show-modal'); showToast("Senha Alterada!"); }
+        if(error) showToast("Erro: " + error.message); else { $('#modal-senha').css('display', 'none'); showToast("Senha Alterada!"); }
     }
 
     window.uploadFoto = async function() {
