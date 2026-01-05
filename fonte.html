@@ -60,7 +60,12 @@
         .bg-cancelado { background: #fee2e2; color: #991b1b; }
 
         /* MODAIS */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
+        .modal-overlay { 
+            display: none; position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.7); z-index: 9999; 
+            align-items: center; justify-content: center; 
+            padding: 20px; backdrop-filter: blur(2px); 
+        }
         .modal-ativo { display: flex !important; }
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
         @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
