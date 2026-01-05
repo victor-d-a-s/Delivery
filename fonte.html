@@ -35,13 +35,12 @@
         .custom-option { padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 600; color: #4B5563; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 10px; background: white; }
         .custom-option:hover { background-color: #eff6ff; color: #1E40AF; }
 
-        /* AUTOCOMPLETE */
+        /* AUTOCOMPLETE & SWITCH */
         .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px; z-index: 60; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.1); display: none; }
         .autocomplete-header { padding: 8px; background: #f3f4f6; color: #6b7280; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; border-bottom: 1px solid #e5e7eb; }
         .autocomplete-item { padding: 12px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #f3f4f6; color: #374151; }
         .autocomplete-item:hover { background: #eff6ff; color: #1e40af; }
-
-        /* SWITCH */
+        
         .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -50,19 +49,18 @@
         input:checked + .slider { background-color: #1E40AF; }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        /* BUTTONS */
+        /* BUTTONS & BADGES */
         .btn-primary { background: #1E40AF; color: white; width: 100%; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 16px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; border: none; }
         .btn-primary:active { transform: scale(0.98); }
+        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .bg-solicitado { background: #e5e7eb; color: #374151; }
+        .bg-pendente { background: #fef3c7; color: #d97706; }
+        .bg-em_rota { background: #dbeafe; color: #1e40af; }
+        .bg-concluido { background: #d1fae5; color: #059669; }
+        .bg-cancelado { background: #fee2e2; color: #991b1b; }
 
         /* MODAIS */
-        .modal-overlay { 
-            display: none; 
-            position: fixed; inset: 0; 
-            background: rgba(0,0,0,0.7); 
-            z-index: 9999; 
-            align-items: center; justify-content: center; 
-            padding: 20px; backdrop-filter: blur(2px); 
-        }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
         .modal-ativo { display: flex !important; }
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
         @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -72,41 +70,17 @@
         .filter-btn.active-filter { background-color: #1E40AF !important; color: white !important; border-color: #1E40AF !important; }
         .filter-btn.inactive-filter { background-color: white !important; color: #4B5563 !important; border: 1px solid #E5E7EB !important; }
 
-        /* STATUS */
-        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .bg-solicitado { background: #e5e7eb; color: #374151; }
-        .bg-pendente { background: #fef3c7; color: #d97706; }
-        .bg-em_rota { background: #dbeafe; color: #1e40af; }
-        .bg-concluido { background: #d1fae5; color: #059669; }
-        .bg-cancelado { background: #fee2e2; color: #991b1b; }
-
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #1E40AF; border-radius: 50%; width: 30px; height: 30px; animation: spin 0.8s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* IMPRESSÃO (CORRIGIDO PARA 1 PÁGINA) */
+        /* PRINT */
         @media print {
             @page { size: auto; margin: 0mm; }
             body, html { height: auto; overflow: visible; background: white; margin: 0; padding: 0; }
             body * { visibility: hidden; }
             #modal-comprovante, #modal-comprovante * { visibility: visible; }
-            #modal-comprovante { 
-                position: absolute; 
-                left: 0; top: 0; width: 100%; height: auto;
-                margin: 0; padding: 20px; 
-                background: white; 
-                display: block !important;
-                box-shadow: none;
-                backdrop-filter: none;
-            }
-            .modal-content { 
-                box-shadow: none !important; 
-                border: 2px solid #000; 
-                margin: 0 auto;
-                width: 100% !important;
-                max-width: 100% !important;
-                transform: none !important;
-                animation: none !important;
-            }
+            #modal-comprovante { position: absolute; left: 0; top: 0; width: 100%; height: auto; margin: 0; padding: 20px; background: white; display: block !important; box-shadow: none; backdrop-filter: none; }
+            .modal-content { box-shadow: none !important; border: 2px solid #000; margin: 0 auto; width: 100% !important; max-width: 100% !important; transform: none !important; animation: none !important; }
             .no-print { display: none !important; }
         }
     </style>
@@ -123,18 +97,24 @@
         <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md text-center">
             <div class="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-700 text-4xl"><i class="fas fa-box-open"></i></div>
             <h1 class="text-2xl font-bold text-gray-800 mb-6">Drop Entregas</h1>
+            
             <div id="box-login">
                 <input type="email" id="log-email" class="input-std mb-3" placeholder="E-mail">
                 <input type="password" id="log-senha" class="input-std mb-4" placeholder="Senha">
                 <button onclick="fazerLogin()" id="btn-login" class="btn-primary">Entrar</button>
                 <p class="text-gray-500 text-xs mt-4 cursor-pointer hover:text-blue-600" onclick="toggleAuth()">Criar Conta</p>
             </div>
-            <div id="box-register" class="hidden text-left space-y-3">
-                <input type="text" id="reg-nome" class="input-std" placeholder="Nome Fantasia">
-                <input type="tel" id="reg-zap" class="input-std" placeholder="WhatsApp">
-                <input type="email" id="reg-email" class="input-std" placeholder="E-mail">
-                <input type="password" id="reg-senha" class="input-std" placeholder="Senha (6+ dígitos)">
-                <button onclick="fazerCadastro()" id="btn-reg" class="btn-primary">Cadastrar</button>
+            
+            <div id="box-register" class="hidden text-left space-y-3 max-h-[70vh] overflow-y-auto">
+                <p class="text-center font-bold text-gray-800 mb-2">Novo Cadastro</p>
+                <input type="text" id="reg-nome" class="input-std" placeholder="Nome Fantasia*">
+                <input type="text" id="reg-razao" class="input-std" placeholder="Razão Social">
+                <input type="tel" id="reg-cnpj" class="input-std" placeholder="CNPJ / CPF">
+                <input type="tel" id="reg-zap" class="input-std" placeholder="WhatsApp (DDD + Número)*">
+                <input type="text" id="reg-endereco" class="input-std" placeholder="Endereço Completo">
+                <input type="email" id="reg-email" class="input-std" placeholder="E-mail*">
+                <input type="password" id="reg-senha" class="input-std" placeholder="Senha (6+ dígitos)*">
+                <button onclick="fazerCadastro()" id="btn-reg" class="btn-primary mt-2">Cadastrar</button>
                 <p class="text-center text-gray-500 text-xs mt-2 cursor-pointer hover:text-blue-600" onclick="toggleAuth()">Voltar para Login</p>
             </div>
         </div>
@@ -158,7 +138,6 @@
             <button onclick="fazerLogout()" class="w-full flex items-center justify-center gap-2 text-red-500 font-bold py-3 hover:bg-red-50 rounded-xl transition"><i class="fas fa-sign-out-alt"></i> Sair</button>
         </div>
     </div>
-
     <div id="screen-app" class="hidden min-h-screen flex flex-col">
         <header class="portal-header no-print">
             <div class="flex items-center gap-4">
@@ -249,6 +228,7 @@
                     <button onclick="iniciarPedido()" id="btn-enviar" class="hidden btn-primary bg-green-600 hover:bg-green-700 mt-4 shadow-lg">Confirmar Solicitação</button>
                 </div>
             </div>
+
             <div id="view-pedidos" class="hidden fade-in max-w-5xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="font-bold text-2xl text-gray-800">Histórico</h2>
@@ -278,14 +258,12 @@
                         <button onclick="atualizarExtratoManual()" class="bg-white border border-gray-200 text-gray-600 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-gray-50"><i class="fas fa-sync-alt"></i></button>
                     </div>
                 </div>
-                
                 <div id="box-filtro-extrato" class="hidden bg-blue-50 p-4 rounded-xl mb-4 border border-blue-100 flex items-end gap-2">
                     <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Início</label><input type="date" id="filtro-ext-ini" class="input-std py-1 px-2 text-xs h-8"></div>
                     <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Fim</label><input type="date" id="filtro-ext-fim" class="input-std py-1 px-2 text-xs h-8"></div>
                     <button onclick="filtrarPorDataExt()" class="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center shadow hover:bg-blue-700"><i class="fas fa-check"></i></button>
                     <button onclick="limparFiltroExtrato()" class="bg-gray-300 text-gray-700 w-8 h-8 rounded flex items-center justify-center hover:bg-gray-400"><i class="fas fa-times"></i></button>
                 </div>
-
                 <div id="lista-extrato" class="space-y-3"></div>
             </div>
 
@@ -303,7 +281,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div><label class="text-xs font-bold text-gray-400 uppercase">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="input-std mt-1"></div>
                         <div><label class="text-xs font-bold text-gray-400 uppercase">Razão Social</label><input type="text" id="edit-razao" class="input-std mt-1"></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">CNPJ</label><input type="tel" id="edit-cnpj" class="input-std mt-1"></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">CNPJ/CPF</label><input type="tel" id="edit-cnpj" class="input-std mt-1"></div>
                         <div><label class="text-xs font-bold text-gray-400 uppercase">WhatsApp Loja</label><input type="tel" id="edit-zap-loja" class="input-std mt-1"></div>
                         <div class="md:col-span-2"><label class="text-xs font-bold text-gray-400 uppercase">Endereço Completo</label><input type="text" id="edit-endereco" class="input-std mt-1"></div>
                     </div>
@@ -326,38 +304,21 @@
             </div>
             <div class="p-6 space-y-6">
                 <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <div>
-                        <p class="text-xs text-gray-400 font-bold uppercase">Valor Total</p>
-                        <p id="det-valor" class="text-3xl font-extrabold text-green-600">R$ 0,00</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs text-gray-400 font-bold uppercase">PIN Entrega</p>
-                        <p id="det-pin" class="text-2xl font-mono font-bold text-blue-700">----</p>
-                    </div>
+                    <div><p class="text-xs text-gray-400 font-bold uppercase">Valor Total</p><p id="det-valor" class="text-3xl font-extrabold text-green-600">R$ 0,00</p></div>
+                    <div class="text-right"><p class="text-xs text-gray-400 font-bold uppercase">PIN Entrega</p><p id="det-pin" class="text-2xl font-mono font-bold text-blue-700">----</p></div>
                 </div>
                 <div class="space-y-4">
-                    <div>
-                        <p class="text-xs font-bold text-gray-400 uppercase mb-1">Retirada</p>
-                        <p id="det-origem" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-gray-400 uppercase mb-1">Entrega</p>
-                        <p id="det-destino" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p>
-                    </div>
+                    <div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Retirada</p><p id="det-origem" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div>
+                    <div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Entrega</p><p id="det-destino" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div>
                 </div>
                 <div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl flex items-center justify-between border border-blue-100">
                     <div class="flex items-center gap-3">
                         <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 text-xl shadow-sm"><i class="fas fa-motorcycle"></i></div>
-                        <div>
-                            <p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p>
-                            <p id="det-moto-placa" class="text-xs font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-500">PLACA</p>
-                        </div>
+                        <div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-500">PLACA</p></div>
                     </div>
                     <button id="btn-zap-moto" class="bg-green-500 hover:bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition"><i class="fab fa-whatsapp text-xl"></i></button>
                 </div>
-                <div id="box-cancelar" class="hidden">
-                    <button onclick="cancelarPedido()" class="w-full border-2 border-red-100 text-red-500 font-bold py-3 rounded-xl hover:bg-red-50 transition">Cancelar Pedido</button>
-                </div>
+                <div id="box-cancelar" class="hidden"><button onclick="cancelarPedido()" class="w-full border-2 border-red-100 text-red-500 font-bold py-3 rounded-xl hover:bg-red-50 transition">Cancelar Pedido</button></div>
             </div>
         </div>
     </div>
@@ -372,51 +333,25 @@
                 <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 text-2xl"><i class="fas fa-check"></i></div>
                 <h2 class="text-2xl font-bold text-gray-800 mb-1">Transação Concluída</h2>
                 <p class="text-sm text-gray-500 mb-6" id="comp-data-hora">--/--/-- às --:--</p>
-                
                 <div class="text-left space-y-3 bg-gray-50 p-5 rounded-xl border border-gray-200 mb-6">
                     <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Loja</span><span id="comp-loja" class="font-bold text-gray-800 text-sm text-right truncate w-32">...</span></div>
                     <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Tipo</span><span id="comp-tipo" class="font-bold text-blue-600 text-sm">...</span></div>
                     <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">ID</span><span id="comp-id" class="font-mono text-xs text-gray-500">...</span></div>
-                    
                     <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Pagamento</span><span id="comp-pgto" class="font-bold text-gray-800 text-sm">...</span></div>
-                    
                     <div class="border-t border-dashed border-gray-300 my-2"></div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-gray-400 uppercase">Valor Total</span>
-                        <span id="comp-valor" class="font-extrabold text-2xl text-gray-900">R$ 0,00</span>
-                    </div>
+                    <div class="flex justify-between items-center"><span class="text-xs font-bold text-gray-400 uppercase">Valor Total</span><span id="comp-valor" class="font-extrabold text-2xl text-gray-900">R$ 0,00</span></div>
                 </div>
-                <div class="text-left mb-6">
-                    <p class="text-xs font-bold text-gray-400 uppercase mb-1">Descrição</p>
-                    <p id="comp-desc" class="text-sm text-gray-600 leading-snug">...</p>
-                </div>
-
+                <div class="text-left mb-6"><p class="text-xs font-bold text-gray-400 uppercase mb-1">Descrição</p><p id="comp-desc" class="text-sm text-gray-600 leading-snug">...</p></div>
                 <button onclick="window.print()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 no-print transition"><i class="fas fa-print"></i> Imprimir / Salvar PDF</button>
             </div>
         </div>
     </div>
 
     <div id="modal-pin" class="modal-overlay">
-        <div class="modal-content p-8 text-center">
-            <h3 class="font-bold text-xl mb-2">Novo PIN</h3>
-            <p class="text-sm text-gray-500 mb-6">Digite 4 números.</p>
-            <input type="tel" id="novo-pin" maxlength="4" class="input-std text-center text-3xl font-bold tracking-[0.5em] mb-6" placeholder="0000">
-            <div class="flex gap-4">
-                <button onclick="$('#modal-pin').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
-                <button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
-            </div>
-        </div>
+        <div class="modal-content p-8 text-center"><h3 class="font-bold text-xl mb-2">Novo PIN</h3><input type="tel" id="novo-pin" maxlength="4" class="input-std text-center text-3xl font-bold tracking-[0.5em] mb-6" placeholder="0000"><div class="flex gap-4"><button onclick="$('#modal-pin').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button><button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button></div></div>
     </div>
-
     <div id="modal-senha" class="modal-overlay">
-        <div class="modal-content p-8 text-center">
-            <h3 class="font-bold text-xl mb-6">Nova Senha</h3>
-            <input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres">
-            <div class="flex gap-4">
-                <button onclick="$('#modal-senha').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button>
-                <button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button>
-            </div>
-        </div>
+        <div class="modal-content p-8 text-center"><h3 class="font-bold text-xl mb-6">Nova Senha</h3><input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres"><div class="flex gap-4"><button onclick="$('#modal-senha').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button><button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button></div></div>
     </div>
 
 <script>
@@ -436,29 +371,14 @@
     let pedidosCache = [];
     let currentFilter = 'todos';
 
-    // --- INICIALIZAÇÃO ---
     $(document).ready(function(){
         $('#reg-zap, #edit-zap-loja, #edit-resp-zap, #tel_dest').mask('(00) 00000-0000');
-        $('#edit-cnpj').mask('00.000.000/0000-00');
-        $('#edit-cpf-resp').mask('000.000.000-00');
-
-        setTimeout(() => {
-            if($('#global-loading').is(':visible') && !user) {
-                $('#global-loading').addClass('hidden');
-                $('#screen-auth').removeClass('hidden');
-            }
-        }, 5000);
-
+        $('#edit-cnpj, #reg-cnpj').mask('00.000.000/0000-00');
+        setTimeout(() => { if($('#global-loading').is(':visible') && !user) { $('#global-loading').addClass('hidden'); $('#screen-auth').removeClass('hidden'); } }, 5000);
         initSession();
-        
         $(document).click(function(e) {
-            if (!$(e.target).closest('.custom-select-btn').length && !$(e.target).closest('.custom-options').length) {
-                $('.custom-options').slideUp(100);
-                $('.fa-chevron-down').removeClass('rotate-180');
-            }
-            if (!$(e.target).closest('.relative').length) {
-                $('.autocomplete-list').hide();
-            }
+            if (!$(e.target).closest('.custom-select-btn').length && !$(e.target).closest('.custom-options').length) { $('.custom-options').slideUp(100); $('.fa-chevron-down').removeClass('rotate-180'); }
+            if (!$(e.target).closest('.relative').length) { $('.autocomplete-list').hide(); }
         });
     });
 
@@ -466,12 +386,12 @@
         const { data: { session } } = await sb.auth.getSession();
         if(session) {
             user = session.user;
+            // CHECK DE SEGURANÇA: Se o ID não for UUID, força logout
+            if(user.id.length < 20) { fazerLogout(); return; }
             await loadData();
             $('#global-loading').addClass('hidden');
             $('#screen-auth').addClass('hidden');
             $('#screen-app').removeClass('hidden');
-            
-            // PERSISTÊNCIA TELA
             const saved = localStorage.getItem('app_screen') || 'home';
             mudarTela(saved);
         } else {
@@ -489,313 +409,146 @@
             profile = prof;
             $('#header-saldo, #dash-saldo').text(`R$ ${parseFloat(prof.saldo || 0).toFixed(2)}`);
             $('#origem').val(prof.endereco || prof.nome_loja);
-            const visualId = prof.codigo_visual || '---';
-            $('#header-id').text(`#${visualId}`);
-            $('#menu-nome').text(prof.nome_loja);
             
-            if(prof.foto_perfil) {
-                $('#header-foto, #edit-img-perfil, #menu-img').attr('src', prof.foto_perfil);
-                $('#header-iniciais').addClass('hidden');
-                $('#header-foto').removeClass('hidden');
-            } else {
-                $('#header-iniciais').text(prof.nome_loja.substring(0,2).toUpperCase()).removeClass('hidden');
-                $('#header-foto').addClass('hidden');
-            }
+            // CORREÇÃO DO HEADER ID
+            const visualId = prof.codigo_visual ? '#' + prof.codigo_visual : '---';
+            $('#header-id').text(visualId);
+            
+            $('#menu-nome').text(prof.nome_loja);
+            if(prof.foto_perfil) { $('#header-foto, #edit-img-perfil, #menu-img').attr('src', prof.foto_perfil); $('#header-iniciais').addClass('hidden'); $('#header-foto').removeClass('hidden'); }
+            else { $('#header-iniciais').text(prof.nome_loja.substring(0,2).toUpperCase()).removeClass('hidden'); $('#header-foto').addClass('hidden'); }
+            
+            // POPULA PERFIL
             $('#edit-nome-loja').val(prof.nome_loja);
             $('#edit-razao').val(prof.razao_social);
             $('#edit-cnpj').val(prof.cnpj);
             $('#edit-zap-loja').val(prof.whatsapp_loja);
             $('#edit-endereco').val(prof.endereco);
-            $('#edit-resp-nome').val(prof.responsavel);
-            $('#edit-cpf-resp').val(prof.cpf_responsavel);
-            $('#edit-resp-zap').val(prof.whatsapp_responsavel);
         }
     }
 
-    window.toggleMenu = function() {
-        $('#sidebar').toggleClass('open');
-        $('#menu-overlay').toggleClass('modal-ativo');
-    }
-
+    // --- FUNÇÕES DE NAVEGAÇÃO E UI ---
+    window.toggleMenu = function() { $('#sidebar').toggleClass('open'); $('#menu-overlay').toggleClass('modal-ativo'); }
     window.mudarTela = function(screen) {
         localStorage.setItem('app_screen', screen);
-        $('.menu-link').removeClass('active');
-        $(`.menu-link[onclick*="${screen}"]`).addClass('active');
-        
+        $('.menu-link').removeClass('active'); $(`.menu-link[onclick*="${screen}"]`).addClass('active');
         $('#view-home, #view-pedidos, #view-extrato, #view-perfil').addClass('hidden');
         $(`#view-${screen}`).removeClass('hidden').addClass('fade-in');
         window.scrollTo(0,0);
-
         if(screen === 'pedidos') carregarHistoricoPedidos();
         if(screen === 'extrato') carregarExtrato();
     }
-
-    window.toggleAuth = function() {
-        $('#box-login, #box-register').toggleClass('hidden');
-    }
-
-    // --- DROPDOWNS ---
-    window.toggleDropdown = function(id) {
-        $('.custom-options').not(`#list-${id}`).slideUp(100);
-        $('.fa-chevron-down').not(`#arrow-${id}`).removeClass('rotate-180');
-        $(`#list-${id}`).slideToggle(150);
-        $(`#arrow-${id}`).toggleClass('rotate-180');
-    }
-
-    window.selectOption = function(type, val, text) {
-        $(`#pagamento_${type}`).val(val);
-        $(`#display-${type}`).text(text);
-        $(`#list-${type}`).slideUp(100);
-    }
-
+    window.toggleAuth = function() { $('#box-login, #box-register').toggleClass('hidden'); }
+    window.toggleDropdown = function(id) { $('.custom-options').not(`#list-${id}`).slideUp(100); $(`#list-${id}`).slideToggle(150); }
+    window.selectOption = function(type, val, text) { $(`#pagamento_${type}`).val(val); $(`#display-${type}`).text(text); $(`#list-${type}`).slideUp(100); }
+    
+    // --- LÓGICA DE PEDIDOS ---
     window.selectLogistica = function(val, iconClass) {
-        $('#input-logistica').val(val);
-        $('#display-logistica').html(`<i class="fas ${iconClass} text-blue-500 mr-2"></i> ${val}`);
-        $('#list-logistica').slideUp(100);
-        
-        if(val === 'Logística Reversa') {
-            $('#origem').prop('readonly', false).val('').attr('placeholder', 'Onde buscar?').removeClass('cursor-not-allowed bg-gray-50').addClass('bg-white');
-            $('#destino').prop('readonly', true).val(profile.endereco).attr('placeholder', 'Sua Loja').addClass('cursor-not-allowed bg-gray-50');
-        } else {
-            $('#origem').prop('readonly', true).val(profile.endereco).addClass('cursor-not-allowed bg-gray-50');
-            $('#destino').prop('readonly', false).val('').attr('placeholder', 'Onde vamos entregar?').removeClass('cursor-not-allowed bg-gray-50').addClass('bg-white');
-        }
-        $('#box-resultado, #btn-enviar').addClass('hidden');
-        $('#btn-calcular').show();
+        $('#input-logistica').val(val); $('#display-logistica').html(`<i class="fas ${iconClass} text-blue-500 mr-2"></i> ${val}`); $('#list-logistica').slideUp(100);
+        if(val === 'Logística Reversa') { $('#origem').prop('readonly', false).val('').removeClass('cursor-not-allowed bg-gray-50'); $('#destino').prop('readonly', true).val(profile.endereco).addClass('cursor-not-allowed bg-gray-50'); }
+        else { $('#origem').prop('readonly', true).val(profile.endereco).addClass('cursor-not-allowed bg-gray-50'); $('#destino').prop('readonly', false).val('').removeClass('cursor-not-allowed bg-gray-50'); }
+        $('#box-resultado, #btn-enviar').addClass('hidden'); $('#btn-calcular').show();
     }
 
     window.buscarEndereco = function(query, fieldId) {
-        const listaId = `#sugestoes-lista-${fieldId}`;
-        if(query.length < 4) {
-            $(listaId).hide();
-            $('#box-resultado, #btn-enviar').addClass('hidden');
-            $('#btn-calcular').show();
-            return;
-        }
+        if(query.length < 4) { $(`#sugestoes-lista-${fieldId}`).hide(); return; }
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(async () => {
             const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', ' + CITY_FIX)}&limit=3`);
             const data = await res.json();
-            let html = `<div class="autocomplete-header" onclick="$('${listaId}').hide()">🔼 Fechar Sugestões</div>`;
-            data.forEach(item => {
-                const clean = item.display_name.split(',')[0] + ', ' + (item.display_name.split(',')[1] || '');
-                html += `<div class="autocomplete-item" onclick="selectEnd('${clean}', '${fieldId}')">${clean}</div>`;
-            });
-            $(listaId).html(html).show();
+            let html = `<div class="autocomplete-header" onclick="$('.autocomplete-list').hide()">Fechar</div>`;
+            data.forEach(item => { html += `<div class="autocomplete-item" onclick="selectEnd('${item.display_name}', '${fieldId}')">${item.display_name}</div>`; });
+            $(`#sugestoes-lista-${fieldId}`).html(html).show();
         }, 500);
     }
-
-    window.selectEnd = function(address, fieldId) {
-        const currentVal = $(`#${fieldId}`).val();
-        const numberMatch = currentVal.match(/\d+/);
-        let finalAddress = address;
-        if (numberMatch) finalAddress += `, ${numberMatch[0]}`;
-        $(`#${fieldId}`).val(finalAddress);
-        $(`#sugestoes-lista-${fieldId}`).hide();
-        const o = $('#origem').val();
-        const d = $('#destino').val();
-        if(o && d && o.length > 5 && d.length > 5) calcularDistancia();
-    }
+    window.selectEnd = function(address, fieldId) { $(`#${fieldId}`).val(address); $('.autocomplete-list').hide(); }
 
     window.calcularDistancia = async function() {
-        const o = $('#origem').val();
-        const d = $('#destino').val();
-        if(!o || !d) return showToast("Preencha os endereços");
+        const o = $('#origem').val(), d = $('#destino').val();
+        if(!o || !d) return showToast("Preencha endereços");
         $('#btn-calcular').text("Calculando...").prop('disabled', true);
         try {
-            const [resO, resD] = await Promise.all([
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(o + ', ' + CITY_FIX)}&limit=1`),
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(d + ', ' + CITY_FIX)}&limit=1`)
-            ]);
+            const [resO, resD] = await Promise.all([fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(o)}&limit=1`), fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(d)}&limit=1`)]);
             const [dataO, dataD] = await Promise.all([resO.json(), resD.json()]);
-            if(!dataO[0] || !dataD[0]) throw new Error("Endereço não encontrado");
+            if(!dataO[0] || !dataD[0]) throw new Error("Endereço não achado");
             const lat1 = dataO[0].lat, lon1 = dataO[0].lon, lat2 = dataD[0].lat, lon2 = dataD[0].lon;
             const R = 6371; 
-            const dLat = (lat2-lat1) * Math.PI/180;
-            const dLon = (lon2-lon1) * Math.PI/180; 
+            const dLat = (lat2-lat1) * Math.PI/180, dLon = (lon2-lon1) * Math.PI/180; 
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2); 
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-            tempDist = (R * c * 1.3).toFixed(1); 
+            tempDist = (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.3).toFixed(1);
             if(tempDist < 1) tempDist = 1;
             recalcularTotal();
-            $('#btn-calcular').hide();
-            $('#box-resultado').removeClass('hidden').addClass('flex');
-            $('#btn-enviar').removeClass('hidden');
-        } catch(e) {
-            showToast("Endereço não encontrado.");
-        } finally {
-            $('#btn-calcular').text("Calcular Valor").prop('disabled', false);
-        }
+            $('#btn-calcular').hide(); $('#box-resultado, #btn-enviar').removeClass('hidden');
+        } catch(e) { showToast("Endereço não encontrado"); } finally { $('#btn-calcular').text("Calcular").prop('disabled', false); }
     }
 
     window.recalcularTotal = function() {
         let total = config.taxa + (tempDist * config.km);
-        const temRetorno = $('#retorno').is(':checked');
-        $('#text-retorno').text(temRetorno ? "Com Retorno" : "Sem Retorno").toggleClass('text-blue-600', temRetorno);
-        $('#bg-icon-retorno').toggleClass('bg-blue-100', temRetorno);
-        $('#icon-retorno').attr('class', temRetorno ? 'fas fa-exchange-alt text-blue-600' : 'fas fa-arrow-right text-gray-400');
-        if(temRetorno) total += (total * (config.retorno / 100));
-        $('#valor-display').text(total.toFixed(2).replace('.',','));
-        $('#km-display').text(tempDist);
+        if($('#retorno').is(':checked')) total += (total * (config.retorno / 100));
+        $('#valor-display').text(total.toFixed(2).replace('.',',')); $('#km-display').text(tempDist);
     }
 
     window.iniciarPedido = async function() {
-        // SEGURANÇA: Verificando se o ID é um UUID válido antes de enviar
-        if (!user || !user.id || user.id.length < 30) {
-            showToast("Erro de autenticação. Faça login novamente.");
-            return;
-        }
-
-        const nome = $('#nome_dest').val();
-        const tel = $('#tel_dest').val();
-        const ref = $('#referencia').val();
-        if(!nome || !tel || !ref) return showToast("Preencha Nome, WhatsApp e Referência");
+        // SEGURANÇA: Garante que é UUID
+        if(!user || !user.id || user.id.length < 20) { showToast("Sessão inválida. Logue novamente."); setTimeout(fazerLogout, 2000); return; }
+        
         $('#btn-enviar').text('Enviando...').prop('disabled', true);
-        const destFull = `${$('#destino').val()} - ${$('#complemento').val() || ''} (${ref})`;
         const { error } = await sb.rpc('criar_pedido_seguro', {
-            p_user_id: user.id,
-            p_origem: $('#origem').val(),
-            p_destino: destFull,
-            p_distancia_km: parseFloat(tempDist),
-            p_forma_pagamento: $('#pagamento_entrega').val(),
-            p_nome_dest: nome,
-            p_tel_dest: tel.replace(/\D/g,''),
-            p_tipo_logistica: $('#input-logistica').val(),
-            p_com_retorno: $('#retorno').is(':checked')
+            p_user_id: user.id, p_origem: $('#origem').val(), p_destino: $('#destino').val(),
+            p_distancia_km: parseFloat(tempDist), p_forma_pagamento: $('#pagamento_entrega').val(),
+            p_nome_dest: $('#nome_dest').val(), p_tel_dest: $('#tel_dest').val(),
+            p_tipo_logistica: $('#input-logistica').val(), p_com_retorno: $('#retorno').is(':checked')
         });
-        if(error) {
-            showToast("Erro: " + error.message);
-            $('#btn-enviar').text('Confirmar Solicitação').prop('disabled', false);
-        } else {
-            showToast("Pedido Criado com Sucesso!");
-            $('#destino, #nome_dest, #tel_dest, #complemento, #referencia').val('');
-            $('#box-resultado, #btn-enviar').addClass('hidden');
-            $('#btn-calcular').show();
-            loadData();
-            mudarTela('pedidos');
-        }
+        if(error) { showToast("Erro: " + error.message); $('#btn-enviar').text('Confirmar').prop('disabled', false); }
+        else { showToast("Pedido Criado!"); loadData(); mudarTela('pedidos'); }
     }
 
+    // --- AUTH & USER ---
     window.fazerLogin = async function() {
-        const email = $('#log-email').val();
-        const pass = $('#log-senha').val();
-        if(!email || !pass) return showToast("Preencha todos os campos");
-        $('#btn-login').text('Entrando...').prop('disabled', true);
-        const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-        if(error) {
-            showToast("Erro: " + error.message);
-            $('#btn-login').text('Entrar').prop('disabled', false);
-        } else {
-            location.reload();
-        }
+        const { error } = await sb.auth.signInWithPassword({ email: $('#log-email').val(), password: $('#log-senha').val() });
+        if(error) showToast("Erro: " + error.message); else location.reload();
     }
 
     window.fazerCadastro = async function() {
-        const d = { nome: $('#reg-nome').val(), zap: $('#reg-zap').val(), email: $('#reg-email').val(), pass: $('#reg-senha').val() };
-        if(!d.nome || !d.zap || !d.email || !d.pass) return showToast("Preencha todos os campos");
+        const d = { nome: $('#reg-nome').val(), razao: $('#reg-razao').val(), cnpj: $('#reg-cnpj').val(), zap: $('#reg-zap').val(), end: $('#reg-endereco').val(), email: $('#reg-email').val(), pass: $('#reg-senha').val() };
+        if(!d.nome || !d.zap || !d.email || !d.pass) return showToast("Preencha campos obrigatórios (*)");
+        
         $('#btn-reg').text('Criando...').prop('disabled', true);
         const { data, error } = await sb.auth.signUp({ email: d.email, password: d.pass });
-        if(error) {
-            showToast("Erro: " + error.message);
-            $('#btn-reg').text('Cadastrar').prop('disabled', false);
-        } else if(data.user) {
-            await sb.from('profiles').insert([{ id: data.user.id, nome_loja: d.nome, whatsapp_loja: d.zap, email: d.email, codigo_visual: '#' + Math.floor(Math.random()*9000+1000) }]);
-            showToast("Conta criada! Faça login.");
-            toggleAuth();
+        if(error) { showToast("Erro: " + error.message); $('#btn-reg').text('Cadastrar').prop('disabled', false); }
+        else if(data.user) {
+            await sb.from('profiles').insert([{ 
+                id: data.user.id, nome_loja: d.nome, razao_social: d.razao, cnpj: d.cnpj, 
+                whatsapp_loja: d.zap, endereco: d.end, email: d.email, 
+                codigo_visual: Math.floor(Math.random()*9000+1000) 
+            }]);
+            showToast("Conta criada! Faça login."); toggleAuth();
         }
     }
 
-    window.fazerLogout = async function() {
-        await sb.auth.signOut();
-        localStorage.clear();
-        location.reload();
-    }
+    window.fazerLogout = async function() { await sb.auth.signOut(); localStorage.clear(); location.reload(); }
 
-    // --- LISTAS ---
-    window.filtrarStatus = function(status) {
-        currentFilter = status;
-        $('.filter-btn').removeClass('active-filter').addClass('inactive-filter');
-        $(`.filter-btn[data-filter="${status}"]`).removeClass('inactive-filter').addClass('active-filter');
-        renderizarPedidos();
-    }
-
+    // --- LISTAS, FILTROS & MODAIS ---
+    window.filtrarStatus = function(s) { currentFilter = s; renderizarPedidos(); }
     window.atualizarPedidosManual = function() { carregarHistoricoPedidos(); }
-
-    window.toggleFiltroData = function() { $('#box-filtro-data').toggleClass('hidden'); }
-
-    window.limparFiltroData = function() {
-        $('#data-ini-ped, #data-fim-ped').val('');
-        $('#box-filtro-data').addClass('hidden');
-        renderizarPedidos();
-    }
-
-    window.filtrarPorDataPed = function() {
-        const ini = $('#data-ini-ped').val();
-        const fim = $('#data-fim-ped').val();
-        if(!ini || !fim) return showToast("Selecione ambas as datas");
-        const d1 = new Date(ini);
-        const d2 = new Date(fim);
-        if(Math.ceil(Math.abs(d2 - d1) / (1000 * 60 * 60 * 24)) > 90) return showToast("Período máximo é de 90 dias");
-        if(d1 > d2) return showToast("Data inicial deve ser menor que a final");
-        renderizarPedidos(d1, d2);
-        $('#box-filtro-data').addClass('hidden');
-    }
-
+    
     window.carregarHistoricoPedidos = async function() {
-        $('#lista-pedidos').html('<div class="col-span-2 text-center py-10"><div class="loader"></div></div>');
-        const { data } = await sb.from('pedidos').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(200); 
-        if(!data) { $('#lista-pedidos').html('<div class="col-span-2 text-center text-gray-400">Erro.</div>'); return; }
-        pedidosCache = data;
-        renderizarPedidos();
+        $('#lista-pedidos').html('<div class="loader"></div>');
+        const { data } = await sb.from('pedidos').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(100);
+        pedidosCache = data || []; renderizarPedidos();
     }
 
-    function renderizarPedidos(dataIni = null, dataFim = null) {
-        const lista = $('#lista-pedidos');
-        lista.empty();
-        let filtrados = pedidosCache.filter(p => {
-            if(currentFilter === 'andamento') return ['pendente', 'em_rota'].includes(p.status);
-            if(currentFilter === 'finalizados') return ['concluido', 'cancelado'].includes(p.status);
-            if(currentFilter !== 'todos' && p.status !== currentFilter) return false;
-            if(dataIni && dataFim) {
-                const d = new Date(p.created_at);
-                const fimAjustado = new Date(dataFim);
-                fimAjustado.setHours(23,59,59);
-                return d >= dataIni && d <= fimAjustado;
-            }
-            return true;
-        });
-        if(filtrados.length === 0) {
-            lista.html('<div class="col-span-2 text-center py-10 text-gray-400 opacity-60"><i class="fas fa-folder-open text-4xl mb-2"></i><br>Nenhum pedido aqui.</div>');
-            return;
-        }
-        filtrados.forEach(p => {
-            let stClass = 'bg-solicitado';
-            if(p.status === 'pendente') stClass = 'bg-pendente';
-            if(p.status === 'em_rota') stClass = 'bg-em_rota';
-            if(p.status === 'concluido') stClass = 'bg-concluido';
-            if(p.status === 'cancelado') stClass = 'bg-cancelado';
-            const html = `
-                <div class="pedido-item bg-white p-5 rounded-xl border border-gray-200 shadow-sm" onclick="verDetalhePedido('${p.id}')">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="badge ${stClass}">${p.status.replace('_',' ')}</span>
-                        <span class="text-xs font-mono text-gray-400 bg-gray-100 px-2 rounded">#${p.codigo_visual || '---'}</span>
-                    </div>
-                    <div class="flex justify-between items-end">
-                        <div class="w-3/4">
-                            <p class="font-bold text-gray-800 truncate">${p.nome_destinatario || 'Cliente'}</p>
-                            <p class="text-xs text-gray-500 truncate mt-1"><i class="fas fa-map-marker-alt text-red-400 mr-1"></i>${p.destino}</p>
-                        </div>
-                        <p class="font-bold text-blue-600 text-lg">R$ ${parseFloat(p.valor_frete).toFixed(2)}</p>
-                    </div>
-                </div>
-            `;
-            lista.append(html);
+    function renderizarPedidos() {
+        const lista = $('#lista-pedidos').empty();
+        pedidosCache.filter(p => currentFilter === 'todos' || p.status === currentFilter).forEach(p => {
+            lista.append(`<div class="bg-white p-4 rounded-xl border mb-2 shadow-sm" onclick="verDetalhePedido('${p.id}')">
+                <div class="flex justify-between"><span class="font-bold text-gray-800">${p.nome_destinatario}</span><span class="text-blue-600 font-bold">R$ ${p.valor_frete}</span></div>
+                <div class="text-xs text-gray-500 mt-1">${p.status.toUpperCase()}</div>
+            </div>`);
         });
     }
 
-    // --- FIX MODAL DEFINITIVO ---
     window.verDetalhePedido = async function(id) {
-        activePedidoId = id;
         const p = pedidosCache.find(x => x.id == id);
         if(!p) return;
         $('#det-valor').text(`R$ ${parseFloat(p.valor_frete).toFixed(2)}`);
@@ -803,162 +556,51 @@
         $('#det-origem').text(p.origem);
         $('#det-destino').text(p.destino);
         $('#det-status').text(p.status.toUpperCase());
-        if(p.entregador_id) {
-            const { data: m } = await sb.from('profiles').select('*').eq('id', p.entregador_id).single();
-            if(m) {
-                $('#box-motoboy').removeClass('hidden').addClass('flex');
-                $('#det-moto-nome').text(m.responsavel);
-                $('#det-moto-placa').text(m.placa_moto || '---');
-                $('#btn-zap-moto').attr('onclick', `window.open('https://wa.me/${m.whatsapp_responsavel}', '_blank')`);
-            }
-        } else {
-            $('#box-motoboy').addClass('hidden').removeClass('flex');
-        }
-        if(['solicitado', 'pendente'].includes(p.status)) $('#box-cancelar').removeClass('hidden');
-        else $('#box-cancelar').addClass('hidden');
-        
         $('#modal-detalhes').addClass('modal-ativo');
     }
 
-    window.cancelarPedido = async function() {
-        if(!confirm('Deseja realmente cancelar este pedido?')) return;
-        const { error } = await sb.from('pedidos').update({status: 'cancelado'}).eq('id', activePedidoId);
-        if(error) showToast("Erro ao cancelar");
-        else {
-            $('#modal-detalhes').removeClass('modal-ativo');
-            carregarHistoricoPedidos();
-            showToast("Pedido Cancelado");
-        }
-    }
-
-    window.toggleFiltroExtrato = function() { $('#box-filtro-extrato').toggleClass('hidden'); }
-
-    window.limparFiltroExtrato = function() {
-        $('#filtro-ext-ini, #filtro-ext-fim').val('');
-        $('#box-filtro-extrato').addClass('hidden');
-        carregarExtrato();
-    }
-
-    window.filtrarPorDataExt = function() {
-        const ini = $('#filtro-ext-ini').val();
-        const fim = $('#filtro-ext-fim').val();
-        if(!ini || !fim) return showToast("Selecione ambas as datas");
-        const d1 = new Date(ini);
-        const d2 = new Date(fim);
-        if(d1 > d2) return showToast("Data inicial deve ser menor que final");
-        if(Math.ceil(Math.abs(d2 - d1) / (1000 * 60 * 60 * 24)) > 90) return showToast("Período máximo é de 90 dias");
-        carregarExtrato(ini, fim);
-        $('#box-filtro-extrato').addClass('hidden');
-    }
-
-    window.atualizarExtratoManual = function() { carregarExtrato(); }
-
-    window.carregarExtrato = async function(dataIni = null, dataFim = null) {
-        $('#lista-extrato').html('<div class="text-center py-10"><div class="loader"></div></div>');
-        let query = sb.from('transacoes').select('*').eq('user_id', user.id).order('created_at', {ascending: false});
-        if(dataIni && dataFim) {
-            const dFim = new Date(dataFim); dFim.setHours(23,59,59);
-            query = query.gte('created_at', dataIni).lte('created_at', dFim.toISOString());
-        } else {
-            query = query.limit(50);
-        }
-        const { data } = await query;
-        if(!data || !data.length) { $('#lista-extrato').html('<div class="text-center py-10 text-gray-400">Sem movimentações.</div>'); return; }
+    // --- FINANCEIRO ---
+    window.carregarExtrato = async function() {
+        $('#lista-extrato').html('<div class="loader"></div>');
+        const { data } = await sb.from('transacoes').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(50);
         let html = '';
-        data.forEach(t => {
-            const color = t.tipo === 'credito' ? 'text-green-600' : 'text-red-600';
-            const icon = t.tipo === 'credito' ? 'fa-arrow-down' : 'fa-arrow-up';
-            const bg = t.tipo === 'credito' ? 'bg-green-100' : 'bg-red-100';
-            const desc = t.descricao ? t.descricao.replace(/['"]/g, "") : "Transação";
-            html += `<div class="transacao-item flex items-center justify-between bg-white p-4 rounded-xl border border-gray-200" onclick="verComprovante('${t.id}', '${desc}', '${t.valor}', '${t.created_at}', '${t.tipo}')">
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-full ${bg} flex items-center justify-center ${color}"><i class="fas ${icon}"></i></div>
-                    <div><p class="font-bold text-gray-800 text-sm truncate w-40">${t.descricao}</p><p class="text-xs text-gray-400">${new Date(t.created_at).toLocaleDateString()}</p></div>
-                </div>
-                <p class="font-bold ${color}">${t.tipo === 'credito' ? '+' : '-'} R$ ${parseFloat(t.valor).toFixed(2)}</p>
+        if(data) data.forEach(t => {
+            html += `<div class="bg-white p-4 rounded-xl border mb-2 flex justify-between" onclick="verComprovante('${t.id}','${t.descricao}','${t.valor}','${t.created_at}','${t.tipo}')">
+                <div><p class="font-bold text-gray-800">${t.descricao}</p><p class="text-xs text-gray-400">${new Date(t.created_at).toLocaleDateString()}</p></div>
+                <p class="font-bold ${t.tipo==='credito'?'text-green-600':'text-red-600'}">${t.tipo==='credito'?'+':'-'} R$ ${parseFloat(t.valor).toFixed(2)}</p>
             </div>`;
         });
         $('#lista-extrato').html(html);
     }
 
-    // --- COMPROVANTE INTELIGENTE ---
     window.verComprovante = async function(id, desc, val, date, tipo) {
-        const d = new Date(date);
-        const dataFormatada = `${d.toLocaleDateString()} às ${d.toLocaleTimeString().slice(0,5)}`;
-        
-        $('#comp-data-hora').text(dataFormatada);
+        $('#comp-data-hora').text(new Date(date).toLocaleString());
         $('#comp-loja').text(profile.nome_loja);
-        $('#comp-tipo').text(tipo === 'credito' ? 'Crédito' : 'Débito');
-        $('#comp-id').text(id.split('-')[0] || id);
+        $('#comp-tipo').text(tipo.toUpperCase());
+        $('#comp-id').text(id.substring(0,8));
         $('#comp-valor').text(`R$ ${parseFloat(val).toFixed(2)}`);
         $('#comp-desc').text(desc);
         
-        // Lógica de Pagamento
-        let pgto = "Saldo em Conta"; // Padrão para débito
-        if(tipo === 'credito') pgto = "Transferência / Pix";
-        
-        // Tenta buscar o pedido se a descrição contiver "Pedido"
-        if(tipo === 'debito' && desc.includes('Pedido')) {
-            const match = desc.match(/#(\w+)/);
-            if(match && match[1]) {
-                // Tenta achar no cache primeiro
-                let p = pedidosCache.find(x => x.codigo_visual == match[1]);
-                if(!p) {
-                    // Busca no banco se não tiver no cache
-                    const { data } = await sb.from('pedidos').select('forma_pagamento').eq('codigo_visual', match[1]).single();
-                    if(data) pgto = data.forma_pagamento;
-                } else {
-                    pgto = p.forma_pagamento;
-                }
+        let pgto = "Saldo em Conta";
+        if(tipo === 'credito') pgto = "PIX";
+        else if(desc.includes('Pedido')) {
+            const match = desc.match(/#(\d+)/);
+            if(match) {
+                const p = pedidosCache.find(x => x.codigo_visual == match[1]);
+                if(p) pgto = p.forma_pagamento;
             }
         }
-        
         $('#comp-pgto').text(pgto);
         $('#modal-comprovante').addClass('modal-ativo');
     }
 
+    // --- HELPERS ---
+    window.addSaldo = function() { window.open(`https://wa.me/${ADMIN_ZAP}?text=Olá, quero adicionar saldo. ID: ${profile.codigo_visual}`, '_blank'); }
+    function showToast(msg) { $('#native-toast').text(msg).removeClass('opacity-0'); setTimeout(()=>$('#native-toast').addClass('opacity-0'), 3000); }
     window.salvarPerfil = async function() {
-        const u = { nome_loja: $('#edit-nome-loja').val(), razao_social: $('#edit-razao').val(), cnpj: $('#edit-cnpj').val(), whatsapp_loja: $('#edit-zap-loja').val(), endereco: $('#edit-endereco').val(), responsavel: $('#edit-resp-nome').val(), cpf_responsavel: $('#edit-cpf-resp').val(), whatsapp_responsavel: $('#edit-resp-zap').val() };
-        const { error } = await sb.from('profiles').update(u).eq('id', user.id);
-        if(error) showToast("Erro ao salvar"); else { showToast("Perfil Salvo!"); loadData(); }
-    }
-
-    window.salvarNovoPin = async function() {
-        const pin = $('#novo-pin').val();
-        if(pin.length !== 4) return showToast("O PIN deve ter 4 dígitos");
-        await sb.from('profiles').update({pin_carteira: pin}).eq('id', user.id);
-        $('#modal-pin').removeClass('modal-ativo');
-        showToast("PIN Alterado!");
-    }
-
-    window.salvarNovaSenha = async function() {
-        const senha = $('#nova-senha').val();
-        if(senha.length < 6) return showToast("Mínimo 6 caracteres");
-        const { error } = await sb.auth.updateUser({ password: senha });
-        if(error) showToast("Erro: " + error.message); else { $('#modal-senha').removeClass('modal-ativo'); showToast("Senha Alterada!"); }
-    }
-
-    window.uploadFoto = async function() {
-        const file = $('#input-foto')[0].files[0];
-        if(!file) return;
-        const name = `${user.id}-${Date.now()}`;
-        await sb.storage.from('avatars').upload(name, file);
-        const { data } = sb.storage.from('avatars').getPublicUrl(name);
-        await sb.from('profiles').update({foto_perfil: data.publicUrl}).eq('id', user.id);
-        loadData();
-    }
-
-    window.addSaldo = function() {
-        const id = profile?.codigo_visual || 'ND';
-        window.open(`https://wa.me/${ADMIN_ZAP}?text=Olá, quero adicionar saldo. Meu ID é: ${id}`, '_blank');
-    }
-
-    function showToast(msg) {
-        const t = $('#native-toast');
-        t.text(msg).removeClass('opacity-0').addClass('opacity-100');
-        setTimeout(() => t.removeClass('opacity-100').addClass('opacity-0'), 3000);
+        await sb.from('profiles').update({ nome_loja: $('#edit-nome-loja').val(), whatsapp_loja: $('#edit-zap-loja').val(), endereco: $('#edit-endereco').val() }).eq('id', user.id);
+        showToast("Perfil Salvo!");
     }
 </script>
-
 </body>
 </html>
