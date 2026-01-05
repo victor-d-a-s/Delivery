@@ -640,6 +640,12 @@
     }
 
     window.iniciarPedido = async function() {
+        // SEGURANÇA: Verificando se o ID é um UUID válido antes de enviar
+        if (!user || !user.id || user.id.length < 30) {
+            showToast("Erro de autenticação. Faça login novamente.");
+            return;
+        }
+
         const nome = $('#nome_dest').val();
         const tel = $('#tel_dest').val();
         const ref = $('#referencia').val();
