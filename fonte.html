@@ -46,11 +46,11 @@
             display: flex; align-items: center; gap: 12px;
             font-size: 14px; font-weight: 600;
             opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            border-left: 6px solid #3b82f6; /* Default Blue */
+            border-left: 6px solid #3b82f6; /* Azul Padrão */
         }
         #native-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        #native-toast.error { border-left-color: #ef4444; } /* Red */
-        #native-toast.success { border-left-color: #22c55e; } /* Green */
+        #native-toast.error { border-left-color: #ef4444; } /* Vermelho Erro */
+        #native-toast.success { border-left-color: #22c55e; } /* Verde Sucesso */
 
         /* AUTOCOMPLETE & SWITCH */
         .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px; z-index: 60; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.1); display: none; }
@@ -363,7 +363,7 @@
     let activePedidoId = null;
     let pedidosCache = [];
     let currentFilter = 'todos';
-    let isPasswordValid = false; // Controle de validação
+    let isPasswordValid = false;
 
     $(document).ready(function(){
         $('#reg-zap, #edit-zap-loja, #reg-zap-resp, #edit-resp-zap, #tel_dest').mask('(00) 00000-0000');
@@ -403,8 +403,6 @@
             profile = prof;
             $('#header-saldo, #dash-saldo').text(`R$ ${parseFloat(prof.saldo || 0).toFixed(2)}`);
             $('#origem').val(prof.endereco || prof.nome_loja);
-            
-            // CORREÇÃO ID: Remove # e mostra visual
             const visualId = prof.codigo_visual || '---';
             $('#header-id').text(visualId);
             
@@ -429,7 +427,7 @@
     window.goBack = function() { $('#box-login, #box-register').addClass('hidden'); $('#box-landing').removeClass('hidden'); }
     window.toggleAuth = function() { }; 
 
-    // --- VALIDAÇÃO DE SENHA EM TEMPO REAL ---
+    // --- VALIDAÇÃO DE SENHA ---
     window.validarSenhaTR = function(pwd) {
         const reqs = {
             len: pwd.length >= 6,
@@ -438,31 +436,26 @@
             num: /[0-9]/.test(pwd),
             spec: /[!@#$%^&*(),.?":{}|<>]/.test(pwd)
         };
-
-        // Atualiza UI
         updateReqUI('req-len', reqs.len);
         updateReqUI('req-up', reqs.up);
         updateReqUI('req-low', reqs.low);
         updateReqUI('req-num', reqs.num);
         updateReqUI('req-spec', reqs.spec);
-
         isPasswordValid = Object.values(reqs).every(Boolean);
     }
 
     function updateReqUI(id, isValid) {
         const el = document.getElementById(id);
         if(isValid) {
-            el.classList.remove('invalid', 'error');
-            el.classList.add('valid');
+            el.classList.remove('invalid', 'error'); el.classList.add('valid');
             el.innerHTML = '<i class="fas fa-check-circle text-[10px]"></i> ' + el.innerText.replace('●','').trim();
         } else {
-            el.classList.remove('valid', 'error');
-            el.classList.add('invalid');
+            el.classList.remove('valid', 'error'); el.classList.add('invalid');
             el.innerHTML = '<i class="fas fa-circle text-[6px]"></i> ' + el.innerText.replace('●','').trim();
         }
     }
 
-    // --- FUNÇÕES UI ---
+    // --- UI E MAPAS ---
     window.toggleMenu = function() { $('#sidebar').toggleClass('open'); $('#menu-overlay').toggleClass('modal-ativo'); }
     window.mudarTela = function(screen) {
         localStorage.setItem('app_screen', screen);
@@ -473,9 +466,10 @@
         if(screen === 'pedidos') carregarHistoricoPedidos();
         if(screen === 'extrato') carregarExtrato();
     }
-    
     window.toggleDropdown = function(id) { $('.custom-options').not(`#list-${id}`).slideUp(100); $(`#list-${id}`).slideToggle(150); }
     window.selectOption = function(type, val, text) { $(`#pagamento_${type}`).val(val); $(`#display-${type}`).text(text); $(`#list-${type}`).slideUp(100); }
+    
+    // --- LÓGICA DE PEDIDOS E CÁLCULO ---
     window.selectLogistica = function(val, iconClass) {
         $('#input-logistica').val(val); $('#display-logistica').html(`<i class="fas ${iconClass} text-blue-500 mr-2"></i> ${val}`); $('#list-logistica').slideUp(100);
         if(val === 'Logística Reversa') { $('#origem').prop('readonly', false).val('').removeClass('cursor-not-allowed bg-gray-50'); $('#destino').prop('readonly', true).val(profile.endereco).addClass('cursor-not-allowed bg-gray-50'); }
@@ -483,7 +477,6 @@
         $('#box-resultado, #btn-enviar').addClass('hidden'); $('#btn-calcular').show();
     }
 
-    // --- MAPAS & CALCULO ---
     window.buscarEndereco = function(query, fieldId) {
         if(query.length < 4) { $(`#sugestoes-lista-${fieldId}`).hide(); return; }
         clearTimeout(debounceTimer);
@@ -516,10 +509,24 @@
         } catch(e) { showToast("Endereço não encontrado", "error"); } finally { $('#btn-calcular').text("Calcular").prop('disabled', false); }
     }
 
+    // --- CORREÇÃO DO BOTÃO RETORNO ---
     window.recalcularTotal = function() {
         let total = config.taxa + (tempDist * config.km);
-        if($('#retorno').is(':checked')) total += (total * (config.retorno / 100));
-        $('#valor-display').text(total.toFixed(2).replace('.',',')); $('#km-display').text(tempDist);
+        const isRetorno = $('#retorno').is(':checked');
+        
+        if(isRetorno) {
+            $('#text-retorno').text("Com Retorno").removeClass('text-gray-500').addClass('text-blue-600');
+            $('#icon-retorno').attr('class', 'fas fa-exchange-alt text-blue-600');
+            $('#bg-icon-retorno').removeClass('bg-gray-100').addClass('bg-blue-100');
+            total += (total * (config.retorno / 100));
+        } else {
+            $('#text-retorno').text("Sem Retorno").removeClass('text-blue-600').addClass('text-gray-500');
+            $('#icon-retorno').attr('class', 'fas fa-arrow-right text-gray-400');
+            $('#bg-icon-retorno').removeClass('bg-blue-100').addClass('bg-gray-100');
+        }
+        
+        $('#valor-display').text(total.toFixed(2).replace('.',',')); 
+        $('#km-display').text(tempDist);
     }
 
     window.iniciarPedido = async function() {
@@ -535,17 +542,15 @@
         else { showToast("Pedido Criado!", "success"); loadData(); mudarTela('pedidos'); }
     }
 
-    // --- AUTH & USER ---
+    // --- AUTH ---
     window.fazerLogin = async function() {
         const { error } = await sb.auth.signInWithPassword({ email: $('#log-email').val(), password: $('#log-senha').val() });
         if(error) showToast("Erro: " + error.message, "error"); else location.reload();
     }
 
     window.fazerCadastro = async function() {
-        // Validação Senha Rigorosa
         if(!isPasswordValid) {
             showToast("A senha não atende aos requisitos!", "error");
-            // Destaca os erros
             document.querySelectorAll('.pwd-req-list li.invalid').forEach(el => el.classList.add('error'));
             return;
         }
@@ -565,9 +570,7 @@
         const { data, error } = await sb.auth.signUp({ email: d.email, password: d.pass });
         if(error) { showToast(error.message, "error"); $('#btn-reg').text('Cadastrar').prop('disabled', false); }
         else if(data.user) {
-            // GERA ID 6 DIGITOS (Ex: 123456)
             const novoId = Math.floor(Math.random() * 900000 + 100000);
-            
             await sb.from('profiles').insert([{ 
                 id: data.user.id, 
                 nome_loja: d.nome, razao_social: d.razao, cnpj: d.cnpj, whatsapp_loja: d.zap, endereco: d.end, 
@@ -581,7 +584,7 @@
 
     window.fazerLogout = async function() { await sb.auth.signOut(); localStorage.clear(); location.reload(); }
 
-    // --- LISTAS, FILTROS & MODAIS ---
+    // --- FILTROS, TOAST & HELPERS ---
     window.filtrarStatus = function(s) { currentFilter = s; renderizarPedidos(); }
     window.atualizarPedidosManual = function() { carregarHistoricoPedidos(); }
     
@@ -612,7 +615,6 @@
         $('#modal-detalhes').addClass('modal-ativo');
     }
 
-    // --- FINANCEIRO ---
     window.carregarExtrato = async function() {
         $('#lista-extrato').html('<div class="loader"></div>');
         const { data } = await sb.from('transacoes').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(50);
@@ -647,27 +649,15 @@
         $('#modal-comprovante').addClass('modal-ativo');
     }
 
-    // --- HELPERS E TOAST ATUALIZADO ---
     window.addSaldo = function() { window.open(`https://wa.me/${ADMIN_ZAP}?text=Olá, quero adicionar saldo. ID: ${profile.codigo_visual}`, '_blank'); }
     
     function showToast(msg, type = "default") { 
-        const t = $('#native-toast');
-        const icon = $('#toast-icon');
-        
+        const t = $('#native-toast'); const icon = $('#toast-icon');
         t.removeClass('error success show').addClass('show');
-        
-        if(type === 'error') {
-            t.addClass('error');
-            icon.html('<i class="fas fa-exclamation-circle text-red-500"></i>');
-        } else if(type === 'success') {
-            t.addClass('success');
-            icon.html('<i class="fas fa-check-circle text-green-500"></i>');
-        } else {
-            icon.html('<i class="fas fa-info-circle text-blue-500"></i>');
-        }
-        
-        $('#toast-msg').text(msg);
-        setTimeout(() => t.removeClass('show'), 3500); 
+        if(type === 'error') { t.addClass('error'); icon.html('<i class="fas fa-exclamation-circle text-red-500"></i>'); }
+        else if(type === 'success') { t.addClass('success'); icon.html('<i class="fas fa-check-circle text-green-500"></i>'); }
+        else { icon.html('<i class="fas fa-info-circle text-blue-500"></i>'); }
+        $('#toast-msg').text(msg); setTimeout(() => t.removeClass('show'), 3500); 
     }
     
     window.salvarPerfil = async function() {
