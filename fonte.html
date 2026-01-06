@@ -52,6 +52,9 @@
         /* BUTTONS & BADGES */
         .btn-primary { background: #1E40AF; color: white; width: 100%; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 16px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; border: none; }
         .btn-primary:active { transform: scale(0.98); }
+        .btn-outline { background: white; color: #1E40AF; border: 2px solid #1E40AF; width: 100%; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 16px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; }
+        .btn-outline:active { background: #eff6ff; transform: scale(0.98); }
+
         .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .bg-solicitado { background: #e5e7eb; color: #374151; }
         .bg-pendente { background: #fef3c7; color: #d97706; }
@@ -60,12 +63,7 @@
         .bg-cancelado { background: #fee2e2; color: #991b1b; }
 
         /* MODAIS */
-        .modal-overlay { 
-            display: none; position: fixed; inset: 0; 
-            background: rgba(0,0,0,0.7); z-index: 9999; 
-            align-items: center; justify-content: center; 
-            padding: 20px; backdrop-filter: blur(2px); 
-        }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
         .modal-ativo { display: flex !important; }
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
         @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -78,7 +76,6 @@
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #1E40AF; border-radius: 50%; width: 30px; height: 30px; animation: spin 0.8s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* PRINT */
         @media print {
             @page { size: auto; margin: 0mm; }
             body, html { height: auto; overflow: visible; background: white; margin: 0; padding: 0; }
@@ -101,31 +98,41 @@
     <div id="screen-auth" class="min-h-[100dvh] flex items-center justify-center bg-gray-100 hidden p-4">
         <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-2xl text-center relative">
             
-            <div id="box-login">
+            <div id="box-landing" class="fade-in">
+                <div class="bg-blue-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-700 text-5xl"><i class="fas fa-box-open"></i></div>
+                <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Drop Entregas</h1>
+                <p class="text-gray-500 text-sm mb-8">Soluções rápidas para sua logística.</p>
+                
+                <div class="space-y-4">
+                    <button onclick="showLogin()" class="btn-primary">Entrar na Conta</button>
+                    <button onclick="showRegister()" class="btn-outline">Criar Nova Conta</button>
+                </div>
+            </div>
+
+            <div id="box-login" class="hidden fade-in">
                 <div class="absolute top-6 left-6">
-                    <button onclick="window.location.reload()" class="text-gray-400 hover:text-blue-600 transition p-2">
-                        <i class="fas fa-arrow-left text-xl"></i>
+                    <button onclick="goBack()" class="text-gray-400 hover:text-blue-600 transition p-2 bg-gray-50 rounded-full w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-arrow-left text-lg"></i>
                     </button>
                 </div>
 
-                <div class="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-700 text-4xl mt-2"><i class="fas fa-box-open"></i></div>
-                <h1 class="text-2xl font-bold text-gray-800 mb-6">Drop Entregas</h1>
+                <div class="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-700 text-3xl mt-4"><i class="fas fa-sign-in-alt"></i></div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Acesse sua Conta</h2>
                 
                 <input type="email" id="log-email" class="input-std mb-3" placeholder="E-mail (Ex: contato@minhaloja.com)">
-                <input type="password" id="log-senha" class="input-std mb-4" placeholder="Senha">
+                <input type="password" id="log-senha" class="input-std mb-6" placeholder="Senha">
                 <button onclick="fazerLogin()" id="btn-login" class="btn-primary">Entrar</button>
-                <p class="text-gray-500 text-xs mt-4 cursor-pointer hover:text-blue-600" onclick="toggleAuth()">Criar Conta</p>
             </div>
             
-            <div id="box-register" class="hidden text-left space-y-3 max-h-[85vh] overflow-y-auto pr-2 custom-scroll pt-2">
-                <div class="flex items-center gap-4 border-b pb-4 mb-2">
-                    <button onclick="toggleAuth()" class="text-gray-400 hover:text-blue-600 transition p-1">
-                        <i class="fas fa-arrow-left text-xl"></i>
+            <div id="box-register" class="hidden text-left space-y-3 max-h-[85vh] overflow-y-auto pr-2 custom-scroll pt-2 fade-in">
+                <div class="flex items-center gap-4 border-b pb-4 mb-2 sticky top-0 bg-white z-10">
+                    <button onclick="goBack()" class="text-gray-400 hover:text-blue-600 transition p-1 bg-gray-50 rounded-full w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-arrow-left text-lg"></i>
                     </button>
-                    <p class="text-center font-bold text-gray-800 flex-1 pr-6">Cadastro Completo</p>
+                    <p class="text-center font-bold text-gray-800 flex-1 pr-10 text-lg">Cadastro Completo</p>
                 </div>
                 
-                <p class="text-xs font-bold text-blue-600 uppercase mt-2">Dados da Loja</p>
+                <p class="text-xs font-bold text-blue-600 uppercase mt-4">Dados da Loja</p>
                 <input type="text" id="reg-nome" class="input-std" placeholder="Nome Fantasia (Ex: Pizzaria do João)*">
                 <input type="text" id="reg-razao" class="input-std" placeholder="Razão Social (Ex: João Silva LTDA)">
                 <input type="tel" id="reg-cnpj" class="input-std" placeholder="CNPJ / CPF (Ex: 12.345.678/0001-90)">
@@ -143,7 +150,7 @@
                 <input type="password" id="reg-senha" class="input-std" placeholder="Senha (Mínimo 6 dígitos)*">
                 <input type="password" id="reg-senha-conf" class="input-std" placeholder="Confirmar Senha*">
 
-                <button onclick="fazerCadastro()" id="btn-reg" class="btn-primary mt-4">Concluir Cadastro</button>
+                <button onclick="fazerCadastro()" id="btn-reg" class="btn-primary mt-6">Concluir Cadastro</button>
             </div>
         </div>
     </div>
@@ -166,6 +173,7 @@
             <button onclick="fazerLogout()" class="w-full flex items-center justify-center gap-2 text-red-500 font-bold py-3 hover:bg-red-50 rounded-xl transition"><i class="fas fa-sign-out-alt"></i> Sair</button>
         </div>
     </div>
+
     <div id="screen-app" class="hidden min-h-screen flex flex-col">
         <header class="portal-header no-print">
             <div class="flex items-center gap-4">
@@ -258,40 +266,12 @@
             </div>
 
             <div id="view-pedidos" class="hidden fade-in max-w-5xl mx-auto">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="font-bold text-2xl text-gray-800">Histórico</h2>
-                    <button onclick="atualizarPedidosManual()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-gray-50 flex items-center gap-2"><i class="fas fa-sync-alt"></i> Atualizar</button>
-                </div>
-                <div id="box-filtro-data" class="hidden bg-blue-50 p-4 rounded-xl mb-4 border border-blue-100 flex items-end gap-2">
-                    <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Início</label><input type="date" id="data-ini-ped" class="input-std py-1 px-2 text-xs h-8"></div>
-                    <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Fim</label><input type="date" id="data-fim-ped" class="input-std py-1 px-2 text-xs h-8"></div>
-                    <button onclick="filtrarPorDataPed()" class="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center shadow hover:bg-blue-700"><i class="fas fa-check"></i></button>
-                    <button onclick="limparFiltroData()" class="bg-gray-300 text-gray-700 w-8 h-8 rounded flex items-center justify-center hover:bg-gray-400"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="flex gap-2 overflow-x-auto pb-4 mb-2 no-scrollbar items-center">
-                    <button onclick="filtrarStatus('todos')" class="filter-btn active-filter px-5 py-2 rounded-full font-bold text-sm shadow-sm border" data-filter="todos">Todos</button>
-                    <button onclick="filtrarStatus('solicitado')" class="filter-btn inactive-filter px-5 py-2 rounded-full font-bold text-sm shadow-sm border" data-filter="solicitado">Solicitados</button>
-                    <button onclick="filtrarStatus('andamento')" class="filter-btn inactive-filter px-5 py-2 rounded-full font-bold text-sm shadow-sm border" data-filter="andamento">Em Andamento</button>
-                    <button onclick="filtrarStatus('finalizados')" class="filter-btn inactive-filter px-5 py-2 rounded-full font-bold text-sm shadow-sm border" data-filter="finalizados">Finalizados</button>
-                    <button onclick="toggleFiltroData()" class="bg-white text-gray-500 border w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-50 shadow-sm ml-1"><i class="fas fa-search"></i></button>
-                </div>
+                <div class="flex justify-between items-center mb-6"><h2 class="font-bold text-2xl text-gray-800">Histórico</h2><button onclick="atualizarPedidosManual()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-gray-50 flex items-center gap-2"><i class="fas fa-sync-alt"></i> Atualizar</button></div>
                 <div id="lista-pedidos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
 
             <div id="view-extrato" class="hidden fade-in max-w-4xl mx-auto">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="font-bold text-2xl text-gray-800">Movimentações</h2>
-                    <div class="flex gap-2">
-                        <button onclick="toggleFiltroExtrato()" class="bg-white border border-gray-200 text-gray-500 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-gray-50 shadow-sm"><i class="fas fa-search"></i></button>
-                        <button onclick="atualizarExtratoManual()" class="bg-white border border-gray-200 text-gray-600 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-gray-50"><i class="fas fa-sync-alt"></i></button>
-                    </div>
-                </div>
-                <div id="box-filtro-extrato" class="hidden bg-blue-50 p-4 rounded-xl mb-4 border border-blue-100 flex items-end gap-2">
-                    <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Início</label><input type="date" id="filtro-ext-ini" class="input-std py-1 px-2 text-xs h-8"></div>
-                    <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Fim</label><input type="date" id="filtro-ext-fim" class="input-std py-1 px-2 text-xs h-8"></div>
-                    <button onclick="filtrarPorDataExt()" class="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center shadow hover:bg-blue-700"><i class="fas fa-check"></i></button>
-                    <button onclick="limparFiltroExtrato()" class="bg-gray-300 text-gray-700 w-8 h-8 rounded flex items-center justify-center hover:bg-gray-400"><i class="fas fa-times"></i></button>
-                </div>
+                <div class="flex justify-between items-center mb-6"><h2 class="font-bold text-2xl text-gray-800">Movimentações</h2><button onclick="atualizarExtratoManual()" class="bg-white border border-gray-200 text-gray-600 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-gray-50"><i class="fas fa-sync-alt"></i></button></div>
                 <div id="lista-extrato" class="space-y-3"></div>
             </div>
 
@@ -332,63 +312,10 @@
         </main>
     </div>
 
-    <div id="modal-detalhes" class="modal-overlay">
-        <div class="modal-content max-w-lg">
-            <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
-                <div><h3 class="font-bold text-xl">Detalhes</h3><p id="det-status" class="text-sm opacity-80 font-bold uppercase mt-1">...</p></div>
-                <button onclick="$('#modal-detalhes').removeClass('modal-ativo')" class="text-2xl hover:text-gray-200">&times;</button>
-            </div>
-            <div class="p-6 space-y-6">
-                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <div><p class="text-xs text-gray-400 font-bold uppercase">Valor Total</p><p id="det-valor" class="text-3xl font-extrabold text-green-600">R$ 0,00</p></div>
-                    <div class="text-right"><p class="text-xs text-gray-400 font-bold uppercase">PIN Entrega</p><p id="det-pin" class="text-2xl font-mono font-bold text-blue-700">----</p></div>
-                </div>
-                <div class="space-y-4">
-                    <div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Retirada</p><p id="det-origem" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div>
-                    <div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Entrega</p><p id="det-destino" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div>
-                </div>
-                <div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl flex items-center justify-between border border-blue-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 text-xl shadow-sm"><i class="fas fa-motorcycle"></i></div>
-                        <div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-500">PLACA</p></div>
-                    </div>
-                    <button id="btn-zap-moto" class="bg-green-500 hover:bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition"><i class="fab fa-whatsapp text-xl"></i></button>
-                </div>
-                <div id="box-cancelar" class="hidden"><button onclick="cancelarPedido()" class="w-full border-2 border-red-100 text-red-500 font-bold py-3 rounded-xl hover:bg-red-50 transition">Cancelar Pedido</button></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-comprovante" class="modal-overlay">
-        <div class="modal-content text-center p-0">
-            <div class="bg-gray-100 p-6 border-b border-gray-200 flex justify-between items-center no-print">
-                <h3 class="font-bold text-gray-700">Comprovante</h3>
-                <button onclick="$('#modal-comprovante').removeClass('modal-ativo')" class="text-gray-500 hover:text-gray-800 text-xl">&times;</button>
-            </div>
-            <div class="p-8">
-                <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 text-2xl"><i class="fas fa-check"></i></div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-1">Transação Concluída</h2>
-                <p class="text-sm text-gray-500 mb-6" id="comp-data-hora">--/--/-- às --:--</p>
-                <div class="text-left space-y-3 bg-gray-50 p-5 rounded-xl border border-gray-200 mb-6">
-                    <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Loja</span><span id="comp-loja" class="font-bold text-gray-800 text-sm text-right truncate w-32">...</span></div>
-                    <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Tipo</span><span id="comp-tipo" class="font-bold text-blue-600 text-sm">...</span></div>
-                    <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">ID</span><span id="comp-id" class="font-mono text-xs text-gray-500">...</span></div>
-                    <div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Pagamento</span><span id="comp-pgto" class="font-bold text-gray-800 text-sm">...</span></div>
-                    <div class="border-t border-dashed border-gray-300 my-2"></div>
-                    <div class="flex justify-between items-center"><span class="text-xs font-bold text-gray-400 uppercase">Valor Total</span><span id="comp-valor" class="font-extrabold text-2xl text-gray-900">R$ 0,00</span></div>
-                </div>
-                <div class="text-left mb-6"><p class="text-xs font-bold text-gray-400 uppercase mb-1">Descrição</p><p id="comp-desc" class="text-sm text-gray-600 leading-snug">...</p></div>
-                <button onclick="window.print()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 no-print transition"><i class="fas fa-print"></i> Imprimir / Salvar PDF</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-pin" class="modal-overlay">
-        <div class="modal-content p-8 text-center"><h3 class="font-bold text-xl mb-2">Novo PIN</h3><input type="tel" id="novo-pin" maxlength="4" class="input-std text-center text-3xl font-bold tracking-[0.5em] mb-6" placeholder="0000"><div class="flex gap-4"><button onclick="$('#modal-pin').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button><button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button></div></div>
-    </div>
-    <div id="modal-senha" class="modal-overlay">
-        <div class="modal-content p-8 text-center"><h3 class="font-bold text-xl mb-6">Nova Senha</h3><input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres"><div class="flex gap-4"><button onclick="$('#modal-senha').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button><button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button></div></div>
-    </div>
+    <div id="modal-detalhes" class="modal-overlay"><div class="modal-content max-w-lg"><div class="bg-blue-600 p-6 text-white flex justify-between items-center"><div><h3 class="font-bold text-xl">Detalhes</h3><p id="det-status" class="text-sm opacity-80 font-bold uppercase mt-1">...</p></div><button onclick="$('#modal-detalhes').removeClass('modal-ativo')" class="text-2xl hover:text-gray-200">&times;</button></div><div class="p-6 space-y-6"><div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100"><div><p class="text-xs text-gray-400 font-bold uppercase">Valor Total</p><p id="det-valor" class="text-3xl font-extrabold text-green-600">R$ 0,00</p></div><div class="text-right"><p class="text-xs text-gray-400 font-bold uppercase">PIN Entrega</p><p id="det-pin" class="text-2xl font-mono font-bold text-blue-700">----</p></div></div><div class="space-y-4"><div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Retirada</p><p id="det-origem" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div><div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Entrega</p><p id="det-destino" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div></div><div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl flex items-center justify-between border border-blue-100"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 text-xl shadow-sm"><i class="fas fa-motorcycle"></i></div><div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-500">PLACA</p></div></div><button id="btn-zap-moto" class="bg-green-500 hover:bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition"><i class="fab fa-whatsapp text-xl"></i></button></div><div id="box-cancelar" class="hidden"><button onclick="cancelarPedido()" class="w-full border-2 border-red-100 text-red-500 font-bold py-3 rounded-xl hover:bg-red-50 transition">Cancelar Pedido</button></div></div></div></div>
+    <div id="modal-comprovante" class="modal-overlay"><div class="modal-content text-center p-0"><div class="bg-gray-100 p-6 border-b border-gray-200 flex justify-between items-center no-print"><h3 class="font-bold text-gray-700">Comprovante</h3><button onclick="$('#modal-comprovante').removeClass('modal-ativo')" class="text-gray-500 hover:text-gray-800 text-xl">&times;</button></div><div class="p-8"><div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 text-2xl"><i class="fas fa-check"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-1">Transação Concluída</h2><p class="text-sm text-gray-500 mb-6" id="comp-data-hora">--/--/-- às --:--</p><div class="text-left space-y-3 bg-gray-50 p-5 rounded-xl border border-gray-200 mb-6"><div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Loja</span><span id="comp-loja" class="font-bold text-gray-800 text-sm text-right truncate w-32">...</span></div><div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Tipo</span><span id="comp-tipo" class="font-bold text-blue-600 text-sm">...</span></div><div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">ID</span><span id="comp-id" class="font-mono text-xs text-gray-500">...</span></div><div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Pagamento</span><span id="comp-pgto" class="font-bold text-gray-800 text-sm">...</span></div><div class="border-t border-dashed border-gray-300 my-2"></div><div class="flex justify-between items-center"><span class="text-xs font-bold text-gray-400 uppercase">Valor Total</span><span id="comp-valor" class="font-extrabold text-2xl text-gray-900">R$ 0,00</span></div></div><div class="text-left mb-6"><p class="text-xs font-bold text-gray-400 uppercase mb-1">Descrição</p><p id="comp-desc" class="text-sm text-gray-600 leading-snug">...</p></div><button onclick="window.print()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 no-print transition"><i class="fas fa-print"></i> Imprimir / Salvar PDF</button></div></div></div>
+    <div id="modal-pin" class="modal-overlay"><div class="modal-content p-8 text-center"><h3 class="font-bold text-xl mb-2">Novo PIN</h3><input type="tel" id="novo-pin" maxlength="4" class="input-std text-center text-3xl font-bold tracking-[0.5em] mb-6" placeholder="0000"><div class="flex gap-4"><button onclick="$('#modal-pin').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button><button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button></div></div></div>
+    <div id="modal-senha" class="modal-overlay"><div class="modal-content p-8 text-center"><h3 class="font-bold text-xl mb-6">Nova Senha</h3><input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres"><div class="flex gap-4"><button onclick="$('#modal-senha').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button><button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button></div></div></div>
 
 <script>
     // --- CONFIGURAÇÃO ---
@@ -465,7 +392,26 @@
         }
     }
 
-    // --- FUNÇÕES DE NAVEGAÇÃO E UI ---
+    // --- FUNÇÕES DE NAVEGAÇÃO DE AUTH ---
+    // Estas funções controlam a tela inicial, login e cadastro
+    window.showLogin = function() {
+        $('#box-landing').addClass('hidden');
+        $('#box-login').removeClass('hidden');
+    }
+    
+    window.showRegister = function() {
+        $('#box-landing').addClass('hidden');
+        $('#box-register').removeClass('hidden');
+    }
+    
+    window.goBack = function() {
+        $('#box-login, #box-register').addClass('hidden');
+        $('#box-landing').removeClass('hidden');
+    }
+
+    window.toggleAuth = function() { /* Mantido para retrocompatibilidade, mas substituído por showLogin/Register */ };
+
+    // --- FUNÇÕES DE NAVEGAÇÃO UI (APP) ---
     window.toggleMenu = function() { $('#sidebar').toggleClass('open'); $('#menu-overlay').toggleClass('modal-ativo'); }
     window.mudarTela = function(screen) {
         localStorage.setItem('app_screen', screen);
@@ -476,7 +422,7 @@
         if(screen === 'pedidos') carregarHistoricoPedidos();
         if(screen === 'extrato') carregarExtrato();
     }
-    window.toggleAuth = function() { $('#box-login, #box-register').toggleClass('hidden'); }
+    
     window.toggleDropdown = function(id) { $('.custom-options').not(`#list-${id}`).slideUp(100); $(`#list-${id}`).slideToggle(150); }
     window.selectOption = function(type, val, text) { $(`#pagamento_${type}`).val(val); $(`#display-${type}`).text(text); $(`#list-${type}`).slideUp(100); }
     
@@ -569,7 +515,9 @@
                 responsavel: d.resp, cpf_responsavel: d.cpf_resp, whatsapp_responsavel: d.zap_resp,
                 email: d.email, codigo_visual: Math.floor(Math.random()*9000+1000) 
             }]);
-            showToast("Conta criada! Faça login."); toggleAuth();
+            showToast("Conta criada! Faça login."); 
+            // Após cadastro, mostra login
+            showLogin();
         }
     }
 
