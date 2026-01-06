@@ -99,12 +99,12 @@
     <div id="native-toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-xl opacity-0 transition z-[300] text-sm font-bold pointer-events-none"></div>
 
     <div id="screen-auth" class="min-h-screen flex items-center justify-center bg-gray-100 hidden p-4">
-        <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md text-center">
+        <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-2xl text-center">
             <div class="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-700 text-4xl"><i class="fas fa-box-open"></i></div>
             <h1 class="text-2xl font-bold text-gray-800 mb-6">Drop Entregas</h1>
             
             <div id="box-login">
-                <input type="email" id="log-email" class="input-std mb-3" placeholder="E-mail">
+                <input type="email" id="log-email" class="input-std mb-3" placeholder="E-mail (Ex: contato@minhaloja.com)">
                 <input type="password" id="log-senha" class="input-std mb-4" placeholder="Senha">
                 <button onclick="fazerLogin()" id="btn-login" class="btn-primary">Entrar</button>
                 <p class="text-gray-500 text-xs mt-4 cursor-pointer hover:text-blue-600" onclick="toggleAuth()">Criar Conta</p>
@@ -114,21 +114,21 @@
                 <p class="text-center font-bold text-gray-800 mb-2 border-b pb-2">Cadastro Completo</p>
                 
                 <p class="text-xs font-bold text-blue-600 uppercase mt-2">Dados da Loja</p>
-                <input type="text" id="reg-nome" class="input-std" placeholder="Nome Fantasia*">
-                <input type="text" id="reg-razao" class="input-std" placeholder="Razão Social">
-                <input type="tel" id="reg-cnpj" class="input-std" placeholder="CNPJ / CPF">
-                <input type="tel" id="reg-zap" class="input-std" placeholder="WhatsApp Loja (DDD+Num)*">
-                <input type="text" id="reg-endereco" class="input-std" placeholder="Endereço Completo (Rua, Nº, Bairro)*">
+                <input type="text" id="reg-nome" class="input-std" placeholder="Nome Fantasia (Ex: Pizzaria do João)*">
+                <input type="text" id="reg-razao" class="input-std" placeholder="Razão Social (Ex: João Silva LTDA)">
+                <input type="tel" id="reg-cnpj" class="input-std" placeholder="CNPJ / CPF (Ex: 12.345.678/0001-90)">
+                <input type="tel" id="reg-zap" class="input-std" placeholder="WhatsApp Loja (Ex: (84) 99123-4567)*">
+                <input type="text" id="reg-endereco" class="input-std" placeholder="Endereço Completo (Ex: Av. Rio Branco, 100)*">
 
                 <p class="text-xs font-bold text-blue-600 uppercase mt-2">Responsável</p>
-                <input type="text" id="reg-nome-resp" class="input-std" placeholder="Nome do Responsável">
-                <input type="tel" id="reg-cpf-resp" class="input-std" placeholder="CPF Responsável">
-                <input type="tel" id="reg-zap-resp" class="input-std" placeholder="WhatsApp Responsável">
+                <input type="text" id="reg-nome-resp" class="input-std" placeholder="Nome do Responsável (Ex: João da Silva)">
+                <input type="tel" id="reg-cpf-resp" class="input-std" placeholder="CPF Responsável (Ex: 123.456.789-00)">
+                <input type="tel" id="reg-zap-resp" class="input-std" placeholder="WhatsApp Responsável (Ex: (84) 99988-7766)">
 
                 <p class="text-xs font-bold text-blue-600 uppercase mt-2">Dados de Acesso</p>
-                <input type="email" id="reg-email" class="input-std" placeholder="E-mail*">
+                <input type="email" id="reg-email" class="input-std" placeholder="E-mail (Ex: loja@email.com)*">
                 <input type="email" id="reg-email-conf" class="input-std" placeholder="Confirmar E-mail*">
-                <input type="password" id="reg-senha" class="input-std" placeholder="Senha (6+ dígitos)*">
+                <input type="password" id="reg-senha" class="input-std" placeholder="Senha (Mínimo 6 dígitos)*">
                 <input type="password" id="reg-senha-conf" class="input-std" placeholder="Confirmar Senha*">
 
                 <button onclick="fazerCadastro()" id="btn-reg" class="btn-primary mt-4">Concluir Cadastro</button>
@@ -298,197 +298,16 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="md:col-span-2 border-b pb-2 mb-2"><span class="text-blue-600 font-bold uppercase text-xs">Dados da Empresa</span></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="input-std mt-1"></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">Razão Social</label><input type="text" id="edit-razao" class="input-std mt-1"></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">CNPJ/CPF</label><input type="tel" id="edit-cnpj" class="input-std mt-1"></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">WhatsApp Loja</label><input type="tel" id="edit-zap-loja" class="input-std mt-1"></div>
-                        <div class="md:col-span-2"><label class="text-xs font-bold text-gray-400 uppercase">Endereço Completo</label><input type="text" id="edit-endereco" class="input-std mt-1"></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="input-std mt-1" placeholder="Ex: Pizzaria do João"></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">Razão Social</label><input type="text" id="edit-razao" class="input-std mt-1" placeholder="Ex: João Silva LTDA"></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">CNPJ/CPF</label><input type="tel" id="edit-cnpj" class="input-std mt-1" placeholder="Ex: 12.345.678/0001-90"></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">WhatsApp Loja</label><input type="tel" id="edit-zap-loja" class="input-std mt-1" placeholder="Ex: (84) 99123-4567"></div>
+                        <div class="md:col-span-2"><label class="text-xs font-bold text-gray-400 uppercase">Endereço Completo</label><input type="text" id="edit-endereco" class="input-std mt-1" placeholder="Ex: Av. Rio Branco, 100, Centro"></div>
 
                         <div class="md:col-span-2 border-b pb-2 mb-2 mt-4"><span class="text-blue-600 font-bold uppercase text-xs">Responsável</span></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">Nome Responsável</label><input type="text" id="edit-resp-nome" class="input-std mt-1"></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">CPF Responsável</label><input type="tel" id="edit-cpf-resp" class="input-std mt-1"></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">WhatsApp Responsável</label><input type="tel" id="edit-resp-zap" class="input-std mt-1"></div>
-                    </div>
-
-                    <div class="flex gap-4 mb-8 mt-6">
-                        <button onclick="$('#modal-pin').addClass('modal-ativo')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar PIN</button>
-                        <button onclick="$('#modal-senha').addClass('modal-ativo')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar Senha</button>
-                    </div>
-                    <button onclick="salvarPerfil()" class="btn-primary mb-4">Salvar Alterações</button>
-                    <button onclick="fazerLogout()" class="w-full text-red-500 font-bold hover:bg-red-50 py-4 rounded-xl transition">Sair da Conta</button>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <div id="modal-detalhes" class="modal-overlay">
-        <div class="modal-content max-w-lg">
-            <div class="bg-blue-600 p-6 text-white flex justify-between items-center">
-                <div><h3 class="font-bold text-xl">Detalhes</h3><p id="det-status" class="text-sm opacity-80 font-bold uppercase mt-1">...</p></div>
-                <button onclick="$('#modal-detalhes').removeClass('modal-ativo')" class="text-2xl hover:text-gray-200">&times;</button>
-            </div>
-            <div class="p-6 space-y-6">
-                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <div><p class="text-xs text-gray-400 font-bold uppercase">Valor Total</p><p id="det-valor" class="text-3xl font-extrabold text-green-600">R$ 0,00</p></div>
-                    <div class="text-right"><p class="text-xs text-gray-400 font-bold uppercase">PIN Entrega</p><p id="det-pin" class="text-2xl font-mono font-bold text-blue-700">----</p></div>
-                </div>
-                <div class="space-y-4">
-                    <div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Retirada</p><p id="det-origem" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div>
-                    <div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Entrega</p><p id="det-destino" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div>
-                </div>
-         <div id="screen-app" class="hidden min-h-screen flex flex-col">
-        <header class="portal-header no-print">
-            <div class="flex items-center gap-4">
-                <div class="cursor-pointer hover:opacity-90 transition" onclick="toggleMenu()">
-                    <div class="bg-white/20 p-1 rounded-full border border-white/30">
-                        <div class="bg-white text-blue-800 w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm overflow-hidden" id="header-avatar">
-                            <img id="header-foto" src="" class="w-full h-full object-cover hidden">
-                            <span id="header-iniciais">LJ</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex flex-col">
-                    <p class="text-[10px] opacity-70 uppercase tracking-widest leading-none mb-0.5">Seu ID</p>
-                    <p class="font-extrabold text-xl leading-none tracking-wide" id="header-id">...</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="text-right"><h1 class="font-extrabold text-lg tracking-tight">Drop Entregas</h1></div>
-                <div class="bg-white text-blue-700 w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"><i class="fas fa-box-open"></i></div>
-            </div>
-        </header>
-
-        <main class="main-container flex-1 w-full p-4 md:p-8 max-w-4xl mx-auto">
-            <div id="view-home" class="fade-in">
-                <div class="bg-gradient-to-r from-blue-700 to-blue-600 rounded-2xl p-6 text-white shadow-lg mb-6 relative overflow-hidden flex justify-between items-end">
-                    <div><p class="text-xs font-bold opacity-80 uppercase tracking-widest mb-1">Saldo Disponível</p><h2 class="text-3xl font-extrabold" id="dash-saldo">R$ 0,00</h2></div>
-                    <button onclick="addSaldo()" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-4 rounded-lg backdrop-blur-sm transition border border-white/30 text-xs flex items-center gap-2"><i class="fas fa-plus"></i> Adicionar</button>
-                    <i class="fas fa-wallet absolute -right-6 -bottom-8 text-9xl opacity-10"></i>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                    <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2 pb-4 border-b"><i class="fas fa-paper-plane text-blue-600"></i> Nova Solicitação</h3>
-                    <div class="mb-6 relative z-30">
-                        <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">O que vamos entregar?</label>
-                        <div class="custom-select-btn" onclick="toggleDropdown('logistica')"><span id="display-logistica"><i class="fas fa-box text-blue-500 mr-2"></i> Pequenas Encomendas</span><i class="fas fa-chevron-down text-gray-400" id="arrow-logistica"></i></div>
-                        <input type="hidden" id="input-logistica" value="Pequenas Encomendas">
-                        <div id="list-logistica" class="custom-options">
-                            <div class="custom-option" onclick="selectLogistica('Pequenas Encomendas', 'fa-box')"><i class="fas fa-box text-blue-500"></i> Pequenas Encomendas</div>
-                            <div class="custom-option" onclick="selectLogistica('Alimentação', 'fa-utensils')"><i class="fas fa-utensils text-orange-500"></i> Alimentação</div>
-                            <div class="custom-option" onclick="selectLogistica('Farmácia', 'fa-capsules')"><i class="fas fa-capsules text-red-500"></i> Farmácia</div>
-                            <div class="custom-option" onclick="selectLogistica('Documentos', 'fa-file-alt')"><i class="fas fa-file-alt text-gray-500"></i> Documentos</div>
-                            <div class="custom-option" onclick="selectLogistica('Logística Reversa', 'fa-exchange-alt')"><i class="fas fa-exchange-alt text-purple-600"></i> Logística Reversa</div>
-                            <div class="custom-option" onclick="selectLogistica('Peças Automotivas', 'fa-cogs')"><i class="fas fa-cogs text-gray-700"></i> Peças Automotivas</div>
-                            <div class="custom-option" onclick="selectLogistica('Encomendas Maiores', 'fa-truck-loading')"><i class="fas fa-truck-loading text-blue-800"></i> Encomendas Maiores</div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 gap-4 mb-6">
-                        <div class="relative"><i class="fas fa-store text-blue-600 absolute left-4 top-4"></i><input type="text" id="origem" class="input-std pl-10 bg-gray-50 font-bold text-gray-600 cursor-not-allowed" readonly placeholder="Retirada (Sua Loja)" oninput="buscarEndereco(this.value, 'origem')"><div id="sugestoes-lista-origem" class="autocomplete-list"></div></div>
-                        <div class="relative"><i class="fas fa-map-marker-alt text-red-500 absolute left-4 top-4"></i><input type="text" id="destino" class="input-std pl-10 font-medium border-blue-100 focus:border-blue-500" placeholder="Onde vamos entregar? (Rua, Número, Bairro)" oninput="buscarEndereco(this.value, 'destino')"><div id="sugestoes-lista-destino" class="autocomplete-list"></div></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <input type="text" id="nome_dest" class="input-std" placeholder="Nome Cliente*">
-                        <input type="tel" id="tel_dest" class="input-std" placeholder="WhatsApp*">
-                        <input type="text" id="complemento" class="input-std" placeholder="Complemento">
-                        <input type="text" id="referencia" class="input-std" placeholder="Referência*">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="relative z-20">
-                            <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pgto. Entrega</label>
-                            <div class="custom-select-btn" onclick="toggleDropdown('entrega')"><span id="display-entrega">💠 PIX</span><i class="fas fa-chevron-down text-gray-400" id="arrow-entrega"></i></div>
-                            <input type="hidden" id="pagamento_entrega" value="PIX">
-                            <div id="list-entrega" class="custom-options">
-                                <div class="custom-option" onclick="selectOption('entrega', 'PIX', '💠 PIX')"><i class="fas fa-qrcode text-blue-500"></i> PIX</div>
-                                <div class="custom-option" onclick="selectOption('entrega', 'Dinheiro', '💵 Dinheiro')"><i class="fas fa-money-bill-wave text-green-600"></i> Dinheiro</div>
-                                <div class="custom-option" onclick="selectOption('entrega', 'Carteira', '💳 Saldo App')"><i class="fas fa-wallet text-purple-600"></i> Saldo App</div>
-                            </div>
-                        </div>
-                        <div class="relative z-20">
-                            <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pgto. Produto</label>
-                            <div class="custom-select-btn" onclick="toggleDropdown('produto')"><span id="display-produto">✅ Pago</span><i class="fas fa-chevron-down text-gray-400" id="arrow-produto"></i></div>
-                            <input type="hidden" id="pagamento_produto" value="Pago">
-                            <div id="list-produto" class="custom-options">
-                                <div class="custom-option" onclick="selectOption('produto', 'Pago', '✅ Pago')"><i class="fas fa-check-circle text-green-600"></i> Pago</div>
-                                <div class="custom-option" onclick="selectOption('produto', 'Cartão', '💳 Cartão')"><i class="fas fa-credit-card text-blue-600"></i> Cartão</div>
-                                <div class="custom-option" onclick="selectOption('produto', 'PIX', '💠 PIX')"><i class="fas fa-qrcode text-blue-500"></i> PIX</div>
-                                <div class="custom-option" onclick="selectOption('produto', 'Dinheiro', '💵 Dinheiro')"><i class="fas fa-money-bill-wave text-green-600"></i> Dinheiro</div>
-                            </div>
-                        </div>
-                    </div>
-                    <label class="switch-container mb-6">
-                        <div class="flex items-center gap-3"><div class="p-2 rounded-full bg-gray-100" id="bg-icon-retorno"><i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i></div><p id="text-retorno" class="font-bold text-gray-500 text-sm">Sem Retorno</p></div>
-                        <div class="switch"><input type="checkbox" id="retorno" onchange="recalcularTotal()"><span class="slider"></span></div>
-                    </label>
-                    <button onclick="calcularDistancia()" id="btn-calcular" class="btn-primary mt-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1">Calcular Valor</button>
-                    <div id="box-resultado" class="hidden bg-blue-50 border border-blue-200 p-6 rounded-2xl mt-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div class="text-center md:text-left"><p class="text-xs text-blue-600 font-bold uppercase mb-1">Distância Estimada</p><p class="font-bold text-gray-800 text-lg"><span id="km-display">0</span> km</p></div>
-                        <div class="text-center md:text-right"><p class="text-xs text-blue-600 font-bold uppercase mb-1">Valor Total</p><p class="font-extrabold text-4xl text-blue-800">R$ <span id="valor-display">0,00</span></p></div>
-                    </div>
-                    <button onclick="iniciarPedido()" id="btn-enviar" class="hidden btn-primary bg-green-600 hover:bg-green-700 mt-4 shadow-lg">Confirmar Solicitação</button>
-                </div>
-            </div>
-
-            <div id="view-pedidos" class="hidden fade-in max-w-5xl mx-auto">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="font-bold text-2xl text-gray-800">Histórico</h2>
-                    <button onclick="atualizarPedidosManual()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-gray-50 flex items-center gap-2"><i class="fas fa-sync-alt"></i> Atualizar</button>
-                </div>
-                <div id="box-filtro-data" class="hidden bg-blue-50 p-4 rounded-xl mb-4 border border-blue-100 flex items-end gap-2">
-                    <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Início</label><input type="date" id="data-ini-ped" class="input-std py-1 px-2 text-xs h-8"></div>
-                    <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Fim</label><input type="date" id="data-fim-ped" class="input-std py-1 px-2 text-xs h-8"></div>
-                    <button onclick="filtrarPorDataPed()" class="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center shadow hover:bg-blue-700"><i class="fas fa-check"></i></button>
-                    <button onclick="limparFiltroData()" class="bg-gray-300 text-gray-700 w-8 h-8 rounded flex items-center justify-center hover:bg-gray-400"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="flex gap-2 overflow-x-auto pb-4 mb-2 no-scrollbar items-center">
-                    <button onclick="filtrarStatus('todos')" class="filter-btn active-filter px-5 py-2 rounded-full font-bold text-sm shadow-sm border" data-filter="todos">Todos</button>
-                    <button onclick="filtrarStatus('solicitado')" class="filter-btn inactive-filter px-5 py-2 rounded-full font-bold text-sm shadow-sm border" data-filter="solicitado">Solicitados</button>
-                    <button onclick="filtrarStatus('andamento')" class="filter-btn inactive-filter px-5 py-2 rounded-full font-bold text-sm shadow-sm border" data-filter="andamento">Em Andamento</button>
-                    <button onclick="filtrarStatus('finalizados')" class="filter-btn inactive-filter px-5 py-2 rounded-full font-bold text-sm shadow-sm border" data-filter="finalizados">Finalizados</button>
-                    <button onclick="toggleFiltroData()" class="bg-white text-gray-500 border w-9 h-9 rounded-full flex items-center justify-center hover:bg-gray-50 shadow-sm ml-1"><i class="fas fa-search"></i></button>
-                </div>
-                <div id="lista-pedidos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </div>
-
-            <div id="view-extrato" class="hidden fade-in max-w-4xl mx-auto">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="font-bold text-2xl text-gray-800">Movimentações</h2>
-                    <div class="flex gap-2">
-                        <button onclick="toggleFiltroExtrato()" class="bg-white border border-gray-200 text-gray-500 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-gray-50 shadow-sm"><i class="fas fa-search"></i></button>
-                        <button onclick="atualizarExtratoManual()" class="bg-white border border-gray-200 text-gray-600 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-gray-50"><i class="fas fa-sync-alt"></i></button>
-                    </div>
-                </div>
-                <div id="box-filtro-extrato" class="hidden bg-blue-50 p-4 rounded-xl mb-4 border border-blue-100 flex items-end gap-2">
-                    <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Início</label><input type="date" id="filtro-ext-ini" class="input-std py-1 px-2 text-xs h-8"></div>
-                    <div class="flex-1"><label class="text-[10px] font-bold text-blue-800 uppercase">Fim</label><input type="date" id="filtro-ext-fim" class="input-std py-1 px-2 text-xs h-8"></div>
-                    <button onclick="filtrarPorDataExt()" class="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center shadow hover:bg-blue-700"><i class="fas fa-check"></i></button>
-                    <button onclick="limparFiltroExtrato()" class="bg-gray-300 text-gray-700 w-8 h-8 rounded flex items-center justify-center hover:bg-gray-400"><i class="fas fa-times"></i></button>
-                </div>
-                <div id="lista-extrato" class="space-y-3"></div>
-            </div>
-
-            <div id="view-perfil" class="hidden fade-in max-w-3xl mx-auto">
-                <h2 class="font-bold text-2xl text-gray-800 mb-6">Meu Perfil</h2>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-6">
-                    <div class="flex items-center gap-6 pb-6 border-b border-gray-100">
-                        <div class="relative group">
-                            <img id="edit-img-perfil" src="https://via.placeholder.com/150" class="w-24 h-24 rounded-full object-cover border-4 border-gray-100 group-hover:border-blue-100 transition">
-                            <button onclick="document.getElementById('input-foto').click()" class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition transform hover:scale-110"><i class="fas fa-camera"></i></button>
-                            <input type="file" id="input-foto" class="hidden" accept="image/*" onchange="uploadFoto()">
-                        </div>
-                        <div><h3 id="edit-display-nome" class="font-bold text-xl text-gray-800">Minha Loja</h3><p class="text-gray-500 text-sm">Gerencie seus dados e segurança</p></div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="md:col-span-2 border-b pb-2 mb-2"><span class="text-blue-600 font-bold uppercase text-xs">Dados da Empresa</span></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="input-std mt-1"></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">Razão Social</label><input type="text" id="edit-razao" class="input-std mt-1"></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">CNPJ/CPF</label><input type="tel" id="edit-cnpj" class="input-std mt-1"></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">WhatsApp Loja</label><input type="tel" id="edit-zap-loja" class="input-std mt-1"></div>
-                        <div class="md:col-span-2"><label class="text-xs font-bold text-gray-400 uppercase">Endereço Completo</label><input type="text" id="edit-endereco" class="input-std mt-1"></div>
-
-                        <div class="md:col-span-2 border-b pb-2 mb-2 mt-4"><span class="text-blue-600 font-bold uppercase text-xs">Responsável</span></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">Nome Responsável</label><input type="text" id="edit-resp-nome" class="input-std mt-1"></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">CPF Responsável</label><input type="tel" id="edit-cpf-resp" class="input-std mt-1"></div>
-                        <div><label class="text-xs font-bold text-gray-400 uppercase">WhatsApp Responsável</label><input type="tel" id="edit-resp-zap" class="input-std mt-1"></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">Nome Responsável</label><input type="text" id="edit-resp-nome" class="input-std mt-1" placeholder="Ex: João da Silva"></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">CPF Responsável</label><input type="tel" id="edit-cpf-resp" class="input-std mt-1" placeholder="Ex: 123.456.789-00"></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">WhatsApp Responsável</label><input type="tel" id="edit-resp-zap" class="input-std mt-1" placeholder="Ex: (84) 99988-7766"></div>
                     </div>
 
                     <div class="flex gap-4 mb-8 mt-6">
