@@ -279,7 +279,7 @@
                         </div>
                     </div>
                     <label class="switch-container mb-6">
-                        <div class="flex items-center gap-3"><div class="p-2 rounded-full bg-gray-100" id="bg-icon-retorno"><i id="icon-retorno" class="fas fa-arrow-right text-gray-400"></i></div><p id="text-retorno" class="font-bold text-gray-500 text-sm">Sem Retorno</p></div>
+                        <div class="flex items-center gap-3"><div class="p-2 rounded-full bg-gray-100" id="bg-icon-retorno"><i id="icon-retorno" class="fas fa-exchange-alt text-gray-400"></i></div><p id="text-retorno" class="font-bold text-gray-500 text-sm">Sem Retorno</p></div>
                         <div class="switch"><input type="checkbox" id="retorno" onchange="recalcularTotal()"><span class="slider"></span></div>
                     </label>
                     <button onclick="calcularDistancia()" id="btn-calcular" class="btn-primary mt-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1">Calcular Valor</button>
@@ -397,6 +397,7 @@
             profile = prof;
             $('#header-saldo, #dash-saldo').text(`R$ ${parseFloat(prof.saldo || 0).toFixed(2)}`);
             $('#origem').val(prof.endereco || prof.nome_loja);
+            // CORREÇÃO: ID já vem como string agora
             const visualId = prof.codigo_visual || '---';
             $('#header-id').text(visualId);
             
@@ -564,8 +565,8 @@
         const { data, error } = await sb.auth.signUp({ email: d.email, password: d.pass });
         if(error) { showToast(error.message, "error"); $('#btn-reg').text('Cadastrar').prop('disabled', false); }
         else if(data.user) {
-            // GERA ID 6 DIGITOS (TEXTO)
-            const novoId = Math.floor(Math.random() * 900000 + 100000);
+            // CORREÇÃO: ID 6 dígitos como string
+            const novoId = Math.floor(Math.random() * 900000 + 100000).toString();
             await sb.from('profiles').insert([{ 
                 id: data.user.id, 
                 nome_loja: d.nome, razao_social: d.razao, cnpj: d.cnpj, whatsapp_loja: d.zap, endereco: d.end, 
