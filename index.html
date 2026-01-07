@@ -4,50 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Portal Drop Entregas</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-    
     <style>
-        /* CORE */
         body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; }
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* HEADER */
         .portal-header { background-color: #1E40AF; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 40; }
-        
-        /* SIDEBAR */
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; backdrop-filter: blur(2px); }
         .sidebar-menu { position: fixed; top: 0; left: 0; bottom: 0; width: 280px; background: white; z-index: 101; transform: translateX(-100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
         .sidebar-menu.open { transform: translateX(0); }
         .menu-link { padding: 16px 20px; font-weight: 600; color: #374151; display: flex; align-items: center; gap: 12px; border-left: 4px solid transparent; cursor: pointer; transition: 0.2s; }
         .menu-link:hover, .menu-link.active { background: #eff6ff; color: #1E40AF; border-left-color: #1E40AF; }
-
-        /* INPUTS & DROPDOWNS */
         .input-std { width: 100%; background: #fff; border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s; }
         .input-std:focus { border-color: #1E40AF; box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.1); }
         .custom-select-btn { width: 100%; text-align: left; padding: 14px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-weight: 700; color: #374151; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; position: relative; z-index: 20; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .custom-options { display: none; position: absolute; top: 100%; left: 0; right: 0; background-color: #ffffff !important; border: 1px solid #e5e7eb; border-radius: 12px; margin-top: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 50 !important; overflow: hidden; max-height: 250px; overflow-y: auto; }
         .custom-option { padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 600; color: #4B5563; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 10px; background: white; }
         .custom-option:hover { background-color: #eff6ff; color: #1E40AF; }
-
-        /* TOAST */
         #native-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: white; color: #1f2937; padding: 16px 24px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 9999; width: 90%; max-width: 400px; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); border-left: 6px solid #3b82f6; }
         #native-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         #native-toast.error { border-left-color: #ef4444; }
         #native-toast.success { border-left-color: #22c55e; }
-
-        /* AUTOCOMPLETE & SWITCH */
         .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px; z-index: 60; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.1); display: none; }
         .autocomplete-header { padding: 8px; background: #f3f4f6; color: #6b7280; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; border-bottom: 1px solid #e5e7eb; }
         .autocomplete-item { padding: 12px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #f3f4f6; color: #374151; }
         .autocomplete-item:hover { background: #eff6ff; color: #1e40af; }
-        
         .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -55,39 +41,23 @@
         .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
         input:checked + .slider { background-color: #1E40AF; }
         input:checked + .slider:before { transform: translateX(20px); }
-
-        /* BUTTONS */
         .btn-primary { background: #1E40AF; color: white; width: 100%; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 16px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; border: none; }
         .btn-primary:active { transform: scale(0.98); }
         .btn-outline { background: white; color: #1E40AF; border: 2px solid #1E40AF; width: 100%; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 16px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; }
         .btn-outline:active { background: #eff6ff; transform: scale(0.98); }
-
-        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .bg-solicitado { background: #e5e7eb; color: #374151; }
-        .bg-pendente { background: #fef3c7; color: #d97706; }
-        .bg-em_rota { background: #dbeafe; color: #1e40af; }
-        .bg-concluido { background: #d1fae5; color: #059669; }
-        .bg-cancelado { background: #fee2e2; color: #991b1b; }
-
-        /* MODAIS */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
         .modal-ativo { display: flex !important; }
         .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
         @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        /* FILTERS */
         .filter-btn { transition: 0.2s; white-space: nowrap; }
         .filter-btn.active-filter { background-color: #1E40AF !important; color: white !important; border-color: #1E40AF !important; }
         .filter-btn.inactive-filter { background-color: white !important; color: #4B5563 !important; border: 1px solid #E5E7EB !important; }
-
         .pwd-req-list li { display: flex; align-items: center; gap: 6px; font-size: 12px; transition: 0.2s; }
         .pwd-req-list li.valid { color: #16a34a; font-weight: bold; }
         .pwd-req-list li.invalid { color: #9ca3af; } 
         .pwd-req-list li.error { color: #ef4444; font-weight: bold; }
-
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #1E40AF; border-radius: 50%; width: 30px; height: 30px; animation: spin 0.8s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         @media print {
             @page { size: auto; margin: 0mm; }
             body, html { height: auto; overflow: visible; background: white; margin: 0; padding: 0; }
@@ -100,15 +70,10 @@
     </style>
 </head>
 <body>
-
     <div id="global-loading" class="fixed inset-0 bg-white z-[300] flex flex-col items-center justify-center">
         <div class="loader mb-3"></div><p class="text-blue-900 text-xs font-bold tracking-widest animate-pulse">CARREGANDO</p>
     </div>
-
-    <div id="native-toast">
-        <div id="toast-icon" class="text-xl"></div>
-        <div id="toast-msg">Mensagem</div>
-    </div>
+    <div id="native-toast"><div id="toast-icon" class="text-xl"></div><div id="toast-msg">Mensagem</div></div>
 
     <div id="screen-auth" class="min-h-[100dvh] flex items-center justify-center bg-gray-100 hidden p-4">
         <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-2xl text-center relative">
@@ -121,18 +86,14 @@
                     <button onclick="showRegister()" class="btn-outline">Criar Nova Conta</button>
                 </div>
             </div>
-
             <div id="box-login" class="hidden fade-in">
-                <div class="absolute top-6 left-6">
-                    <button onclick="goBack()" class="text-gray-400 hover:text-blue-600 transition p-2 bg-gray-50 rounded-full w-10 h-10 flex items-center justify-center"><i class="fas fa-arrow-left text-lg"></i></button>
-                </div>
+                <div class="absolute top-6 left-6"><button onclick="goBack()" class="text-gray-400 hover:text-blue-600 transition p-2 bg-gray-50 rounded-full w-10 h-10 flex items-center justify-center"><i class="fas fa-arrow-left text-lg"></i></button></div>
                 <div class="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-700 text-3xl mt-4"><i class="fas fa-sign-in-alt"></i></div>
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">Acesse sua Conta</h2>
                 <input type="email" id="log-email" class="input-std mb-3" placeholder="E-mail">
                 <input type="password" id="log-senha" class="input-std mb-6" placeholder="Senha">
                 <button onclick="fazerLogin()" id="btn-login" class="btn-primary">Entrar</button>
             </div>
-            
             <div id="box-register" class="hidden text-left space-y-3 max-h-[85vh] overflow-y-auto pr-2 custom-scroll pt-2 fade-in">
                 <div class="flex items-center gap-4 border-b pb-4 mb-2 sticky top-0 bg-white z-10">
                     <button onclick="goBack()" class="text-gray-400 hover:text-blue-600 transition p-1 bg-gray-50 rounded-full w-10 h-10 flex items-center justify-center"><i class="fas fa-arrow-left text-lg"></i></button>
@@ -173,7 +134,15 @@
         <div class="p-6 bg-blue-700 text-white pt-10">
             <div class="flex items-center gap-3 mb-2">
                 <img id="menu-img" src="https://via.placeholder.com/150" class="w-14 h-14 rounded-full border-2 border-white bg-gray-200 object-cover">
-                <div><p class="font-bold text-lg leading-tight
+                <div><p class="font-bold text-lg leading-tight truncate w-32" id="menu-nome">...</p><p class="text-xs text-blue-200">Portal Cliente</p></div>
+            </div>
+        </div>
+        <div class="flex-1 py-4">
+            <div class="menu-link active" onclick="mudarTela('home'); toggleMenu()"><i class="fas fa-plus-circle text-lg"></i> Nova Solicitação</div>
+            <div class="menu-link" onclick="mudarTela('pedidos'); toggleMenu()"><i class="fas fa-list text-lg"></i> Meus Pedidos</div>
+            <div class="menu-link" onclick="mudarTela('extrato'); toggleMenu()"><i class="fas fa-wallet text-lg"></i> Financeiro</div>
+            <div class="menu-link" onclick="mudarTela('perfil'); toggleMenu()"><i class="fas fa-user-cog text-lg"></i> Perfil e Segurança</div>
+        </div>
         <div class="p-4 border-t">
             <button onclick="fazerLogout()" class="w-full flex items-center justify-center gap-2 text-red-500 font-bold py-3 hover:bg-red-50 rounded-xl transition"><i class="fas fa-sign-out-alt"></i> Sair</button>
         </div>
@@ -190,15 +159,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col">
-                    <p class="text-[10px] opacity-70 uppercase tracking-widest leading-none mb-0.5">Seu ID</p>
-                    <p class="font-extrabold text-xl leading-none tracking-wide" id="header-id">...</p>
-                </div>
+                <div class="flex flex-col"><p class="text-[10px] opacity-70 uppercase tracking-widest leading-none mb-0.5">Seu ID</p><p class="font-extrabold text-xl leading-none tracking-wide" id="header-id">...</p></div>
             </div>
-            <div class="flex items-center gap-2">
-                <div class="text-right"><h1 class="font-extrabold text-lg tracking-tight">Drop Entregas</h1></div>
-                <div class="bg-white text-blue-700 w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"><i class="fas fa-box-open"></i></div>
-            </div>
+            <div class="flex items-center gap-2"><div class="text-right"><h1 class="font-extrabold text-lg tracking-tight">Drop Entregas</h1></div><div class="bg-white text-blue-700 w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"><i class="fas fa-box-open"></i></div></div>
         </header>
 
         <main class="main-container flex-1 w-full p-4 md:p-8 max-w-4xl mx-auto">
@@ -321,22 +284,13 @@
     <div id="modal-senha" class="modal-overlay"><div class="modal-content p-8 text-center"><h3 class="font-bold text-xl mb-6">Nova Senha</h3><input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres"><div class="flex gap-4"><button onclick="$('#modal-senha').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button><button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button></div></div></div>
 
 <script>
-    // --- CONFIGURAÇÃO ---
     const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
     const ADMIN_ZAP = "5584982005039";
     const CITY_FIX = "Mossoró, RN";
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     
-    let user = null;
-    let profile = null;
-    let config = { taxa: 5.0, km: 1.0, retorno: 20 };
-    let tempDist = 0;
-    let debounceTimer;
-    let activePedidoId = null;
-    let pedidosCache = [];
-    let currentFilter = 'todos';
-    let isPasswordValid = false;
+    let user = null, profile = null, config = { taxa: 5.0, km: 1.0, retorno: 20 }, tempDist = 0, debounceTimer, pedidosCache = [], currentFilter = 'todos', isPasswordValid = false;
 
     $(document).ready(function(){
         $('#reg-zap, #edit-zap-loja, #reg-zap-resp, #edit-resp-zap, #tel_dest').mask('(00) 00000-0000');
@@ -352,297 +306,105 @@
 
     async function initSession() {
         const { data: { session } } = await sb.auth.getSession();
-        if(session) {
-            user = session.user;
-            if(user.id.length < 20) { fazerLogout(); return; }
-            await loadData();
-            $('#global-loading').addClass('hidden');
-            $('#screen-auth').addClass('hidden');
-            $('#screen-app').removeClass('hidden');
-            const saved = localStorage.getItem('app_screen') || 'home';
-            mudarTela(saved);
-        } else {
-            $('#global-loading').addClass('hidden');
-            $('#screen-auth').removeClass('hidden');
-        }
+        if(session) { user = session.user; if(user.id.length < 20) { fazerLogout(); return; } await loadData(); $('#global-loading').addClass('hidden'); $('#screen-auth').addClass('hidden'); $('#screen-app').removeClass('hidden'); mudarTela(localStorage.getItem('app_screen') || 'home'); } else { $('#global-loading').addClass('hidden'); $('#screen-auth').removeClass('hidden'); }
     }
 
     async function loadData() {
         const { data: cfg } = await sb.from('app_config').select('*').single();
         if(cfg) config = { taxa: cfg.taxa_base, km: cfg.preco_km, retorno: cfg.taxa_retorno_valor };
-
         const { data: prof } = await sb.from('profiles').select('*').eq('id', user.id).single();
         if(prof) {
             profile = prof;
             $('#header-saldo, #dash-saldo').text(`R$ ${parseFloat(prof.saldo || 0).toFixed(2)}`);
             $('#origem').val(prof.endereco || prof.nome_loja);
-            const visualId = prof.codigo_visual || '---';
-            $('#header-id').text(visualId);
-            
+            $('#header-id').text(prof.codigo_visual || '---');
             $('#menu-nome').text(prof.nome_loja);
             if(prof.foto_perfil) { $('#header-foto, #edit-img-perfil, #menu-img').attr('src', prof.foto_perfil); $('#header-iniciais').addClass('hidden'); $('#header-foto').removeClass('hidden'); }
             else { $('#header-iniciais').text(prof.nome_loja.substring(0,2).toUpperCase()).removeClass('hidden'); $('#header-foto').addClass('hidden'); }
-            
-            $('#edit-nome-loja').val(prof.nome_loja);
-            $('#edit-razao').val(prof.razao_social);
-            $('#edit-cnpj').val(prof.cnpj);
-            $('#edit-zap-loja').val(prof.whatsapp_loja);
-            $('#edit-endereco').val(prof.endereco);
-            $('#edit-resp-nome').val(prof.responsavel);
-            $('#edit-cpf-resp').val(prof.cpf_responsavel);
-            $('#edit-resp-zap').val(prof.whatsapp_responsavel);
+            $('#edit-nome-loja').val(prof.nome_loja); $('#edit-razao').val(prof.razao_social); $('#edit-cnpj').val(prof.cnpj); $('#edit-zap-loja').val(prof.whatsapp_loja); $('#edit-endereco').val(prof.endereco); $('#edit-resp-nome').val(prof.responsavel); $('#edit-cpf-resp').val(prof.cpf_responsavel); $('#edit-resp-zap').val(prof.whatsapp_responsavel);
         }
     }
 
-    // --- NAVEGAÇÃO AUTH ---
     window.showLogin = function() { $('#box-landing').addClass('hidden'); $('#box-login').removeClass('hidden'); }
     window.showRegister = function() { $('#box-landing').addClass('hidden'); $('#box-register').removeClass('hidden'); }
     window.goBack = function() { $('#box-login, #box-register').addClass('hidden'); $('#box-landing').removeClass('hidden'); }
-    window.toggleAuth = function() { }; 
 
-    // --- VALIDAÇÃO DE SENHA ---
     window.validarSenhaTR = function(pwd) {
-        const reqs = {
-            len: pwd.length >= 6,
-            up: /[A-Z]/.test(pwd),
-            low: /[a-z]/.test(pwd),
-            num: /[0-9]/.test(pwd),
-            spec: /[!@#$%^&*(),.?":{}|<>]/.test(pwd)
-        };
-        updateReqUI('req-len', reqs.len);
-        updateReqUI('req-up', reqs.up);
-        updateReqUI('req-low', reqs.low);
-        updateReqUI('req-num', reqs.num);
-        updateReqUI('req-spec', reqs.spec);
+        const reqs = { len: pwd.length >= 6, up: /[A-Z]/.test(pwd), low: /[a-z]/.test(pwd), num: /[0-9]/.test(pwd), spec: /[!@#$%^&*(),.?":{}|<>]/.test(pwd) };
+        updateReqUI('req-len', reqs.len); updateReqUI('req-up', reqs.up); updateReqUI('req-low', reqs.low); updateReqUI('req-num', reqs.num); updateReqUI('req-spec', reqs.spec);
         isPasswordValid = Object.values(reqs).every(Boolean);
     }
+    function updateReqUI(id, isValid) { const el = document.getElementById(id); if(isValid) { el.classList.remove('invalid', 'error'); el.classList.add('valid'); el.innerHTML = '<i class="fas fa-check-circle text-[10px]"></i> ' + el.innerText.replace('●','').trim(); } else { el.classList.remove('valid', 'error'); el.classList.add('invalid'); el.innerHTML = '<i class="fas fa-circle text-[6px]"></i> ' + el.innerText.replace('●','').trim(); } }
 
-    function updateReqUI(id, isValid) {
-        const el = document.getElementById(id);
-        if(isValid) {
-            el.classList.remove('invalid', 'error'); el.classList.add('valid');
-            el.innerHTML = '<i class="fas fa-check-circle text-[10px]"></i> ' + el.innerText.replace('●','').trim();
-        } else {
-            el.classList.remove('valid', 'error'); el.classList.add('invalid');
-            el.innerHTML = '<i class="fas fa-circle text-[6px]"></i> ' + el.innerText.replace('●','').trim();
-        }
-    }
-
-    // --- UI E MAPAS ---
     window.toggleMenu = function() { $('#sidebar').toggleClass('open'); $('#menu-overlay').toggleClass('modal-ativo'); }
-    window.mudarTela = function(screen) {
-        localStorage.setItem('app_screen', screen);
-        $('.menu-link').removeClass('active'); $(`.menu-link[onclick*="${screen}"]`).addClass('active');
-        $('#view-home, #view-pedidos, #view-extrato, #view-perfil').addClass('hidden');
-        $(`#view-${screen}`).removeClass('hidden').addClass('fade-in');
-        window.scrollTo(0,0);
-        if(screen === 'pedidos') carregarHistoricoPedidos();
-        if(screen === 'extrato') carregarExtrato();
-    }
+    window.mudarTela = function(screen) { localStorage.setItem('app_screen', screen); $('.menu-link').removeClass('active'); $(`.menu-link[onclick*="${screen}"]`).addClass('active'); $('#view-home, #view-pedidos, #view-extrato, #view-perfil').addClass('hidden'); $(`#view-${screen}`).removeClass('hidden').addClass('fade-in'); window.scrollTo(0,0); if(screen === 'pedidos') carregarHistoricoPedidos(); if(screen === 'extrato') carregarExtrato(); }
     window.toggleDropdown = function(id) { $('.custom-options').not(`#list-${id}`).slideUp(100); $(`#list-${id}`).slideToggle(150); }
     window.selectOption = function(type, val, text) { $(`#pagamento_${type}`).val(val); $(`#display-${type}`).text(text); $(`#list-${type}`).slideUp(100); }
     
-    // --- LÓGICA DE PEDIDOS E CÁLCULO ---
-    window.selectLogistica = function(val, iconClass) {
-        $('#input-logistica').val(val); $('#display-logistica').html(`<i class="fas ${iconClass} text-blue-500 mr-2"></i> ${val}`); $('#list-logistica').slideUp(100);
-        if(val === 'Logística Reversa') { $('#origem').prop('readonly', false).val('').removeClass('cursor-not-allowed bg-gray-50'); $('#destino').prop('readonly', true).val(profile.endereco).addClass('cursor-not-allowed bg-gray-50'); }
-        else { $('#origem').prop('readonly', true).val(profile.endereco).addClass('cursor-not-allowed bg-gray-50'); $('#destino').prop('readonly', false).val('').removeClass('cursor-not-allowed bg-gray-50'); }
-        $('#box-resultado, #btn-enviar').addClass('hidden'); $('#btn-calcular').show();
-    }
+    window.selectLogistica = function(val, iconClass) { $('#input-logistica').val(val); $('#display-logistica').html(`<i class="fas ${iconClass} text-blue-500 mr-2"></i> ${val}`); $('#list-logistica').slideUp(100); if(val === 'Logística Reversa') { $('#origem').prop('readonly', false).val('').removeClass('cursor-not-allowed bg-gray-50'); $('#destino').prop('readonly', true).val(profile.endereco).addClass('cursor-not-allowed bg-gray-50'); } else { $('#origem').prop('readonly', true).val(profile.endereco).addClass('cursor-not-allowed bg-gray-50'); $('#destino').prop('readonly', false).val('').removeClass('cursor-not-allowed bg-gray-50'); } $('#box-resultado, #btn-enviar').addClass('hidden'); $('#btn-calcular').show(); }
 
-    window.buscarEndereco = function(query, fieldId) {
-        if(query.length < 4) { $(`#sugestoes-lista-${fieldId}`).hide(); return; }
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(async () => {
-            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', ' + CITY_FIX)}&limit=3`);
-            const data = await res.json();
-            let html = `<div class="autocomplete-header" onclick="$('.autocomplete-list').hide()">Fechar</div>`;
-            data.forEach(item => { html += `<div class="autocomplete-item" onclick="selectEnd('${item.display_name}', '${fieldId}')">${item.display_name}</div>`; });
-            $(`#sugestoes-lista-${fieldId}`).html(html).show();
-        }, 500);
-    }
+    window.buscarEndereco = function(query, fieldId) { if(query.length < 4) { $(`#sugestoes-lista-${fieldId}`).hide(); return; } clearTimeout(debounceTimer); debounceTimer = setTimeout(async () => { const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', ' + CITY_FIX)}&limit=3`); const data = await res.json(); let html = `<div class="autocomplete-header" onclick="$('.autocomplete-list').hide()">Fechar</div>`; data.forEach(item => { html += `<div class="autocomplete-item" onclick="selectEnd('${item.display_name}', '${fieldId}')">${item.display_name}</div>`; }); $(`#sugestoes-lista-${fieldId}`).html(html).show(); }, 500); }
     window.selectEnd = function(address, fieldId) { $(`#${fieldId}`).val(address); $('.autocomplete-list').hide(); }
 
     window.calcularDistancia = async function() {
-        const o = $('#origem').val(), d = $('#destino').val();
-        if(!o || !d) return showToast("Preencha endereços", "error");
+        const o = $('#origem').val(), d = $('#destino').val(); if(!o || !d) return showToast("Preencha endereços", "error");
         $('#btn-calcular').text("Calculando...").prop('disabled', true);
         try {
             const [resO, resD] = await Promise.all([fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(o)}&limit=1`), fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(d)}&limit=1`)]);
             const [dataO, dataD] = await Promise.all([resO.json(), resD.json()]);
             if(!dataO[0] || !dataD[0]) throw new Error("Endereço não achado");
             const lat1 = dataO[0].lat, lon1 = dataO[0].lon, lat2 = dataD[0].lat, lon2 = dataD[0].lon;
-            const R = 6371; 
-            const dLat = (lat2-lat1) * Math.PI/180, dLon = (lon2-lon1) * Math.PI/180; 
+            const R = 6371; const dLat = (lat2-lat1) * Math.PI/180, dLon = (lon2-lon1) * Math.PI/180; 
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2); 
             tempDist = (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.3).toFixed(1);
             if(tempDist < 1) tempDist = 1;
-            recalcularTotal();
-            $('#btn-calcular').hide(); $('#box-resultado, #btn-enviar').removeClass('hidden');
+            recalcularTotal(); $('#btn-calcular').hide(); $('#box-resultado, #btn-enviar').removeClass('hidden');
         } catch(e) { showToast("Endereço não encontrado", "error"); } finally { $('#btn-calcular').text("Calcular").prop('disabled', false); }
     }
 
-    // --- CORREÇÃO DO BOTÃO RETORNO ---
     window.recalcularTotal = function() {
         let total = config.taxa + (tempDist * config.km);
         const isRetorno = $('#retorno').is(':checked');
-        
-        if(isRetorno) {
-            $('#text-retorno').text("Com Retorno").removeClass('text-gray-500').addClass('text-blue-600');
-            $('#icon-retorno').attr('class', 'fas fa-exchange-alt text-blue-600');
-            $('#bg-icon-retorno').removeClass('bg-gray-100').addClass('bg-blue-100');
-            total += (total * (config.retorno / 100));
-        } else {
-            $('#text-retorno').text("Sem Retorno").removeClass('text-blue-600').addClass('text-gray-500');
-            $('#icon-retorno').attr('class', 'fas fa-arrow-right text-gray-400');
-            $('#bg-icon-retorno').removeClass('bg-blue-100').addClass('bg-gray-100');
-        }
-        
-        $('#valor-display').text(total.toFixed(2).replace('.',',')); 
-        $('#km-display').text(tempDist);
+        if(isRetorno) { $('#text-retorno').text("Com Retorno").removeClass('text-gray-500').addClass('text-blue-600'); $('#icon-retorno').attr('class', 'fas fa-exchange-alt text-blue-600'); $('#bg-icon-retorno').removeClass('bg-gray-100').addClass('bg-blue-100'); total += (total * (config.retorno / 100)); } 
+        else { $('#text-retorno').text("Sem Retorno").removeClass('text-blue-600').addClass('text-gray-500'); $('#icon-retorno').attr('class', 'fas fa-arrow-right text-gray-400'); $('#bg-icon-retorno').removeClass('bg-blue-100').addClass('bg-gray-100'); }
+        $('#valor-display').text(total.toFixed(2).replace('.',',')); $('#km-display').text(tempDist);
     }
 
     window.iniciarPedido = async function() {
         if(!user || !user.id || user.id.length < 20) { showToast("Sessão inválida. Logue novamente.", "error"); setTimeout(fazerLogout, 2000); return; }
         $('#btn-enviar').text('Enviando...').prop('disabled', true);
-        const { error } = await sb.rpc('criar_pedido_seguro', {
-            p_user_id: user.id, p_origem: $('#origem').val(), p_destino: $('#destino').val(),
-            p_distancia_km: parseFloat(tempDist), p_forma_pagamento: $('#pagamento_entrega').val(),
-            p_nome_dest: $('#nome_dest').val(), p_tel_dest: $('#tel_dest').val(),
-            p_tipo_logistica: $('#input-logistica').val(), p_com_retorno: $('#retorno').is(':checked')
-        });
-        if(error) { showToast("Erro: " + error.message, "error"); $('#btn-enviar').text('Confirmar').prop('disabled', false); }
-        else { showToast("Pedido Criado!", "success"); loadData(); mudarTela('pedidos'); }
+        const { error } = await sb.rpc('criar_pedido_seguro', { p_user_id: user.id, p_origem: $('#origem').val(), p_destino: $('#destino').val(), p_distancia_km: parseFloat(tempDist), p_forma_pagamento: $('#pagamento_entrega').val(), p_nome_dest: $('#nome_dest').val(), p_tel_dest: $('#tel_dest').val(), p_tipo_logistica: $('#input-logistica').val(), p_com_retorno: $('#retorno').is(':checked') });
+        if(error) { showToast("Erro: " + error.message, "error"); $('#btn-enviar').text('Confirmar').prop('disabled', false); } else { showToast("Pedido Criado!", "success"); loadData(); mudarTela('pedidos'); }
     }
 
-    // --- AUTH ---
-    window.fazerLogin = async function() {
-        const { error } = await sb.auth.signInWithPassword({ email: $('#log-email').val(), password: $('#log-senha').val() });
-        if(error) showToast("Erro: " + error.message, "error"); else location.reload();
-    }
+    window.fazerLogin = async function() { const { error } = await sb.auth.signInWithPassword({ email: $('#log-email').val(), password: $('#log-senha').val() }); if(error) showToast("Erro: " + error.message, "error"); else location.reload(); }
 
     window.fazerCadastro = async function() {
-        if(!isPasswordValid) {
-            showToast("A senha não atende aos requisitos!", "error");
-            document.querySelectorAll('.pwd-req-list li.invalid').forEach(el => el.classList.add('error'));
-            return;
-        }
+        if(!isPasswordValid) { showToast("A senha não atende aos requisitos!", "error"); document.querySelectorAll('.pwd-req-list li.invalid').forEach(el => el.classList.add('error')); return; }
         if($('#reg-email').val() !== $('#reg-email-conf').val()) return showToast("Os e-mails não coincidem!", "error");
         if($('#reg-senha').val() !== $('#reg-senha-conf').val()) return showToast("As senhas não coincidem!", "error");
-
-        const d = { 
-            nome: $('#reg-nome').val(), razao: $('#reg-razao').val(), cnpj: $('#reg-cnpj').val(), 
-            zap: $('#reg-zap').val(), end: $('#reg-endereco').val(), 
-            resp: $('#reg-nome-resp').val(), cpf_resp: $('#reg-cpf-resp').val(), zap_resp: $('#reg-zap-resp').val(),
-            email: $('#reg-email').val(), pass: $('#reg-senha').val() 
-        };
-
+        const d = { nome: $('#reg-nome').val(), razao: $('#reg-razao').val(), cnpj: $('#reg-cnpj').val(), zap: $('#reg-zap').val(), end: $('#reg-endereco').val(), resp: $('#reg-nome-resp').val(), cpf_resp: $('#reg-cpf-resp').val(), zap_resp: $('#reg-zap-resp').val(), email: $('#reg-email').val(), pass: $('#reg-senha').val() };
         if(!d.nome || !d.zap || !d.email || !d.pass || !d.end) return showToast("Preencha campos obrigatórios (*)", "error");
-        
         $('#btn-reg').text('Criando...').prop('disabled', true);
         const { data, error } = await sb.auth.signUp({ email: d.email, password: d.pass });
         if(error) { showToast(error.message, "error"); $('#btn-reg').text('Cadastrar').prop('disabled', false); }
         else if(data.user) {
-            // GERA ID 6 DIGITOS (TEXTO) - COMPATÍVEL COM A CORREÇÃO DE DB
             const novoId = Math.floor(Math.random() * 900000 + 100000).toString();
-            await sb.from('profiles').insert([{ 
-                id: data.user.id, 
-                nome_loja: d.nome, razao_social: d.razao, cnpj: d.cnpj, whatsapp_loja: d.zap, endereco: d.end, 
-                responsavel: d.resp, cpf_responsavel: d.cpf_resp, whatsapp_responsavel: d.zap_resp,
-                email: d.email, codigo_visual: novoId 
-            }]);
-            showToast("Conta criada! Faça login.", "success");
-            setTimeout(showLogin, 2000);
+            await sb.from('profiles').insert([{ id: data.user.id, nome_loja: d.nome, razao_social: d.razao, cnpj: d.cnpj, whatsapp_loja: d.zap, endereco: d.end, responsavel: d.resp, cpf_responsavel: d.cpf_resp, whatsapp_responsavel: d.zap_resp, email: d.email, codigo_visual: novoId }]);
+            showToast("Conta criada! Faça login.", "success"); setTimeout(showLogin, 2000);
         }
     }
 
     window.fazerLogout = async function() { await sb.auth.signOut(); localStorage.clear(); location.reload(); }
-
-    // --- FILTROS, TOAST & HELPERS ---
-    window.filtrarStatus = function(s) { currentFilter = s; renderizarPedidos(); }
     window.atualizarPedidosManual = function() { carregarHistoricoPedidos(); }
-    
-    window.carregarHistoricoPedidos = async function() {
-        $('#lista-pedidos').html('<div class="loader"></div>');
-        const { data } = await sb.from('pedidos').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(100);
-        pedidosCache = data || []; renderizarPedidos();
-    }
-
-    function renderizarPedidos() {
-        const lista = $('#lista-pedidos').empty();
-        pedidosCache.filter(p => currentFilter === 'todos' || p.status === currentFilter).forEach(p => {
-            lista.append(`<div class="bg-white p-4 rounded-xl border mb-2 shadow-sm" onclick="verDetalhePedido('${p.id}')">
-                <div class="flex justify-between"><span class="font-bold text-gray-800">${p.nome_destinatario}</span><span class="text-blue-600 font-bold">R$ ${p.valor_frete}</span></div>
-                <div class="text-xs text-gray-500 mt-1">${p.status.toUpperCase()}</div>
-            </div>`);
-        });
-    }
-
-    window.verDetalhePedido = async function(id) {
-        const p = pedidosCache.find(x => x.id == id);
-        if(!p) return;
-        $('#det-valor').text(`R$ ${parseFloat(p.valor_frete).toFixed(2)}`);
-        $('#det-pin').text(p.pin_entrega);
-        $('#det-origem').text(p.origem);
-        $('#det-destino').text(p.destino);
-        $('#det-status').text(p.status.toUpperCase());
-        $('#modal-detalhes').addClass('modal-ativo');
-    }
-
-    window.carregarExtrato = async function() {
-        $('#lista-extrato').html('<div class="loader"></div>');
-        const { data } = await sb.from('transacoes').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(50);
-        let html = '';
-        if(data) data.forEach(t => {
-            html += `<div class="bg-white p-4 rounded-xl border mb-2 flex justify-between" onclick="verComprovante('${t.id}','${t.descricao}','${t.valor}','${t.created_at}','${t.tipo}')">
-                <div><p class="font-bold text-gray-800">${t.descricao}</p><p class="text-xs text-gray-400">${new Date(t.created_at).toLocaleDateString()}</p></div>
-                <p class="font-bold ${t.tipo==='credito'?'text-green-600':'text-red-600'}">${t.tipo==='credito'?'+':'-'} R$ ${parseFloat(t.valor).toFixed(2)}</p>
-            </div>`;
-        });
-        $('#lista-extrato').html(html);
-    }
-
-    window.verComprovante = async function(id, desc, val, date, tipo) {
-        $('#comp-data-hora').text(new Date(date).toLocaleString());
-        $('#comp-loja').text(profile.nome_loja);
-        $('#comp-tipo').text(tipo.toUpperCase());
-        $('#comp-id').text(id.substring(0,8));
-        $('#comp-valor').text(`R$ ${parseFloat(val).toFixed(2)}`);
-        $('#comp-desc').text(desc);
-        
-        let pgto = "Saldo em Conta";
-        if(tipo === 'credito') pgto = "PIX";
-        else if(desc.includes('Pedido')) {
-            const match = desc.match(/#(\d+)/);
-            if(match) {
-                const p = pedidosCache.find(x => x.codigo_visual == match[1]);
-                if(p) pgto = p.forma_pagamento;
-            }
-        }
-        $('#comp-pgto').text(pgto);
-        $('#modal-comprovante').addClass('modal-ativo');
-    }
-
+    window.carregarHistoricoPedidos = async function() { $('#lista-pedidos').html('<div class="loader"></div>'); const { data } = await sb.from('pedidos').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(100); pedidosCache = data || []; renderizarPedidos(); }
+    function renderizarPedidos() { const lista = $('#lista-pedidos').empty(); pedidosCache.filter(p => currentFilter === 'todos' || p.status === currentFilter).forEach(p => { lista.append(`<div class="bg-white p-4 rounded-xl border mb-2 shadow-sm" onclick="verDetalhePedido('${p.id}')"><div class="flex justify-between"><span class="font-bold text-gray-800">${p.nome_destinatario}</span><span class="text-blue-600 font-bold">R$ ${p.valor_frete}</span></div><div class="text-xs text-gray-500 mt-1">${p.status.toUpperCase()}</div></div>`); }); }
+    window.verDetalhePedido = async function(id) { const p = pedidosCache.find(x => x.id == id); if(!p) return; $('#det-valor').text(`R$ ${parseFloat(p.valor_frete).toFixed(2)}`); $('#det-pin').text(p.pin_entrega); $('#det-origem').text(p.origem); $('#det-destino').text(p.destino); $('#det-status').text(p.status.toUpperCase()); $('#modal-detalhes').addClass('modal-ativo'); }
+    window.carregarExtrato = async function() { $('#lista-extrato').html('<div class="loader"></div>'); const { data } = await sb.from('transacoes').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(50); let html = ''; if(data) data.forEach(t => { html += `<div class="bg-white p-4 rounded-xl border mb-2 flex justify-between" onclick="verComprovante('${t.id}','${t.descricao}','${t.valor}','${t.created_at}','${t.tipo}')"><div><p class="font-bold text-gray-800">${t.descricao}</p><p class="text-xs text-gray-400">${new Date(t.created_at).toLocaleDateString()}</p></div><p class="font-bold ${t.tipo==='credito'?'text-green-600':'text-red-600'}">${t.tipo==='credito'?'+':'-'} R$ ${parseFloat(t.valor).toFixed(2)}</p></div>`; }); $('#lista-extrato').html(html); }
+    window.verComprovante = async function(id, desc, val, date, tipo) { $('#comp-data-hora').text(new Date(date).toLocaleString()); $('#comp-loja').text(profile.nome_loja); $('#comp-tipo').text(tipo.toUpperCase()); $('#comp-id').text(id.substring(0,8)); $('#comp-valor').text(`R$ ${parseFloat(val).toFixed(2)}`); $('#comp-desc').text(desc); let pgto = "Saldo em Conta"; if(tipo === 'credito') pgto = "PIX"; else if(desc.includes('Pedido')) { const match = desc.match(/#(\d+)/); if(match) { const p = pedidosCache.find(x => x.codigo_visual == match[1]); if(p) pgto = p.forma_pagamento; } } $('#comp-pgto').text(pgto); $('#modal-comprovante').addClass('modal-ativo'); }
     window.addSaldo = function() { window.open(`https://wa.me/${ADMIN_ZAP}?text=Olá, quero adicionar saldo. ID: ${profile.codigo_visual}`, '_blank'); }
-    
-    function showToast(msg, type = "default") { 
-        const t = $('#native-toast'); const icon = $('#toast-icon');
-        t.removeClass('error success show').addClass('show');
-        if(type === 'error') { t.addClass('error'); icon.html('<i class="fas fa-exclamation-circle text-red-500"></i>'); }
-        else if(type === 'success') { t.addClass('success'); icon.html('<i class="fas fa-check-circle text-green-500"></i>'); }
-        else { icon.html('<i class="fas fa-info-circle text-blue-500"></i>'); }
-        $('#toast-msg').text(msg); setTimeout(() => t.removeClass('show'), 3500); 
-    }
-    
-    window.salvarPerfil = async function() {
-        const u = { 
-            nome_loja: $('#edit-nome-loja').val(), razao_social: $('#edit-razao').val(), cnpj: $('#edit-cnpj').val(), 
-            whatsapp_loja: $('#edit-zap-loja').val(), endereco: $('#edit-endereco').val(), 
-            responsavel: $('#edit-resp-nome').val(), cpf_responsavel: $('#edit-cpf-resp').val(), whatsapp_responsavel: $('#edit-resp-zap').val() 
-        };
-        await sb.from('profiles').update(u).eq('id', user.id);
-        showToast("Perfil Salvo!", "success"); loadData();
-    }
+    function showToast(msg, type = "default") { const t = $('#native-toast'); const icon = $('#toast-icon'); t.removeClass('error success show').addClass('show'); if(type === 'error') { t.addClass('error'); icon.html('<i class="fas fa-exclamation-circle text-red-500"></i>'); } else if(type === 'success') { t.addClass('success'); icon.html('<i class="fas fa-check-circle text-green-500"></i>'); } else { icon.html('<i class="fas fa-info-circle text-blue-500"></i>'); } $('#toast-msg').text(msg); setTimeout(() => t.removeClass('show'), 3500); }
+    window.salvarPerfil = async function() { const u = { nome_loja: $('#edit-nome-loja').val(), razao_social: $('#edit-razao').val(), cnpj: $('#edit-cnpj').val(), whatsapp_loja: $('#edit-zap-loja').val(), endereco: $('#edit-endereco').val(), responsavel: $('#edit-resp-nome').val(), cpf_responsavel: $('#edit-cpf-resp').val(), whatsapp_responsavel: $('#edit-resp-zap').val() }; await sb.from('profiles').update(u).eq('id', user.id); showToast("Perfil Salvo!", "success"); loadData(); }
 </script>
 </body>
 </html>
