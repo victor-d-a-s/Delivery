@@ -564,7 +564,6 @@
         const { data, error } = await sb.auth.signUp({ email: d.email, password: d.pass });
         if(error) { showToast(error.message, "error"); $('#btn-reg').text('Cadastrar').prop('disabled', false); }
         else if(data.user) {
-            // Gera ID numérico simples (6 dígitos)
             const novoId = Math.floor(Math.random() * 900000 + 100000);
             await sb.from('profiles').insert([{ 
                 id: data.user.id, 
