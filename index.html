@@ -1,315 +1,662 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Drop Entregas - App Oficial</title>
+    <title>Portal Drop Entregas</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
-        /* Ajustes Mobile */
-        body { -webkit-tap-highlight-color: transparent; }
-        #map { height: 350px; width: 100%; z-index: 0; border-radius: 12px; }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(0,0,0,0.05);
-        }
-        .loader {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #ff6b00;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-        }
+        /* CORE */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* HEADER */
+        .portal-header { background-color: #1E40AF; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 40; }
+        
+        /* SIDEBAR */
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; backdrop-filter: blur(2px); }
+        .sidebar-menu { position: fixed; top: 0; left: 0; bottom: 0; width: 280px; background: white; z-index: 101; transform: translateX(-100%); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-menu.open { transform: translateX(0); }
+        .menu-link { padding: 16px 20px; font-weight: 600; color: #374151; display: flex; align-items: center; gap: 12px; border-left: 4px solid transparent; cursor: pointer; transition: 0.2s; }
+        .menu-link:hover, .menu-link.active { background: #eff6ff; color: #1E40AF; border-left-color: #1E40AF; }
+
+        /* INPUTS & DROPDOWNS */
+        .input-std { width: 100%; background: #fff; border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s; }
+        .input-std:focus { border-color: #1E40AF; box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.1); }
+        .custom-select-btn { width: 100%; text-align: left; padding: 14px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-weight: 700; color: #374151; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; position: relative; z-index: 20; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .custom-options { display: none; position: absolute; top: 100%; left: 0; right: 0; background-color: #ffffff !important; border: 1px solid #e5e7eb; border-radius: 12px; margin-top: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 50 !important; overflow: hidden; max-height: 250px; overflow-y: auto; }
+        .custom-option { padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 600; color: #4B5563; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; gap: 10px; background: white; }
+        .custom-option:hover { background-color: #eff6ff; color: #1E40AF; }
+
+        /* TOAST */
+        #native-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: white; color: #1f2937; padding: 16px 24px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); z-index: 9999; width: 90%; max-width: 400px; display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); border-left: 6px solid #3b82f6; }
+        #native-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        #native-toast.error { border-left-color: #ef4444; }
+        #native-toast.success { border-left-color: #22c55e; }
+
+        /* AUTOCOMPLETE & SWITCH */
+        .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px; z-index: 60; max-height: 250px; overflow-y: auto; box-shadow: 0 10px 20px rgba(0,0,0,0.1); display: none; }
+        .autocomplete-header { padding: 8px; background: #f3f4f6; color: #6b7280; font-size: 11px; font-weight: bold; text-align: center; cursor: pointer; border-bottom: 1px solid #e5e7eb; }
+        .autocomplete-item { padding: 12px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #f3f4f6; color: #374151; }
+        .autocomplete-item:hover { background: #eff6ff; color: #1e40af; }
+        
+        .switch-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .2s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
+        input:checked + .slider { background-color: #1E40AF; }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* BUTTONS */
+        .btn-primary { background: #1E40AF; color: white; width: 100%; padding: 16px; border-radius: 12px; font-weight: 800; font-size: 16px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; border: none; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-outline { background: white; color: #1E40AF; border: 2px solid #1E40AF; width: 100%; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 16px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer; }
+        .btn-outline:active { background: #eff6ff; transform: scale(0.98); }
+
+        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .bg-solicitado { background: #e5e7eb; color: #374151; }
+        .bg-pendente { background: #fef3c7; color: #d97706; }
+        .bg-em_rota { background: #dbeafe; color: #1e40af; }
+        .bg-concluido { background: #d1fae5; color: #059669; }
+        .bg-cancelado { background: #fee2e2; color: #991b1b; }
+
+        /* MODAIS */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
+        .modal-ativo { display: flex !important; }
+        .modal-content { background: white; width: 100%; max-width: 450px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); animation: scaleIn 0.2s; }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* FILTERS */
+        .filter-btn { transition: 0.2s; white-space: nowrap; }
+        .filter-btn.active-filter { background-color: #1E40AF !important; color: white !important; border-color: #1E40AF !important; }
+        .filter-btn.inactive-filter { background-color: white !important; color: #4B5563 !important; border: 1px solid #E5E7EB !important; }
+
+        .pwd-req-list li { display: flex; align-items: center; gap: 6px; font-size: 12px; transition: 0.2s; }
+        .pwd-req-list li.valid { color: #16a34a; font-weight: bold; }
+        .pwd-req-list li.invalid { color: #9ca3af; } 
+        .pwd-req-list li.error { color: #ef4444; font-weight: bold; }
+
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #1E40AF; border-radius: 50%; width: 30px; height: 30px; animation: spin 0.8s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @media print {
+            @page { size: auto; margin: 0mm; }
+            body, html { height: auto; overflow: visible; background: white; margin: 0; padding: 0; }
+            body * { visibility: hidden; }
+            #modal-comprovante, #modal-comprovante * { visibility: visible; }
+            #modal-comprovante { position: absolute; left: 0; top: 0; width: 100%; height: auto; margin: 0; padding: 20px; background: white; display: block !important; box-shadow: none; backdrop-filter: none; }
+            .modal-content { box-shadow: none !important; border: 2px solid #000; margin: 0 auto; width: 100% !important; max-width: 100% !important; transform: none !important; animation: none !important; }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans pb-24">
+<body>
 
-    <header class="bg-white shadow-sm sticky top-0 z-50 px-4 py-3 flex justify-between items-center">
-        <div class="flex items-center gap-2">
-            <div class="bg-orange-500 text-white p-2 rounded-lg font-bold">DE</div>
-            <h1 class="text-xl font-bold tracking-tight">Drop Entregas</h1>
-        </div>
-        <button id="btnLogin" onclick="fazerLogin()" class="text-sm bg-gray-900 text-white px-4 py-2 rounded-full font-medium active:scale-95 transition">
-            Entrar
-        </button>
-        <div id="userInfo" class="hidden flex items-center gap-2">
-            <span id="userEmail" class="text-xs text-gray-500 font-medium"></span>
-            <button onclick="fazerLogout()" class="text-xs text-red-500 border border-red-100 px-2 py-1 rounded hover:bg-red-50">Sair</button>
-        </div>
-    </header>
+    <div id="global-loading" class="fixed inset-0 bg-white z-[300] flex flex-col items-center justify-center">
+        <div class="loader mb-3"></div><p class="text-blue-900 text-xs font-bold tracking-widest animate-pulse">CARREGANDO</p>
+    </div>
 
-    <main class="p-4 max-w-md mx-auto space-y-4">
-        
-        <div class="bg-white p-1 rounded-2xl shadow-sm border border-gray-100 relative">
-            <div id="map"></div>
-            <button onclick="centralizarMapa()" class="absolute bottom-4 right-4 z-[400] bg-white p-3 rounded-full shadow-lg text-gray-700 active:bg-gray-100">
-                📍
-            </button>
-        </div>
+    <div id="native-toast">
+        <div id="toast-icon" class="text-xl"></div>
+        <div id="toast-msg">Mensagem</div>
+    </div>
 
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                📦 Novo Pedido
-            </h2>
-
-            <div class="space-y-1">
-                <label class="text-xs font-bold text-gray-500 uppercase ml-1">Retirada (Origem)</label>
-                <div class="relative">
-                    <input type="text" id="inputOrigem" placeholder="Detectando localização..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition" readonly>
-                    <div class="absolute right-3 top-3 text-orange-500 animate-pulse text-xs font-bold" id="gpsStatus">GPS</div>
+    <div id="screen-auth" class="min-h-[100dvh] flex items-center justify-center bg-gray-100 hidden p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-2xl text-center relative">
+            
+            <div id="box-landing" class="fade-in">
+                <div class="bg-blue-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-700 text-5xl"><i class="fas fa-box-open"></i></div>
+                <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Drop Entregas</h1>
+                <p class="text-gray-500 text-sm mb-8">Soluções rápidas para sua logística.</p>
+                <div class="space-y-4">
+                    <button onclick="showLogin()" class="btn-primary">Entrar na Conta</button>
+                    <button onclick="showRegister()" class="btn-outline">Criar Nova Conta</button>
                 </div>
             </div>
 
-            <div class="space-y-1">
-                <label class="text-xs font-bold text-gray-500 uppercase ml-1">Entrega (Destino)</label>
-                <input type="text" id="inputDestino" placeholder="Digite o endereço de entrega" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-orange-500 transition shadow-sm">
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-                <div class="space-y-1">
-                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Nome Dest.</label>
-                    <input type="text" id="nomeDest" placeholder="Ex: João" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm">
+            <div id="box-login" class="hidden fade-in">
+                <div class="absolute top-6 left-6">
+                    <button onclick="goBack()" class="text-gray-400 hover:text-blue-600 transition p-2 bg-gray-50 rounded-full w-10 h-10 flex items-center justify-center"><i class="fas fa-arrow-left text-lg"></i></button>
                 </div>
-                <div class="space-y-1">
-                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Telefone</label>
-                    <input type="tel" id="telDest" placeholder="(84) 9..." class="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm">
-                </div>
+                <div class="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-700 text-3xl mt-4"><i class="fas fa-sign-in-alt"></i></div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Acesse sua Conta</h2>
+                <input type="email" id="log-email" class="input-std mb-3" placeholder="E-mail">
+                <input type="password" id="log-senha" class="input-std mb-6" placeholder="Senha">
+                <button onclick="fazerLogin()" id="btn-login" class="btn-primary">Entrar</button>
             </div>
+            
+            <div id="box-register" class="hidden text-left space-y-3 max-h-[85vh] overflow-y-auto pr-2 custom-scroll pt-2 fade-in">
+                <div class="flex items-center gap-4 border-b pb-4 mb-2 sticky top-0 bg-white z-10">
+                    <button onclick="goBack()" class="text-gray-400 hover:text-blue-600 transition p-1 bg-gray-50 rounded-full w-10 h-10 flex items-center justify-center"><i class="fas fa-arrow-left text-lg"></i></button>
+                    <p class="text-center font-bold text-gray-800 flex-1 pr-10 text-lg">Cadastro Completo</p>
+                </div>
+                
+                <p class="text-xs font-bold text-blue-600 uppercase mt-4">Dados da Loja</p>
+                <input type="text" id="reg-nome" class="input-std" placeholder="Nome Fantasia (Ex: Pizzaria do João)*">
+                <input type="text" id="reg-razao" class="input-std" placeholder="Razão Social (Ex: João Silva LTDA)">
+                <input type="tel" id="reg-cnpj" class="input-std" placeholder="CNPJ / CPF (Ex: 12.345.678/0001-90)">
+                <input type="tel" id="reg-zap" class="input-std" placeholder="WhatsApp Loja (Ex: (84) 99123-4567)*">
+                <input type="text" id="reg-endereco" class="input-std" placeholder="Endereço Completo (Ex: Av. Rio Branco, 100)*">
 
-            <div class="flex gap-3 pt-2">
-                <label class="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100 flex-1 justify-center cursor-pointer active:bg-orange-50 transition select-none">
-                    <input type="checkbox" id="checkRetorno" class="w-4 h-4 text-orange-600 rounded focus:ring-orange-500" onchange="calcularPrevia()">
-                    <span class="text-xs font-medium text-gray-700">Com Retorno</span>
-                </label>
-                <select id="formaPagamento" class="bg-gray-50 border border-gray-100 text-gray-700 text-sm rounded-lg block p-2 flex-1 focus:ring-orange-500 focus:border-orange-500">
-                    <option value="pix">Pix</option>
-                    <option value="dinheiro">Dinheiro</option>
-                    <option value="cartao">Cartão</option>
-                </select>
+                <p class="text-xs font-bold text-blue-600 uppercase mt-2">Responsável</p>
+                <input type="text" id="reg-nome-resp" class="input-std" placeholder="Nome do Responsável">
+                <input type="tel" id="reg-cpf-resp" class="input-std" placeholder="CPF Responsável">
+                <input type="tel" id="reg-zap-resp" class="input-std" placeholder="WhatsApp Responsável">
+
+                <p class="text-xs font-bold text-blue-600 uppercase mt-2">Dados de Acesso</p>
+                <input type="email" id="reg-email" class="input-std" placeholder="E-mail (Ex: loja@email.com)*">
+                <input type="email" id="reg-email-conf" class="input-std" placeholder="Confirmar E-mail*">
+                
+                <input type="password" id="reg-senha" class="input-std" placeholder="Senha Forte*" oninput="validarSenhaTR(this.value)">
+                <div id="pwd-checklist" class="bg-gray-50 p-3 rounded-lg border border-gray-100 mb-2">
+                    <p class="text-[10px] font-bold text-gray-500 uppercase mb-2">Sua senha deve ter:</p>
+                    <ul class="pwd-req-list space-y-1">
+                        <li id="req-len" class="invalid"><i class="fas fa-circle text-[6px]"></i> Mínimo 6 caracteres</li>
+                        <li id="req-up" class="invalid"><i class="fas fa-circle text-[6px]"></i> Letra Maiúscula (Ex: A)</li>
+                        <li id="req-low" class="invalid"><i class="fas fa-circle text-[6px]"></i> Letra Minúscula (Ex: a)</li>
+                        <li id="req-num" class="invalid"><i class="fas fa-circle text-[6px]"></i> Número (Ex: 1)</li>
+                        <li id="req-spec" class="invalid"><i class="fas fa-circle text-[6px]"></i> Caractere Especial (Ex: @ # !)</li>
+                    </ul>
+                </div>
+                <input type="password" id="reg-senha-conf" class="input-std" placeholder="Confirmar Senha*">
+
+                <button onclick="fazerCadastro()" id="btn-reg" class="btn-primary mt-6">Concluir Cadastro</button>
             </div>
         </div>
+    </div>
 
-        <div id="cardResumo" class="hidden bg-gray-900 text-white p-5 rounded-2xl shadow-lg transition-all duration-300">
-            <div class="flex justify-between items-end">
-                <div>
-                    <p class="text-gray-400 text-xs uppercase font-bold mb-1">Total Estimado</p>
-                    <div class="text-3xl font-bold tracking-tight flex items-baseline gap-1">
-                        <span class="text-lg">R$</span>
-                        <span id="valorDisplay">0,00</span>
+    <div id="menu-overlay" class="sidebar-overlay" onclick="toggleMenu()"></div>
+    <div id="sidebar" class="sidebar-menu">
+        <div class="p-6 bg-blue-700 text-white pt-10">
+            <div class="flex items-center gap-3 mb-2">
+                <img id="menu-img" src="https://via.placeholder.com/150" class="w-14 h-14 rounded-full border-2 border-white bg-gray-200 object-cover">
+                <div><p class="font-bold text-lg leading-tight truncate w-32" id="menu-nome">...</p><p class="text-xs text-blue-200">Portal Cliente</p></div>
+            </div>
+        </div>
+        <div class="flex-1 py-4">
+            <div class="menu-link active" onclick="mudarTela('home'); toggleMenu()"><i class="fas fa-plus-circle text-lg"></i> Nova Solicitação</div>
+            <div class="menu-link" onclick="mudarTela('pedidos'); toggleMenu()"><i class="fas fa-list text-lg"></i> Meus Pedidos</div>
+            <div class="menu-link" onclick="mudarTela('extrato'); toggleMenu()"><i class="fas fa-wallet text-lg"></i> Financeiro</div>
+            <div class="menu-link" onclick="mudarTela('perfil'); toggleMenu()"><i class="fas fa-user-cog text-lg"></i> Perfil e Segurança</div>
+        </div>
+        <div class="p-4 border-t">
+            <button onclick="fazerLogout()" class="w-full flex items-center justify-center gap-2 text-red-500 font-bold py-3 hover:bg-red-50 rounded-xl transition"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </div>
+
+    <div id="screen-app" class="hidden min-h-screen flex flex-col">
+        <header class="portal-header no-print">
+            <div class="flex items-center gap-4">
+                <div class="cursor-pointer hover:opacity-90 transition" onclick="toggleMenu()">
+                    <div class="bg-white/20 p-1 rounded-full border border-white/30">
+                        <div class="bg-white text-blue-800 w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm overflow-hidden" id="header-avatar">
+                            <img id="header-foto" src="" class="w-full h-full object-cover hidden">
+                            <span id="header-iniciais">LJ</span>
+                        </div>
                     </div>
-                    <p class="text-gray-500 text-xs mt-1" id="distanciaDisplay">Calculando distância...</p>
                 </div>
-                <button onclick="confirmarPedido()" id="btnConfirmar" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg active:scale-95 transition flex items-center gap-2">
-                    <span>Chamar Moto</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                </button>
+                <div class="flex flex-col">
+                    <p class="text-[10px] opacity-70 uppercase tracking-widest leading-none mb-0.5">Seu ID</p>
+                    <p class="font-extrabold text-xl leading-none tracking-wide" id="header-id">...</p>
+                </div>
             </div>
-        </div>
+            <div class="flex items-center gap-2">
+                <div class="text-right"><h1 class="font-extrabold text-lg tracking-tight">Drop Entregas</h1></div>
+                <div class="bg-white text-blue-700 w-8 h-8 rounded-lg flex items-center justify-center shadow-sm"><i class="fas fa-box-open"></i></div>
+            </div>
+        </header>
+
+        <main class="main-container flex-1 w-full p-4 md:p-8 max-w-4xl mx-auto">
+            <div id="view-home" class="fade-in">
+                <div class="bg-gradient-to-r from-blue-700 to-blue-600 rounded-2xl p-6 text-white shadow-lg mb-6 relative overflow-hidden flex justify-between items-end">
+                    <div><p class="text-xs font-bold opacity-80 uppercase tracking-widest mb-1">Saldo Disponível</p><h2 class="text-3xl font-extrabold" id="dash-saldo">R$ 0,00</h2></div>
+                    <button onclick="addSaldo()" class="bg-white/20 hover:bg-white/30 text-white font-bold py-2 px-4 rounded-lg backdrop-blur-sm transition border border-white/30 text-xs flex items-center gap-2"><i class="fas fa-plus"></i> Adicionar</button>
+                    <i class="fas fa-wallet absolute -right-6 -bottom-8 text-9xl opacity-10"></i>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2 pb-4 border-b"><i class="fas fa-paper-plane text-blue-600"></i> Nova Solicitação</h3>
+                    <div class="mb-6 relative z-30">
+                        <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">O que vamos entregar?</label>
+                        <div class="custom-select-btn" onclick="toggleDropdown('logistica')"><span id="display-logistica"><i class="fas fa-box text-blue-500 mr-2"></i> Pequenas Encomendas</span><i class="fas fa-chevron-down text-gray-400" id="arrow-logistica"></i></div>
+                        <input type="hidden" id="input-logistica" value="Pequenas Encomendas">
+                        <div id="list-logistica" class="custom-options">
+                            <div class="custom-option" onclick="selectLogistica('Pequenas Encomendas', 'fa-box')"><i class="fas fa-box text-blue-500"></i> Pequenas Encomendas</div>
+                            <div class="custom-option" onclick="selectLogistica('Alimentação', 'fa-utensils')"><i class="fas fa-utensils text-orange-500"></i> Alimentação</div>
+                            <div class="custom-option" onclick="selectLogistica('Farmácia', 'fa-capsules')"><i class="fas fa-capsules text-red-500"></i> Farmácia</div>
+                            <div class="custom-option" onclick="selectLogistica('Documentos', 'fa-file-alt')"><i class="fas fa-file-alt text-gray-500"></i> Documentos</div>
+                            <div class="custom-option" onclick="selectLogistica('Logística Reversa', 'fa-exchange-alt')"><i class="fas fa-exchange-alt text-purple-600"></i> Logística Reversa</div>
+                            <div class="custom-option" onclick="selectLogistica('Peças Automotivas', 'fa-cogs')"><i class="fas fa-cogs text-gray-700"></i> Peças Automotivas</div>
+                            <div class="custom-option" onclick="selectLogistica('Encomendas Maiores', 'fa-truck-loading')"><i class="fas fa-truck-loading text-blue-800"></i> Encomendas Maiores</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4 mb-6">
+                        <div class="relative"><i class="fas fa-store text-blue-600 absolute left-4 top-4"></i><input type="text" id="origem" class="input-std pl-10 bg-gray-50 font-bold text-gray-600 cursor-not-allowed" readonly placeholder="Retirada (Sua Loja)" oninput="buscarEndereco(this.value, 'origem')"><div id="sugestoes-lista-origem" class="autocomplete-list"></div></div>
+                        <div class="relative"><i class="fas fa-map-marker-alt text-red-500 absolute left-4 top-4"></i><input type="text" id="destino" class="input-std pl-10 font-medium border-blue-100 focus:border-blue-500" placeholder="Onde vamos entregar? (Rua, Número, Bairro)" oninput="buscarEndereco(this.value, 'destino')"><div id="sugestoes-lista-destino" class="autocomplete-list"></div></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <input type="text" id="nome_dest" class="input-std" placeholder="Nome Cliente*">
+                        <input type="tel" id="tel_dest" class="input-std" placeholder="WhatsApp*">
+                        <input type="text" id="complemento" class="input-std" placeholder="Complemento">
+                        <input type="text" id="referencia" class="input-std" placeholder="Referência*">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="relative z-20">
+                            <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pgto. Entrega</label>
+                            <div class="custom-select-btn" onclick="toggleDropdown('entrega')"><span id="display-entrega">💠 PIX</span><i class="fas fa-chevron-down text-gray-400" id="arrow-entrega"></i></div>
+                            <input type="hidden" id="pagamento_entrega" value="PIX">
+                            <div id="list-entrega" class="custom-options">
+                                <div class="custom-option" onclick="selectOption('entrega', 'PIX', '💠 PIX')"><i class="fas fa-qrcode text-blue-500"></i> PIX</div>
+                                <div class="custom-option" onclick="selectOption('entrega', 'Dinheiro', '💵 Dinheiro')"><i class="fas fa-money-bill-wave text-green-600"></i> Dinheiro</div>
+                                <div class="custom-option" onclick="selectOption('entrega', 'Carteira', '💳 Saldo App')"><i class="fas fa-wallet text-purple-600"></i> Saldo App</div>
+                            </div>
+                        </div>
+                        <div class="relative z-20">
+                            <label class="text-xs font-bold text-gray-400 uppercase mb-1 block">Pgto. Produto</label>
+                            <div class="custom-select-btn" onclick="toggleDropdown('produto')"><span id="display-produto">✅ Pago</span><i class="fas fa-chevron-down text-gray-400" id="arrow-produto"></i></div>
+                            <input type="hidden" id="pagamento_produto" value="Pago">
+                            <div id="list-produto" class="custom-options">
+                                <div class="custom-option" onclick="selectOption('produto', 'Pago', '✅ Pago')"><i class="fas fa-check-circle text-green-600"></i> Pago</div>
+                                <div class="custom-option" onclick="selectOption('produto', 'Cartão', '💳 Cartão')"><i class="fas fa-credit-card text-blue-600"></i> Cartão</div>
+                                <div class="custom-option" onclick="selectOption('produto', 'PIX', '💠 PIX')"><i class="fas fa-qrcode text-blue-500"></i> PIX</div>
+                                <div class="custom-option" onclick="selectOption('produto', 'Dinheiro', '💵 Dinheiro')"><i class="fas fa-money-bill-wave text-green-600"></i> Dinheiro</div>
+                            </div>
+                        </div>
+                    </div>
+                    <label class="switch-container mb-6">
+                        <div class="flex items-center gap-3"><div class="p-2 rounded-full bg-gray-100" id="bg-icon-retorno"><i id="icon-retorno" class="fas fa-exchange-alt text-gray-400"></i></div><p id="text-retorno" class="font-bold text-gray-500 text-sm">Sem Retorno</p></div>
+                        <div class="switch"><input type="checkbox" id="retorno" onchange="recalcularTotal()"><span class="slider"></span></div>
+                    </label>
+                    <button onclick="calcularDistancia()" id="btn-calcular" class="btn-primary mt-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1">Calcular Valor</button>
+                    <div id="box-resultado" class="hidden bg-blue-50 border border-blue-200 p-6 rounded-2xl mt-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="text-center md:text-left"><p class="text-xs text-blue-600 font-bold uppercase mb-1">Distância Estimada</p><p class="font-bold text-gray-800 text-lg"><span id="km-display">0</span> km</p></div>
+                        <div class="text-center md:text-right"><p class="text-xs text-blue-600 font-bold uppercase mb-1">Valor Total</p><p class="font-extrabold text-4xl text-blue-800">R$ <span id="valor-display">0,00</span></p></div>
+                    </div>
+                    <button onclick="iniciarPedido()" id="btn-enviar" class="hidden btn-primary bg-green-600 hover:bg-green-700 mt-4 shadow-lg">Confirmar Solicitação</button>
+                </div>
+            </div>
+
+            <div id="view-pedidos" class="hidden fade-in max-w-5xl mx-auto">
+                <div class="flex justify-between items-center mb-6"><h2 class="font-bold text-2xl text-gray-800">Histórico</h2><button onclick="atualizarPedidosManual()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-gray-50 flex items-center gap-2"><i class="fas fa-sync-alt"></i> Atualizar</button></div>
+                <div id="lista-pedidos" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+
+            <div id="view-extrato" class="hidden fade-in max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-6"><h2 class="font-bold text-2xl text-gray-800">Movimentações</h2><button onclick="atualizarExtratoManual()" class="bg-white border border-gray-200 text-gray-600 w-10 h-10 rounded-lg flex items-center justify-center hover:bg-gray-50"><i class="fas fa-sync-alt"></i></button></div>
+                <div id="lista-extrato" class="space-y-3"></div>
+            </div>
+
+            <div id="view-perfil" class="hidden fade-in max-w-3xl mx-auto">
+                <h2 class="font-bold text-2xl text-gray-800 mb-6">Meu Perfil</h2>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-6">
+                    <div class="flex items-center gap-6 pb-6 border-b border-gray-100">
+                        <div class="relative group">
+                            <img id="edit-img-perfil" src="https://via.placeholder.com/150" class="w-24 h-24 rounded-full object-cover border-4 border-gray-100 group-hover:border-blue-100 transition">
+                            <button onclick="document.getElementById('input-foto').click()" class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition transform hover:scale-110"><i class="fas fa-camera"></i></button>
+                            <input type="file" id="input-foto" class="hidden" accept="image/*" onchange="uploadFoto()">
+                        </div>
+                        <div><h3 id="edit-display-nome" class="font-bold text-xl text-gray-800">Minha Loja</h3><p class="text-gray-500 text-sm">Gerencie seus dados e segurança</p></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2 border-b pb-2 mb-2"><span class="text-blue-600 font-bold uppercase text-xs">Dados da Empresa</span></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">Nome Fantasia</label><input type="text" id="edit-nome-loja" class="input-std mt-1" placeholder="Ex: Pizzaria do João"></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">Razão Social</label><input type="text" id="edit-razao" class="input-std mt-1" placeholder="Ex: João Silva LTDA"></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">CNPJ/CPF</label><input type="tel" id="edit-cnpj" class="input-std mt-1" placeholder="Ex: 12.345.678/0001-90"></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">WhatsApp Loja</label><input type="tel" id="edit-zap-loja" class="input-std mt-1" placeholder="Ex: (84) 99123-4567"></div>
+                        <div class="md:col-span-2"><label class="text-xs font-bold text-gray-400 uppercase">Endereço Completo</label><input type="text" id="edit-endereco" class="input-std mt-1" placeholder="Ex: Av. Rio Branco, 100, Centro"></div>
+
+                        <div class="md:col-span-2 border-b pb-2 mb-2 mt-4"><span class="text-blue-600 font-bold uppercase text-xs">Responsável</span></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">Nome Responsável</label><input type="text" id="edit-resp-nome" class="input-std mt-1" placeholder="Ex: João da Silva"></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">CPF Responsável</label><input type="tel" id="edit-cpf-resp" class="input-std mt-1" placeholder="Ex: 123.456.789-00"></div>
+                        <div><label class="text-xs font-bold text-gray-400 uppercase">WhatsApp Responsável</label><input type="tel" id="edit-resp-zap" class="input-std mt-1" placeholder="Ex: (84) 99988-7766"></div>
+                    </div>
+                    <div class="flex gap-4 mb-8 mt-6">
+                        <button onclick="$('#modal-pin').addClass('modal-ativo')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar PIN</button>
+                        <button onclick="$('#modal-senha').addClass('modal-ativo')" class="flex-1 bg-gray-50 border border-gray-200 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-100 transition">Alterar Senha</button>
+                    </div>
+                    <button onclick="salvarPerfil()" class="btn-primary mb-4">Salvar Alterações</button>
+                    <button onclick="fazerLogout()" class="w-full text-red-500 font-bold hover:bg-red-50 py-4 rounded-xl transition">Sair da Conta</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-detalhes" class="modal-overlay"><div class="modal-content max-w-lg"><div class="bg-blue-600 p-6 text-white flex justify-between items-center"><div><h3 class="font-bold text-xl">Detalhes</h3><p id="det-status" class="text-sm opacity-80 font-bold uppercase mt-1">...</p></div><button onclick="$('#modal-detalhes').removeClass('modal-ativo')" class="text-2xl hover:text-gray-200">&times;</button></div><div class="p-6 space-y-6"><div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl border border-gray-100"><div><p class="text-xs text-gray-400 font-bold uppercase">Valor Total</p><p id="det-valor" class="text-3xl font-extrabold text-green-600">R$ 0,00</p></div><div class="text-right"><p class="text-xs text-gray-400 font-bold uppercase">PIN Entrega</p><p id="det-pin" class="text-2xl font-mono font-bold text-blue-700">----</p></div></div><div class="space-y-4"><div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Retirada</p><p id="det-origem" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div><div><p class="text-xs font-bold text-gray-400 uppercase mb-1">Entrega</p><p id="det-destino" class="font-medium text-gray-800 bg-gray-50 p-3 rounded-xl border border-gray-100">...</p></div></div><div id="box-motoboy" class="hidden bg-blue-50 p-4 rounded-xl flex items-center justify-between border border-blue-100"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 text-xl shadow-sm"><i class="fas fa-motorcycle"></i></div><div><p id="det-moto-nome" class="font-bold text-gray-800">Nome Motoboy</p><p id="det-moto-placa" class="text-xs font-mono bg-white px-2 py-1 rounded border border-gray-200 text-gray-500">PLACA</p></div></div><button id="btn-zap-moto" class="bg-green-500 hover:bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition"><i class="fab fa-whatsapp text-xl"></i></button></div><div id="box-cancelar" class="hidden"><button onclick="cancelarPedido()" class="w-full border-2 border-red-100 text-red-500 font-bold py-3 rounded-xl hover:bg-red-50 transition">Cancelar Pedido</button></div></div></div></div>
+    <div id="modal-comprovante" class="modal-overlay"><div class="modal-content text-center p-0"><div class="bg-gray-100 p-6 border-b border-gray-200 flex justify-between items-center no-print"><h3 class="font-bold text-gray-700">Comprovante</h3><button onclick="$('#modal-comprovante').removeClass('modal-ativo')" class="text-gray-500 hover:text-gray-800 text-xl">&times;</button></div><div class="p-8"><div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 text-2xl"><i class="fas fa-check"></i></div><h2 class="text-2xl font-bold text-gray-800 mb-1">Transação Concluída</h2><p class="text-sm text-gray-500 mb-6" id="comp-data-hora">--/--/-- às --:--</p><div class="text-left space-y-3 bg-gray-50 p-5 rounded-xl border border-gray-200 mb-6"><div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Loja</span><span id="comp-loja" class="font-bold text-gray-800 text-sm text-right truncate w-32">...</span></div><div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Tipo</span><span id="comp-tipo" class="font-bold text-blue-600 text-sm">...</span></div><div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">ID</span><span id="comp-id" class="font-mono text-xs text-gray-500">...</span></div><div class="flex justify-between"><span class="text-xs font-bold text-gray-400 uppercase">Pagamento</span><span id="comp-pgto" class="font-bold text-gray-800 text-sm">...</span></div><div class="border-t border-dashed border-gray-300 my-2"></div><div class="flex justify-between items-center"><span class="text-xs font-bold text-gray-400 uppercase">Valor Total</span><span id="comp-valor" class="font-extrabold text-2xl text-gray-900">R$ 0,00</span></div></div><div class="text-left mb-6"><p class="text-xs font-bold text-gray-400 uppercase mb-1">Descrição</p><p id="comp-desc" class="text-sm text-gray-600 leading-snug">...</p></div><button onclick="window.print()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 no-print transition"><i class="fas fa-print"></i> Imprimir / Salvar PDF</button></div></div></div>
+    <div id="modal-pin" class="modal-overlay"><div class="modal-content p-8 text-center"><h3 class="font-bold text-xl mb-2">Novo PIN</h3><input type="tel" id="novo-pin" maxlength="4" class="input-std text-center text-3xl font-bold tracking-[0.5em] mb-6" placeholder="0000"><div class="flex gap-4"><button onclick="$('#modal-pin').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button><button onclick="salvarNovoPin()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button></div></div></div>
+    <div id="modal-senha" class="modal-overlay"><div class="modal-content p-8 text-center"><h3 class="font-bold text-xl mb-6">Nova Senha</h3><input type="password" id="nova-senha" class="input-std mb-6" placeholder="Mínimo 6 caracteres"><div class="flex gap-4"><button onclick="$('#modal-senha').removeClass('modal-ativo')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm">Cancelar</button><button onclick="salvarNovaSenha()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-sm">Salvar</button></div></div></div>
+
+<script>
+    // --- CONFIGURAÇÃO ---
+    const SUPABASE_URL = 'https://ofpnnijkhgsjarixoyhg.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9mcG5uaWpraGdzamFyaXhveWhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNjUyNzYsImV4cCI6MjA4MDY0MTI3Nn0.dNOIIETmTz3l1HvhuT-ihAiymJqiaYZnklzzBzDGCFU';
+    const ADMIN_ZAP = "5584982005039";
+    const CITY_FIX = "Mossoró, RN";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    let user = null;
+    let profile = null;
+    let config = { taxa: 5.0, km: 1.0, retorno: 20 };
+    let tempDist = 0;
+    let debounceTimer;
+    let activePedidoId = null;
+    let pedidosCache = [];
+    let currentFilter = 'todos';
+    let isPasswordValid = false;
+
+    $(document).ready(function(){
+        $('#reg-zap, #edit-zap-loja, #reg-zap-resp, #edit-resp-zap, #tel_dest').mask('(00) 00000-0000');
+        $('#edit-cnpj, #reg-cnpj').mask('00.000.000/0000-00');
+        $('#reg-cpf-resp, #edit-cpf-resp').mask('000.000.000-00');
+        setTimeout(() => { if($('#global-loading').is(':visible') && !user) { $('#global-loading').addClass('hidden'); $('#screen-auth').removeClass('hidden'); } }, 5000);
+        initSession();
+        $(document).click(function(e) {
+            if (!$(e.target).closest('.custom-select-btn').length && !$(e.target).closest('.custom-options').length) { $('.custom-options').slideUp(100); $('.fa-chevron-down').removeClass('rotate-180'); }
+            if (!$(e.target).closest('.relative').length) { $('.autocomplete-list').hide(); }
+        });
+    });
+
+    async function initSession() {
+        const { data: { session } } = await sb.auth.getSession();
+        if(session) {
+            user = session.user;
+            if(user.id.length < 20) { fazerLogout(); return; }
+            await loadData();
+            $('#global-loading').addClass('hidden');
+            $('#screen-auth').addClass('hidden');
+            $('#screen-app').removeClass('hidden');
+            const saved = localStorage.getItem('app_screen') || 'home';
+            mudarTela(saved);
+        } else {
+            $('#global-loading').addClass('hidden');
+            $('#screen-auth').removeClass('hidden');
+        }
+    }
+
+    async function loadData() {
+        const { data: cfg } = await sb.from('app_config').select('*').single();
+        if(cfg) config = { taxa: cfg.taxa_base, km: cfg.preco_km, retorno: cfg.taxa_retorno_valor };
+
+        const { data: prof } = await sb.from('profiles').select('*').eq('id', user.id).single();
+        if(prof) {
+            profile = prof;
+            $('#header-saldo, #dash-saldo').text(`R$ ${parseFloat(prof.saldo || 0).toFixed(2)}`);
+            $('#origem').val(prof.endereco || prof.nome_loja);
+            const visualId = prof.codigo_visual || '---';
+            $('#header-id').text(visualId);
+            
+            $('#menu-nome').text(prof.nome_loja);
+            if(prof.foto_perfil) { $('#header-foto, #edit-img-perfil, #menu-img').attr('src', prof.foto_perfil); $('#header-iniciais').addClass('hidden'); $('#header-foto').removeClass('hidden'); }
+            else { $('#header-iniciais').text(prof.nome_loja.substring(0,2).toUpperCase()).removeClass('hidden'); $('#header-foto').addClass('hidden'); }
+            
+            $('#edit-nome-loja').val(prof.nome_loja);
+            $('#edit-razao').val(prof.razao_social);
+            $('#edit-cnpj').val(prof.cnpj);
+            $('#edit-zap-loja').val(prof.whatsapp_loja);
+            $('#edit-endereco').val(prof.endereco);
+            $('#edit-resp-nome').val(prof.responsavel);
+            $('#edit-cpf-resp').val(prof.cpf_responsavel);
+            $('#edit-resp-zap').val(prof.whatsapp_responsavel);
+        }
+    }
+
+    // --- NAVEGAÇÃO AUTH ---
+    window.showLogin = function() { $('#box-landing').addClass('hidden'); $('#box-login').removeClass('hidden'); }
+    window.showRegister = function() { $('#box-landing').addClass('hidden'); $('#box-register').removeClass('hidden'); }
+    window.goBack = function() { $('#box-login, #box-register').addClass('hidden'); $('#box-landing').removeClass('hidden'); }
+    window.toggleAuth = function() { }; 
+
+    // --- VALIDAÇÃO DE SENHA ---
+    window.validarSenhaTR = function(pwd) {
+        const reqs = {
+            len: pwd.length >= 6,
+            up: /[A-Z]/.test(pwd),
+            low: /[a-z]/.test(pwd),
+            num: /[0-9]/.test(pwd),
+            spec: /[!@#$%^&*(),.?":{}|<>]/.test(pwd)
+        };
+        updateReqUI('req-len', reqs.len);
+        updateReqUI('req-up', reqs.up);
+        updateReqUI('req-low', reqs.low);
+        updateReqUI('req-num', reqs.num);
+        updateReqUI('req-spec', reqs.spec);
+        isPasswordValid = Object.values(reqs).every(Boolean);
+    }
+
+    function updateReqUI(id, isValid) {
+        const el = document.getElementById(id);
+        if(isValid) {
+            el.classList.remove('invalid', 'error'); el.classList.add('valid');
+            el.innerHTML = '<i class="fas fa-check-circle text-[10px]"></i> ' + el.innerText.replace('●','').trim();
+        } else {
+            el.classList.remove('valid', 'error'); el.classList.add('invalid');
+            el.innerHTML = '<i class="fas fa-circle text-[6px]"></i> ' + el.innerText.replace('●','').trim();
+        }
+    }
+
+    // --- UI E MAPAS ---
+    window.toggleMenu = function() { $('#sidebar').toggleClass('open'); $('#menu-overlay').toggleClass('modal-ativo'); }
+    window.mudarTela = function(screen) {
+        localStorage.setItem('app_screen', screen);
+        $('.menu-link').removeClass('active'); $(`.menu-link[onclick*="${screen}"]`).addClass('active');
+        $('#view-home, #view-pedidos, #view-extrato, #view-perfil').addClass('hidden');
+        $(`#view-${screen}`).removeClass('hidden').addClass('fade-in');
+        window.scrollTo(0,0);
+        if(screen === 'pedidos') carregarHistoricoPedidos();
+        if(screen === 'extrato') carregarExtrato();
+    }
+    window.toggleDropdown = function(id) { $('.custom-options').not(`#list-${id}`).slideUp(100); $(`#list-${id}`).slideToggle(150); }
+    window.selectOption = function(type, val, text) { $(`#pagamento_${type}`).val(val); $(`#display-${type}`).text(text); $(`#list-${type}`).slideUp(100); }
+    
+    // --- LÓGICA DE PEDIDOS E CÁLCULO ---
+    window.selectLogistica = function(val, iconClass) {
+        $('#input-logistica').val(val); $('#display-logistica').html(`<i class="fas ${iconClass} text-blue-500 mr-2"></i> ${val}`); $('#list-logistica').slideUp(100);
+        if(val === 'Logística Reversa') { $('#origem').prop('readonly', false).val('').removeClass('cursor-not-allowed bg-gray-50'); $('#destino').prop('readonly', true).val(profile.endereco).addClass('cursor-not-allowed bg-gray-50'); }
+        else { $('#origem').prop('readonly', true).val(profile.endereco).addClass('cursor-not-allowed bg-gray-50'); $('#destino').prop('readonly', false).val('').removeClass('cursor-not-allowed bg-gray-50'); }
+        $('#box-resultado, #btn-enviar').addClass('hidden'); $('#btn-calcular').show();
+    }
+
+    window.buscarEndereco = function(query, fieldId) {
+        if(query.length < 4) { $(`#sugestoes-lista-${fieldId}`).hide(); return; }
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(async () => {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', ' + CITY_FIX)}&limit=3`);
+            const data = await res.json();
+            let html = `<div class="autocomplete-header" onclick="$('.autocomplete-list').hide()">Fechar</div>`;
+            data.forEach(item => { html += `<div class="autocomplete-item" onclick="selectEnd('${item.display_name}', '${fieldId}')">${item.display_name}</div>`; });
+            $(`#sugestoes-lista-${fieldId}`).html(html).show();
+        }, 500);
+    }
+    window.selectEnd = function(address, fieldId) { $(`#${fieldId}`).val(address); $('.autocomplete-list').hide(); }
+
+    window.calcularDistancia = async function() {
+        const o = $('#origem').val(), d = $('#destino').val();
+        if(!o || !d) return showToast("Preencha endereços", "error");
+        $('#btn-calcular').text("Calculando...").prop('disabled', true);
+        try {
+            const [resO, resD] = await Promise.all([fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(o)}&limit=1`), fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(d)}&limit=1`)]);
+            const [dataO, dataD] = await Promise.all([resO.json(), resD.json()]);
+            if(!dataO[0] || !dataD[0]) throw new Error("Endereço não achado");
+            const lat1 = dataO[0].lat, lon1 = dataO[0].lon, lat2 = dataD[0].lat, lon2 = dataD[0].lon;
+            const R = 6371; 
+            const dLat = (lat2-lat1) * Math.PI/180, dLon = (lon2-lon1) * Math.PI/180; 
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+            tempDist = (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.3).toFixed(1);
+            if(tempDist < 1) tempDist = 1;
+            recalcularTotal();
+            $('#btn-calcular').hide(); $('#box-resultado, #btn-enviar').removeClass('hidden');
+        } catch(e) { showToast("Endereço não encontrado", "error"); } finally { $('#btn-calcular').text("Calcular").prop('disabled', false); }
+    }
+
+    // --- CORREÇÃO DO BOTÃO RETORNO ---
+    window.recalcularTotal = function() {
+        let total = config.taxa + (tempDist * config.km);
+        const isRetorno = $('#retorno').is(':checked');
         
-        <div id="statusMsg" class="hidden p-4 rounded-xl text-center text-sm font-medium"></div>
-
-    </main>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        // CONFIGURAÇÃO DO SUPABASE (Sua Chave Pública)
-        const SUPABASE_URL = 'https://tvhbumscbgvjrrpqgmwc.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2aGJ1bXNjYmd2anJycHFZ213YyIsInJvbGUiOiJhbW9uIiwiaWF0IjoxNzM1NzY3OTg5LCJleHAiOjIwNTEzNDM5ODl9.4C_L_7F_t_6F_t_6F_t_6F_t_6F_t_6F_t_6F_t_6F_t_6'; // Coloque sua chave ANON KEY aqui se for diferente
+        if(isRetorno) {
+            $('#text-retorno').text("Com Retorno").removeClass('text-gray-500').addClass('text-blue-600');
+            $('#icon-retorno').attr('class', 'fas fa-exchange-alt text-blue-600');
+            $('#bg-icon-retorno').removeClass('bg-gray-100').addClass('bg-blue-100');
+            total += (total * (config.retorno / 100));
+        } else {
+            $('#text-retorno').text("Sem Retorno").removeClass('text-blue-600').addClass('text-gray-500');
+            $('#icon-retorno').attr('class', 'fas fa-arrow-right text-gray-400');
+            $('#bg-icon-retorno').removeClass('bg-blue-100').addClass('bg-gray-100');
+        }
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        $('#valor-display').text(total.toFixed(2).replace('.',',')); 
+        $('#km-display').text(tempDist);
+    }
 
-        // VARIÁVEIS GLOBAIS
-        let map, userMarker, routeLayer;
-        let userLocation = null;
-        let distKm = 0;
+    window.iniciarPedido = async function() {
+        if(!user || !user.id || user.id.length < 20) { showToast("Sessão inválida. Logue novamente.", "error"); setTimeout(fazerLogout, 2000); return; }
+        $('#btn-enviar').text('Enviando...').prop('disabled', true);
+        const { error } = await sb.rpc('criar_pedido_seguro', {
+            p_user_id: user.id, p_origem: $('#origem').val(), p_destino: $('#destino').val(),
+            p_distancia_km: parseFloat(tempDist), p_forma_pagamento: $('#pagamento_entrega').val(),
+            p_nome_dest: $('#nome_dest').val(), p_tel_dest: $('#tel_dest').val(),
+            p_tipo_logistica: $('#input-logistica').val(), p_com_retorno: $('#retorno').is(':checked')
+        });
+        if(error) { showToast("Erro: " + error.message, "error"); $('#btn-enviar').text('Confirmar').prop('disabled', false); }
+        else { showToast("Pedido Criado!", "success"); loadData(); mudarTela('pedidos'); }
+    }
 
-        // INICIALIZAÇÃO
-        window.onload = async () => {
-            initMap();
-            checkUser();
-            watchLocation();
+    // --- AUTH ---
+    window.fazerLogin = async function() {
+        const { error } = await sb.auth.signInWithPassword({ email: $('#log-email').val(), password: $('#log-senha').val() });
+        if(error) showToast("Erro: " + error.message, "error"); else location.reload();
+    }
+
+    window.fazerCadastro = async function() {
+        if(!isPasswordValid) {
+            showToast("A senha não atende aos requisitos!", "error");
+            document.querySelectorAll('.pwd-req-list li.invalid').forEach(el => el.classList.add('error'));
+            return;
+        }
+        if($('#reg-email').val() !== $('#reg-email-conf').val()) return showToast("Os e-mails não coincidem!", "error");
+        if($('#reg-senha').val() !== $('#reg-senha-conf').val()) return showToast("As senhas não coincidem!", "error");
+
+        const d = { 
+            nome: $('#reg-nome').val(), razao: $('#reg-razao').val(), cnpj: $('#reg-cnpj').val(), 
+            zap: $('#reg-zap').val(), end: $('#reg-endereco').val(), 
+            resp: $('#reg-nome-resp').val(), cpf_resp: $('#reg-cpf-resp').val(), zap_resp: $('#reg-zap-resp').val(),
+            email: $('#reg-email').val(), pass: $('#reg-senha').val() 
         };
 
-        // --- MAPA E GPS ---
-        function initMap() {
-            map = L.map('map').setView([-5.188, -37.344], 13); // Mossoró
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap',
-                maxZoom: 19
-            }).addTo(map);
+        if(!d.nome || !d.zap || !d.email || !d.pass || !d.end) return showToast("Preencha campos obrigatórios (*)", "error");
+        
+        $('#btn-reg').text('Criando...').prop('disabled', true);
+        const { data, error } = await sb.auth.signUp({ email: d.email, password: d.pass });
+        if(error) { showToast(error.message, "error"); $('#btn-reg').text('Cadastrar').prop('disabled', false); }
+        else if(data.user) {
+            // GERA ID 6 DIGITOS (TEXTO) - COMPATÍVEL COM A CORREÇÃO DE DB
+            const novoId = Math.floor(Math.random() * 900000 + 100000).toString();
+            await sb.from('profiles').insert([{ 
+                id: data.user.id, 
+                nome_loja: d.nome, razao_social: d.razao, cnpj: d.cnpj, whatsapp_loja: d.zap, endereco: d.end, 
+                responsavel: d.resp, cpf_responsavel: d.cpf_resp, whatsapp_responsavel: d.zap_resp,
+                email: d.email, codigo_visual: novoId 
+            }]);
+            showToast("Conta criada! Faça login.", "success");
+            setTimeout(showLogin, 2000);
         }
+    }
 
-        function watchLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.watchPosition((pos) => {
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-                    userLocation = { lat, lng };
+    window.fazerLogout = async function() { await sb.auth.signOut(); localStorage.clear(); location.reload(); }
 
-                    if (!userMarker) {
-                        userMarker = L.marker([lat, lng], {
-                            icon: L.divIcon({
-                                className: 'bg-blue-500 w-4 h-4 rounded-full border-2 border-white shadow-lg',
-                                iconSize: [16, 16]
-                            })
-                        }).addTo(map);
-                        map.setView([lat, lng], 15);
-                        document.getElementById('inputOrigem').value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-                        // Busca endereço reverso
-                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
-                            .then(r => r.json())
-                            .then(d => {
-                                if(d.address) document.getElementById('inputOrigem').value = `${d.address.road || ''}, ${d.address.suburb || ''}`;
-                            });
-                    } else {
-                        userMarker.setLatLng([lat, lng]);
-                    }
-                }, (err) => console.error("Erro GPS", err), { enableHighAccuracy: true });
-            }
-        }
+    // --- FILTROS, TOAST & HELPERS ---
+    window.filtrarStatus = function(s) { currentFilter = s; renderizarPedidos(); }
+    window.atualizarPedidosManual = function() { carregarHistoricoPedidos(); }
+    
+    window.carregarHistoricoPedidos = async function() {
+        $('#lista-pedidos').html('<div class="loader"></div>');
+        const { data } = await sb.from('pedidos').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(100);
+        pedidosCache = data || []; renderizarPedidos();
+    }
 
-        function centralizarMapa() {
-            if(userLocation) map.setView([userLocation.lat, userLocation.lng], 16);
-        }
-        // --- CÁLCULO DE ROTA SIMPLES ---
-        document.getElementById('inputDestino').addEventListener('blur', async function() {
-            const destino = this.value;
-            if (destino.length > 5 && userLocation) {
-                // Simulação de busca de coordenadas do destino (Nominatim)
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destino + ', Mossoró')}`);
-                const data = await res.json();
-                
-                if (data && data.length > 0) {
-                    const destLat = parseFloat(data[0].lat);
-                    const destLon = parseFloat(data[0].lon);
-                    
-                    // Desenha linha reta simples para estimativa
-                    if(routeLayer) map.removeLayer(routeLayer);
-                    routeLayer = L.polyline([[userLocation.lat, userLocation.lng], [destLat, destLon]], {color: '#ff6b00', weight: 4}).addTo(map);
-                    map.fitBounds(routeLayer.getBounds(), {padding: [50,50]});
-
-                    // Calcula Distância (Haversine simples)
-                    const R = 6371; 
-                    const dLat = (destLat - userLocation.lat) * Math.PI / 180;
-                    const dLon = (destLon - userLocation.lng) * Math.PI / 180;
-                    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                              Math.cos(userLocation.lat * Math.PI / 180) * Math.cos(destLat * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                    distKm = R * c;
-
-                    calcularPrevia();
-                    document.getElementById('cardResumo').classList.remove('hidden');
-                }
-            }
+    function renderizarPedidos() {
+        const lista = $('#lista-pedidos').empty();
+        pedidosCache.filter(p => currentFilter === 'todos' || p.status === currentFilter).forEach(p => {
+            lista.append(`<div class="bg-white p-4 rounded-xl border mb-2 shadow-sm" onclick="verDetalhePedido('${p.id}')">
+                <div class="flex justify-between"><span class="font-bold text-gray-800">${p.nome_destinatario}</span><span class="text-blue-600 font-bold">R$ ${p.valor_frete}</span></div>
+                <div class="text-xs text-gray-500 mt-1">${p.status.toUpperCase()}</div>
+            </div>`);
         });
+    }
 
-        function calcularPrevia() {
-            // Lógica simples de preço: R$5 fixo + R$1.50 por Km
-            let total = 5.0 + (distKm * 1.50);
-            if (document.getElementById('checkRetorno').checked) total *= 1.2; // +20% se tiver retorno
-            
-            document.getElementById('valorDisplay').innerText = total.toFixed(2).replace('.', ',');
-            document.getElementById('distanciaDisplay').innerText = `Distância aprox: ${distKm.toFixed(1)} km`;
-        }
+    window.verDetalhePedido = async function(id) {
+        const p = pedidosCache.find(x => x.id == id);
+        if(!p) return;
+        $('#det-valor').text(`R$ ${parseFloat(p.valor_frete).toFixed(2)}`);
+        $('#det-pin').text(p.pin_entrega);
+        $('#det-origem').text(p.origem);
+        $('#det-destino').text(p.destino);
+        $('#det-status').text(p.status.toUpperCase());
+        $('#modal-detalhes').addClass('modal-ativo');
+    }
 
-        // --- SISTEMA DE LOGIN ---
-        async function checkUser() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                document.getElementById('btnLogin').classList.add('hidden');
-                document.getElementById('userInfo').classList.remove('hidden');
-                document.getElementById('userEmail').innerText = user.email.split('@')[0];
-            } else {
-                document.getElementById('btnLogin').classList.remove('hidden');
-                document.getElementById('userInfo').classList.add('hidden');
+    window.carregarExtrato = async function() {
+        $('#lista-extrato').html('<div class="loader"></div>');
+        const { data } = await sb.from('transacoes').select('*').eq('user_id', user.id).order('created_at', {ascending: false}).limit(50);
+        let html = '';
+        if(data) data.forEach(t => {
+            html += `<div class="bg-white p-4 rounded-xl border mb-2 flex justify-between" onclick="verComprovante('${t.id}','${t.descricao}','${t.valor}','${t.created_at}','${t.tipo}')">
+                <div><p class="font-bold text-gray-800">${t.descricao}</p><p class="text-xs text-gray-400">${new Date(t.created_at).toLocaleDateString()}</p></div>
+                <p class="font-bold ${t.tipo==='credito'?'text-green-600':'text-red-600'}">${t.tipo==='credito'?'+':'-'} R$ ${parseFloat(t.valor).toFixed(2)}</p>
+            </div>`;
+        });
+        $('#lista-extrato').html(html);
+    }
+
+    window.verComprovante = async function(id, desc, val, date, tipo) {
+        $('#comp-data-hora').text(new Date(date).toLocaleString());
+        $('#comp-loja').text(profile.nome_loja);
+        $('#comp-tipo').text(tipo.toUpperCase());
+        $('#comp-id').text(id.substring(0,8));
+        $('#comp-valor').text(`R$ ${parseFloat(val).toFixed(2)}`);
+        $('#comp-desc').text(desc);
+        
+        let pgto = "Saldo em Conta";
+        if(tipo === 'credito') pgto = "PIX";
+        else if(desc.includes('Pedido')) {
+            const match = desc.match(/#(\d+)/);
+            if(match) {
+                const p = pedidosCache.find(x => x.codigo_visual == match[1]);
+                if(p) pgto = p.forma_pagamento;
             }
         }
+        $('#comp-pgto').text(pgto);
+        $('#modal-comprovante').addClass('modal-ativo');
+    }
 
-        async function fazerLogin() {
-            const email = prompt("Digite seu email:");
-            if (!email) return;
-            const senha = prompt("Digite sua senha:");
-            
-            const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
-            if (error) alert("Erro: " + error.message);
-            else {
-                alert("Login realizado!");
-                location.reload();
-            }
-        }
-
-        async function fazerLogout() {
-            await supabase.auth.signOut();
-            location.reload();
-        }
-
-        // --- ENVIAR PEDIDO (A CORREÇÃO DEFINITIVA) ---
-        async function confirmarPedido() {
-            const btn = document.getElementById('btnConfirmar');
-            const msg = document.getElementById('statusMsg');
-            
-            // 1. Validações visuais
-            btn.disabled = true;
-            btn.innerHTML = '<div class="loader"></div> Processando...';
-            msg.classList.add('hidden');
-
-            try {
-                // 2. FORÇAR OBTENÇÃO DO USUÁRIO ATUAL (CORREÇÃO DO ERRO 79)
-                // Não usamos variável cacheada. Pegamos na hora.
-                const { data: { user } } = await supabase.auth.getUser();
-                
-                // Se não tiver user logado, passamos NULL (o banco já sabe lidar com isso agora)
-                const userIdSeguro = user ? user.id : null; 
-
-                console.log("Enviando ID Seguro:", userIdSeguro); // Para debug
-
-                // 3. Montar o objeto para enviar
-                const payload = {
-                    p_user_id: userIdSeguro, // AQUI ESTAVA O PROBLEMA, AGORA ESTÁ BLINDADO
-                    p_origem: document.getElementById('inputOrigem').value,
-                    p_destino: document.getElementById('inputDestino').value,
-                    p_distancia_km: distKm,
-                    p_forma_pagamento: document.getElementById('formaPagamento').value,
-                    p_nome_dest: document.getElementById('nomeDest').value,
-                    p_tel_dest: document.getElementById('telDest').value,
-                    p_tipo_logistica: 'moto',
-                    p_com_retorno: document.getElementById('checkRetorno').checked
-                };
-
-                // 4. Chamar a função SQL (RPC)
-                const { data, error } = await supabase.rpc('criar_pedido_seguro', payload);
-
-                if (error) throw error;
-
-                // Sucesso!
-                msg.className = "p-4 rounded-xl text-center text-sm font-medium bg-green-100 text-green-700 block";
-                msg.innerHTML = `✅ Pedido Enviado!<br>Código: <b>#${data.msg || 'Novo'}</b>`;
-                
-                // Limpar mapa e form
-                if(routeLayer) map.removeLayer(routeLayer);
-                document.getElementById('cardResumo').classList.add('hidden');
-                document.getElementById('inputDestino').value = '';
-
-            } catch (err) {
-                console.error(err);
-                msg.className = "p-4 rounded-xl text-center text-sm font-medium bg-red-100 text-red-700 block";
-                msg.innerText = "Erro ao pedir: " + (err.message || err.error_description || "Tente novamente.");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<span>Chamar Moto</span><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>';
-            }
-        }
-    </script>
+    window.addSaldo = function() { window.open(`https://wa.me/${ADMIN_ZAP}?text=Olá, quero adicionar saldo. ID: ${profile.codigo_visual}`, '_blank'); }
+    
+    function showToast(msg, type = "default") { 
+        const t = $('#native-toast'); const icon = $('#toast-icon');
+        t.removeClass('error success show').addClass('show');
+        if(type === 'error') { t.addClass('error'); icon.html('<i class="fas fa-exclamation-circle text-red-500"></i>'); }
+        else if(type === 'success') { t.addClass('success'); icon.html('<i class="fas fa-check-circle text-green-500"></i>'); }
+        else { icon.html('<i class="fas fa-info-circle text-blue-500"></i>'); }
+        $('#toast-msg').text(msg); setTimeout(() => t.removeClass('show'), 3500); 
+    }
+    
+    window.salvarPerfil = async function() {
+        const u = { 
+            nome_loja: $('#edit-nome-loja').val(), razao_social: $('#edit-razao').val(), cnpj: $('#edit-cnpj').val(), 
+            whatsapp_loja: $('#edit-zap-loja').val(), endereco: $('#edit-endereco').val(), 
+            responsavel: $('#edit-resp-nome').val(), cpf_responsavel: $('#edit-cpf-resp').val(), whatsapp_responsavel: $('#edit-resp-zap').val() 
+        };
+        await sb.from('profiles').update(u).eq('id', user.id);
+        showToast("Perfil Salvo!", "success"); loadData();
+    }
+</script>
 </body>
 </html>
